@@ -1,0 +1,40 @@
+<div id="editor" layout="column" class="hundred-hg" ng-controller="EditorCtrl as ctrl">
+    <section layout="row" flex>
+        <md-content flex>
+            <topbar></topbar>
+            <div layout="row" flex>
+                <md-list flex="25" style="border-right-style: solid; border-color: #d3d3d3; border-width: 1px;">
+                    <md-subheader>Scripts</md-subheader>
+                    <md-list-item id="script-list"  ng-class="{'nav-active': ctrl.currentScript.name == script.name}" ng-mouseenter="show=true" ng-mouseleave="show=false" ng-click="ctrl.select(script)" ng-repeat="script in ctrl.app.scripts">
+                        <div class="md-list-item-text" id="app-name">
+                            <md-icon md-font-library="material-icons" class="md-18">insert_drive_file</md-icon>
+                            {{script.name}}
+                        </div>
+                        <span flex></span>
+                        <md-icon ng-click="ctrl.renameScript($event, script)" ng-show="show && script.name != 'main.js'" md-font-library="material-icons" class="md-18">edit</md-icon>
+                        <md-icon ng-click="ctrl.removeScript($index)" ng-show="show && script.name != 'main.js'" md-font-library="material-icons" class="md-18">delete</md-icon>
+                    </md-list-item>
+                    <md-list-item id="add-script" ng-click="ctrl.add($event)">
+                        <div class="md-list-item-text">
+                            <md-icon md-font-library="material-icons" class="md-18">add_circle_outline</md-icon>
+                            <md-tooltip md-direction="right">
+                                Add Script
+                            </md-tooltip>
+                        </div>
+                    </md-list-item>
+                </md-list>
+
+                <div id="code-area" ng-mouseleave="ctrl.save()" ng-show="ctrl.currentScript.name == script.name" ng-repeat="script in ctrl.app.scripts" class="hg-hundred" flex>
+                    <md-progress-circular md-theme="alt" class="md-hue-3 loading" ng-hide="!ctrl.loading" md-mode="indeterminate"></md-progress-circular>
+                    <md-button ng-click="ctrl.call($event)" ng-show="!ctrl.loading" md-theme="alt" class="md-fab md-mini md-primary test-button" aria-label="Fullscreen">
+                        <md-icon id="call-button" md-font-library="material-icons" class="md-primary md-24">call</md-icon>
+                        <md-tooltip md-direction="down">
+                            Test call
+                        </md-tooltip>
+                    </md-button>
+                    <textarea ng-show="false" id="{{script.name}}" name="{{script.name}}"></textarea>
+                </div>
+            </div>
+        </md-content>
+    </section>
+</div>

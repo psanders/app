@@ -1,0 +1,134 @@
+<md-toolbar class="md-menu-toolbar md-whiteframe-z1">
+    <div layout="row">
+        <md-toolbar-filler layout layout-align="center">
+            <md-icon md-font-library="material-icons" class="md-24" style="color: rgba(0,0,0,.54);">subject</md-icon>
+        </md-toolbar-filler>
+        <div>
+            <h2 class="md-toolbar-tools">
+                <span id="app-name">{{ctrl.app.name}}</span>
+                <div></div>
+                <span id="app-id" class="idtag">Id {{ctrl.app.id}}</span>
+            </h2>
+            <md-menu-bar id="menu-bar">
+                <md-menu>
+                    <button ng-click="$mdOpenMenu()">
+                        File
+                    </button>
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-button ng-click="ctrl.renameApp()">
+                                Rename
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="ctrl.add($event)">
+                                New Script
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-divider></md-menu-divider>
+                        <md-menu-item>
+                            <md-button ng-click="ctrl.close()">
+                                Exit
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+                <md-menu>
+                    <button ng-click="$mdOpenMenu()">
+                        Edit
+                    </button>
+                    <md-menu-content>
+                        <md-menu-item class="md-indent">
+                            <md-icon md-font-library="material-icons">undo</md-icon>
+                            <md-button ng-click="ctrl.undo()">
+                                Undo
+                                <span class="md-alt-text">{{ 'M-Z' | keyboardShortcut }}</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item class="md-indent">
+                            <md-icon md-font-library="material-icons">redo</md-icon>
+                            <md-button ng-click="ctrl.undo()">
+                                Redo
+                                <span class="md-alt-text">{{ 'M-Y' | keyboardShortcut }}</span>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-divider></md-menu-divider>
+                        <md-menu-item class="md-indent" ng-click="ctrl.chgPgndPhone()">
+                            <md-icon md-font-library="material-icons">settings_phone</md-icon>
+                            <md-button ng-click="ctrl.undo()">
+                                Change Dest
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-divider></md-menu-divider>
+                        <md-menu-item class="md-indent">
+                            <md-button ng-click="ctrl.replace()">
+                                Find and replace...
+                                <span class="md-alt-text">{{ 'M-A-F' | keyboardShortcut }}</span>
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+                <md-menu>
+                    <button ng-click="$mdOpenMenu()">
+                        View
+                    </button>
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-menu>
+                                <md-button ng-click="$mdOpenMenu()">Editor Theme</md-button>
+                                <md-menu-content width="1">
+                                    <md-menu-item class="md-indent">
+                                        <md-button ng-click="ctrl.changeTheme('elegant')">
+                                            Elegant
+                                        </md-button>
+                                    </md-menu-item>
+                                    <md-menu-item class="md-indent">
+                                        <md-button ng-click="ctrl.changeTheme('base16-light')">
+                                            Base16 (default)
+                                        </md-button>
+                                    </md-menu-item>
+                                    <md-menu-item class="md-indent">
+                                        <md-button ng-click="ctrl.changeTheme('neo')">
+                                           Neo
+                                        </md-button>
+                                    </md-menu-item>
+                                </md-menu-content>
+                            </md-menu>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+                <md-menu >
+                    <button ng-click="$mdOpenMenu()">
+                        Help
+                    </button>
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-button href="https://fonoster.slack.com" target="_blank">
+                                Docs Help
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-divider></md-menu-divider>
+                        <md-menu-item>
+                            <md-button href="https://goo.gl/P2rt25" target="_blank">
+                               Join us at Slack
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button href="https://github.com/fonoster/callflow-examples" target="_blank">
+                                Github examples
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </md-menu-bar>
+        </div>
+        <span flex></span>
+        <md-chips ng-model="ctrl.phoneChips" md-max-chips="1" readonly="true"></md-chips>
+        <md-button href="https://fonoster.slack.com" class="md-icon-button md-accent md-hue-2" aria-label="More">
+            <md-icon md-font-library="material-icons" class="md-primary md-24">help_outline</md-icon>
+            <md-tooltip md-direction="left">
+                Help
+            </md-tooltip>
+        </md-button>
+    </div>
+</md-toolbar>

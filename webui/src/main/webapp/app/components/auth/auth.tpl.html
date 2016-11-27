@@ -1,0 +1,19 @@
+<div ng-hide="ctrl.isAuthenticated()"
+     layout="row"
+     layout-align="center center"
+     layout-fill>
+
+    <div class="auth-card" >
+        <hgroup>
+            <a href="https://fonoster.com">
+                <img style="height: 45px" src="static/assets/images/logo.png">
+            </a>
+        </hgroup>
+        <login layout-margin ng-show="ctrl.isView('login')"></login>
+        <forgot layout-margin ng-show="ctrl.isView('forgot')"></forgot>
+        <signup layout-margin ng-show="ctrl.isView('signup')"></signup>
+        <div class="auth-footer">
+            <small>© 2016 Fonoster. All rights reserved.</small>
+        </div>
+    </div>
+</div>

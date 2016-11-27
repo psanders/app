@@ -1,0 +1,19 @@
+<div class="auth-card" layout-fill>
+    <md-card layout-fill>
+        <md-card-content>
+            <form name="ctrl.forgotForm" ng-submit="ctrl.recover()" novalidate layout="column">
+                <md-input-container>
+                    <label>Email</label>
+                    <input type="email" ng-model="ctrl.user.email" name="email" maxlength="100" ng-pattern="/^.+@.+\..+$/"  autofocus required tabindex="1"/>
+                </md-input-container>
+                <div layout="row" >
+                    <span flex></span>
+                    <md-button ng-disabled="ctrl.forgotForm.$invalid" class="md-primary md-raised" type="submit" tabindex="2">Recover</md-button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+    <div class="top20">
+        <md-button md-no-ink class="md-accent md-hue-2" ng-click="ctrl.chgView('login')">Already have an account? Sign In.</md-button>
+    </div>
+</div>

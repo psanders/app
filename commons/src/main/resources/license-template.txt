@@ -1,0 +1,7 @@
+Copyright (C) ${year} Fonoster
+http://fonoster.com
+
+This file is part of Fonoster
+
+
+

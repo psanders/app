@@ -1,0 +1,33 @@
+<div layout-fill>
+    <md-card layout-fill>
+        <md-card-content>
+            <form name="ctrl.signupForm" ng-submit="ctrl.signup()" novalidate layout="column">
+                <md-input-container ng-hide="ctrl.hasCode()">
+                    <label>Email</label>
+                    <input required autofocus type="email" name="clientEmail" ng-model="ctrl.user.email" maxlength="100" ng-pattern="/^.+@.+\..+$/" tabindex="1"/>
+                </md-input-container>
+                <div layout="row">
+                    <md-input-container>
+                        <label>First Name</label>
+                        <input required type="text" name="firstName" ng-model="ctrl.user.firstName" tabindex="2"/>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Last Name</label>
+                        <input required type="text" name="lastName" ng-model="ctrl.user.lastName" tabindex="3"/>
+                    </md-input-container>
+                </div>
+                <md-input-container>
+                    <label>Password</label>
+                    <input required type="password" name="password" ng-model="ctrl.user.password" tabindex="4"/>
+                </md-input-container>
+                <div layout="row" >
+                    <span flex></span>
+                    <md-button ng-disabled="ctrl.signupForm.$invalid" class="md-primary md-raised" type="submit" tabindex="5">Sign up</md-button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+    <div class="top20">
+        <md-button href="#" md-no-ink class="md-accent md-hue-2" ng-click="ctrl.chgView('login')">Already have an account? Sign In.</md-button>
+    </div>
+</div>

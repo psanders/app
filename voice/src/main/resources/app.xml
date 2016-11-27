@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app>
+    <name>FonosterJS</name>
+    <description>This Astivlet is use to provide voice features to Fonoster</description>
+    <astivlet>
+        <astivletId>FonosterJS</astivletId>
+        <class>com.fonoster.voice.js.FonosterJS</class>
+    </astivlet>
+    <astivletMapping>
+        <astivletId>FonosterJS</astivletId>
+        <urlPattern>/fn/FonosterJS</urlPattern>
+    </astivletMapping>
+</app>

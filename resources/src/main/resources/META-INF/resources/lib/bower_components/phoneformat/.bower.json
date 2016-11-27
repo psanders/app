@@ -1,0 +1,15 @@
+{
+  "name": "phoneformat",
+  "version": "0.0.7",
+  "main": "phoneformat.min.js",
+  "homepage": "https://github.com/elad/phoneformat",
+  "_release": "0.0.7",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.0.7",
+    "commit": "a2f9edc73a59bd0d47a42df713888303b33d9b6c"
+  },
+  "_source": "https://github.com/eladxxx/phoneformat.git",
+  "_target": "~0.0.7",
+  "_originalSource": "phoneformat"
+}

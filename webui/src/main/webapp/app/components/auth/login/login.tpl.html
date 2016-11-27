@@ -1,0 +1,22 @@
+<div layout-fill>
+    <md-card layout-fill>
+        <md-card-content>
+            <form name="ctrl.loginForm" ng-submit="ctrl.login()" novalidate layout="column">
+                <md-input-container>
+                    <label>Email</label>
+                    <input type="email" ng-model="ctrl.user.email" name="email"
+                          maxlength="100" ng-pattern="/^.+@.+\..+$/"  autofocus required tabindex="3"/>
+                </md-input-container>
+                <md-input-container>
+                    <label>Password</label>
+                    <input ng-model="ctrl.user.password" type="password" name="password" required tabindex="3"/>
+                </md-input-container>
+                <md-button class="md-primary md-raised" type="submit" tabindex="3">Sign in</md-button>
+            </form>
+        </md-card-content>
+    </md-card>
+    <div layout="row" class="top20">
+        <md-button md-no-ink class="md-accent md-hue-2" ng-click="ctrl.chgView('signup')">Need an account?</md-button>
+        <md-button md-no-ink class="md-accent md-hue-2" ng-click="ctrl.chgView('forgot')">Forgot Password?</md-button>
+    </div>
+</div>

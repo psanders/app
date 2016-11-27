@@ -1,0 +1,146 @@
+<div ng-controller="BillingCtrl" layout-padding>
+    <div ng-show="isView('PNT_PREVIEW')">
+
+        <md-toolbar class="md-accent">
+            <div class="md-toolbar-tools">
+                <span class="md-headline">Billing Preview </span>
+
+                <span flex></span>
+
+                <md-button ng-click="autopay(!curPntInfo.autopay)" aria-label="Change payment method" class="md-raised">
+                    <i class="fa fa-check-square-o" ng-show="curPntInfo.autopay"></i>
+                    <i class="fa fa-square-o" ng-show="!curPntInfo.autopay"></i>
+                    Autopay
+                    <md-tooltip md-direction="down">
+                        Autopay when balance under is {{funds}}
+                    </md-tooltip>
+                </md-button>
+
+                <md-button ng-click="setView('PNT_DETAIL')" aria-label="Change payment method" class="md-raised">
+                    <i class="fa fa-credit-card"></i>
+                    Change Payment Method
+                    <md-tooltip md-direction="down">
+                        Change payment method
+                    </md-tooltip>
+                </md-button>
+
+                <md-menu>
+                    <md-button aria-label="Open funds menu" class="md-raised md-primary" ng-click="$mdOpenMenu($event)">
+                        <i class="fa fa-money"></i>
+                        Fund
+                        <md-tooltip md-direction="down">
+                            Add funds
+                        </md-tooltip>
+                    </md-button>
+                    <md-menu-content width="2">
+                        <md-menu-item ng-repeat="amount in [5, 10, 20, 25, 30, 50, 100, 150, 200, 250, 500, 1000, 1500, 2000, 3000]">
+                            <md-button ng-click="fund(amount)">
+                                ${{amount}}
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </div>
+        </md-toolbar>
+
+        <p class="md-body-1">
+            Your current method is
+            <span class="fa fa-credit-card" aria-hidden="true" ng-show="isCurPntType('CREDIT_CARD')"></span>
+                <span aria-hidden="true" ng-show="isCurPntType('PAYPAL')">
+                      <i class="fa fa-paypal"></i>
+                </span>{{curPntInfo.method.description}}
+        </p>
+
+    </div>
+
+    <md-button class="md-icon-button" ng-click="setView('PNT_PREVIEW')" ng-show="isView('PNT_DETAIL') && hasPntMethod()">
+        <md-icon md-font-library="material-icons">arrow_back</md-icon>
+    </md-button>
+
+    <form layout-padding ng-show="isView('PNT_DETAIL')" method="POST" id="payment-form" novalidate>
+        <md-radio-group ng-model="newPntInfo.method.type" layout="row">
+            <md-radio-button value="PAYPAL" class="md-primary">Paypal</md-radio-button>
+            <md-radio-button value="CREDIT_CARD">Credit Card</md-radio-button>
+        </md-radio-group>
+
+        <md-grid-list
+                md-cols-sm="1" md-cols-md="3" md-cols-gt-md="6"
+                md-row-height-gt-md="1:1" md-row-height="2:2"
+                md-gutter="12px" md-gutter-gt-sm="8px" >
+            <md-grid-tile md-rowspan="2" md-colspan="4" md-colspan-sm="1">
+
+                <div  ng-show="isPntType('PAYPAL')" id="paypal-container"></div>
+
+                {{$scope.card.type}}
+                <div  ng-show="isPntType('CREDIT_CARD')">
+                    <div layout="row">
+                        <md-input-container>
+                            <label>1234 5678 9012 3456</label>
+                            <input id="cardNumber" required ng-pattern="/^(0|[1-9][0-9]*)$/" ng-minlength="14"
+                                   ng-maxlength="20" data-braintree-name="number"
+                                   size="20"
+                                   ng-model="card.number"
+                                   ng-keyup="validateCard()">
+                        </md-input-container>
+
+                        <md-input-container>
+                            <label>CVV</label>
+                            <input required ng-pattern="/^(0|[1-9][0-9]*)$/" ng-minlength="3" ng-maxlength="4" size="4"
+                                   data-braintree-name="cvv" class="form-control cvv" type="text"
+                                   size="4" ng-model="card.cvv"/>
+                        </md-input-container>
+
+                        <md-input-container>
+                            <label>MM/YY</label>
+                            <input required ng-pattern="/^((0[1-9])|(1[0-2]))\/(\d{2})$/" ng-minlength="4"
+                                   ng-minlength="5" size="6" data-braintree-name="expiration_date"
+                                   class="form-control exp" type="text" ng-model="card.expDate"/>
+                        </md-input-container>
+                    </div>
+                    <md-button class="md-primary md-raised" ng-click="savePntInfo()" ng-show="isCurPntType('PAYPAL')">
+                        <span class="fa fa-credit-card" ng-class="{'fa-cc-visa': isCard('visa'), 'fa-cc-mastercard': isCard('mastercard'), 'fa-cc-amex': isCard('amex'), }"></span>
+                        Save card
+                    </md-button>
+                    <md-button class="md-primary md-raised" ng-click="savePntInfo()" ng-hide="isCurPntType('PAYPAL')">Update method</md-button>
+                </div>
+                <md-grid-tile-footer layout-padding>
+                    <small ng-bind-html="pntNote"></small>
+                </md-grid-tile-footer>
+            </md-grid-tile>
+        </md-grid-list>
+    </form>
+
+    <p class="md-body-2" ng-show="!isView('PNT_DETAIL') && curPntInfo.transactions.length > 0">Payment History</p>
+
+    <md-table-container class="md-whiteframe-z1" ng-show="!isView('PNT_DETAIL') && curPntInfo.transactions.length > 0">
+        <table md-table>
+            <thead md-head>
+                <tr md-row>
+                    <th md-column>ID</th>
+                    <th md-column>Date</th>
+                    <th md-column>Payment Method</th>
+                    <th md-column>Amount</th>
+                    <th md-column>Status</th>
+                </tr>
+            </thead>
+            <tbody md-body>
+                <tr md-row ng-repeat="entry in curPntInfo.transactions | orderBy:'-created'">
+                    <td md-cell>
+                        <small>{{entry.id | truncate:4:'':true | uppercase}}</small>
+                    </td>
+                    <td md-cell>
+                        <small>{{entry.created | asCalendar}}</small>
+                    </td>
+                    <td md-cell>
+                        <span class="fa fa-credit-card" ng-class="{'fa-paypal': entry.method=='paypal_account'}" aria-hidden="true"></span> {{entry.description}}
+                    </td>
+                    <td md-cell>{{entry.amount | currency}}</td>
+                    <td md-cell>
+                        <span class="fa" ng-class="{'fa-check': entry.status=='AUTHORIZED'}" aria-hidden="true"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+</div>
+

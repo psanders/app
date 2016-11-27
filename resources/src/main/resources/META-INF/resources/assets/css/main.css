@@ -1,0 +1,240 @@
+/* General styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'RobotoDraft', sans-serif;
+}
+
+/* Use for the table */
+.alternate {
+    background-color: #edf4fd;
+    color: #4285f4;
+}
+
+a {
+    text-decoration: none;
+    color: rgb(33, 150, 243);
+}
+
+md-grid-tile {
+    transition: all 400ms ease-out 50ms;
+}
+
+md-content {
+    background-color: #fafafa;
+}
+
+.main-section {
+    height: calc(100% - 65px);
+}
+
+.hundred-hg {
+    height: 100%;
+}
+
+/* NVD3 styles */
+
+nvd3 {
+    width: 100%;
+}
+
+.nvd3.nv-noData {
+    font-size: 14px;
+    font-weight: normal;
+    color: gray;
+    text-align: center;
+}
+
+/* Editor styles */
+
+.call-button {
+    position: absolute;
+    top: 45px;
+    right: 50px;
+}
+
+/* Recordings */
+
+.recordings-player {
+    min-width: 80px;
+}
+
+/* Auth card */
+.auth-card {
+    max-width: 360px;
+}
+
+.right10 { margin-right: 10px;}
+.right15 { margin-right: 15px;}
+
+.top10 { margin-top: 10px;}
+.top15 { margin-top: 15px;}
+.top20 { margin-top: 20px;}
+
+.md-caption {
+    color: gray;
+}
+
+md-toast {
+    position: fixed;
+}
+
+#loading-bar .bar {
+    background: red;
+}
+
+.auth-footer {
+    color: gray;
+    text-align: center;
+}
+
+h1.logo, h2.logo  {
+    color: #fff;
+    font-family:'DIN Pro Medium';
+    font-weight: normal;
+    font-size: 30px;
+    margin-bottom: 0px;
+    text-transform: uppercase;
+}
+
+h2.logo {
+    font-size: 20px;
+}
+
+.logo {
+    margin-top: 0px;
+}
+
+.logo-drawer {
+    color: #fff;
+    margin: 5px;
+}
+
+.sub-header {
+    font-family: "Roboto","Helvetica","Arial",sans-serif;
+    font-size: 14px;
+    -webkit-align-self: flex-end;
+    -ms-flex-item-align: end;
+    align-self: flex-end;
+    color: inherit;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    font-weight: 300;
+    line-height: normal;
+    overflow: hidden;
+    -webkit-transform-origin: 149px 48px;
+    -ms-transform-origin: 149px 48px;
+    transform-origin: 149px 48px;
+    margin: 0;
+}
+
+a.brown, a.brown:link , a.brown:visited, a.brown:hover, a.brown:active {
+    color: rgb(141,110,99);
+}
+
+a.yellow, a.yellow:link , a.yellow:visited, a.yellow:hover, a.yellow:active {
+    color: #FFC107;
+}
+
+h1, h2, h3, h4 {
+    font-family: "open sans",arial,sans-serif;
+}
+
+.intro-paragraph {
+    padding: 100px;
+    min-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.center {
+    margin: auto;
+}
+
+.top60 {
+    margin-bottom: 60px;
+}
+
+.title {
+    font-weight: 300;
+}
+
+.rest {
+    background-color: #404042;
+    color: #fff;
+    text-align: center;
+}
+
+.invite-section {
+    background-color: #424242;
+    width: 100%;
+    padding: 5px;
+}
+
+#doorbell-button {
+    z-index: 1000;
+}
+
+#doorbell textarea:focus {
+    outline: none !important;
+    border:1px solid #4d4d4d;
+}
+
+div.success {
+    background-color: rgb(76, 175, 80);
+    padding: 10px;
+    color: #fff;
+}
+
+div.error {
+    background-color: rgb(255,82,82);
+    padding: 10px;
+    color: #fff;
+}
+
+#doorbell {
+    position: absolute;
+    z-index: 99999;
+    left: 50%;
+    width: 400px;
+    margin-left: -200px;
+    top: 100px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.btn {
+    padding: 14px 24px;
+    border: 0 none;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.btn:focus, .btn:active:focus, .btn.active:focus {
+    outline: 0 none;
+}
+
+.btn-primary {
+    background: #0099cc;
+    color: #ffffff;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open > .dropdown-toggle.btn-primary {
+    background: #33a6cc;
+}
+
+.btn-primary:active, .btn-primary.active {
+    background: #007299;
+    box-shadow: none;
+}
+
+.material-icons.md-14 { font-size: 14px; }
+.material-icons.md-16 { font-size: 16px; }
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+
+.nav-active { background-color: #efefef; }
+
+[role="tabpanel"] {transition: none;}

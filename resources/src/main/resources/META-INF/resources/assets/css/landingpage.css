@@ -1,0 +1,216 @@
+.body {
+    background: #fff;
+}
+
+main {
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, .1)), url(/static/assets/images/walking.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.android-wear-band-text {
+    max-width: 800px;
+    margin-left: 25%;
+    padding: 24px;
+    text-align: left;
+    color: white;
+}
+
+.android-wear-band {
+
+    width: 100%;
+    text-align: center;
+    background-color: #37474f;
+}
+
+.content {
+    margin-top: 170px;
+    min-height: 400px;
+    max-width: 600px;
+    text-align: center;
+}
+
+@media screen and (max-width: 480px) {
+    h3.title {
+        font-size: 24px;
+    }
+    .content {
+        margin-top: 100px;
+        max-width: 300px;
+        text-align: center;
+    }
+}
+
+.max-content-width {
+    max-width: 1366px;
+}
+
+
+h1, h2, h3, h4 {
+    font-family: "open sans",arial,sans-serif;
+}
+
+.title {
+    color: gray;
+}
+
+h4 {
+    font-weight: 200;
+}
+
+a, a:link, a:visited, a:hover, a:active {
+    text-transform: none;
+}
+
+/* Email input & label */
+.mdl-textfield__label {
+    color: rgba(255,255,255,.6);
+}
+
+.mdl-textfield__input {
+    color: rgba(255,255,255,1.0);
+    border-color: rgba(255,255,255,0.12);
+}
+
+img.landpg-icons {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+}
+
+/* Paddings */
+.padding10 {padding: 10px;}
+.padding50 {padding: 50px;}
+.no-padding {padding: 0;}
+
+/* Margins */
+.top50 {margin-top: 50px;}
+
+.bg-white {
+    background-color: #fff;
+}
+
+.social-icons {
+    color: #6FD4C7;
+}
+
+.social-btn {
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-color: #fff;
+  margin: 0 16px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  opacity: 0.46;
+  border-radius: 2px;
+}
+.social-btn__twitter {
+  background-image: url('https://www.gstatic.com/images/icons/material/system/2x/post_twitter_black_24dp.png');
+}
+.social-btn__facebook {
+  background-image: url('https://www.gstatic.com/images/icons/material/system/2x/post_facebook_black_24dp.png');
+}
+.social-btn__linkedin {
+  background-image: url('https://www.gstatic.com/images/icons/material/system/2x/post_linkedin_black_24dp.png');
+}
+.social-btn__share {
+  color: rgba(0, 0, 0, 0.54);
+  background: transparent;
+}
+
+a.no-transform {
+    text-transform: none;
+}
+
+/* MDL Dialog */
+.mdl-dialog {
+  border: none;
+  box-shadow: 0 9px 46px 8px rgba(0, 0, 0, 0.14), 0 11px 15px -7px rgba(0, 0, 0, 0.12), 0 24px 38px 3px rgba(0, 0, 0, 0.2);
+  max-width: 280px;
+}
+
+.mdl-dialog__title {
+  padding: 24px 24px 0;
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.mdl-dialog__actions {
+  padding: 8px 8px 8px 24px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row-reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.mdl-dialog__actions > * {
+  margin-right: 8px;
+  height: 36px;
+}
+
+.mdl-dialog__actions > *:first-child {
+  margin-right: 0;
+}
+
+.mdl-dialog__actions--full-width {
+  padding: 0 0 8px 0;
+}
+
+.mdl-dialog__actions--full-width > * {
+  height: 48px;
+  -webkit-flex: 0 0 100%;
+  -ms-flex: 0 0 100%;
+  flex: 0 0 100%;
+  padding-right: 16px;
+  margin-right: 0;
+  text-align: right;
+}
+
+.mdl-dialog__content {
+  padding: 20px 24px 24px 24px;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.invite-section {
+    background-color: rgba(255,255,255, .2);
+    border-radius: 16px 16px 16px 16px;
+    -moz-border-radius: 16px 16px 16px 16px;
+    -webkit-border-radius: 16px 16px 16px 16px;
+    border: 0px solid #000000;
+}
+
+
+.android-customized-section {
+  text-align: center;
+}
+
+.android-customized-section-text {
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 80px 16px 0 16px;
+}
+
+  .android-customized-section-text p {
+    padding-top: 16px;
+  }
+
+.android-customized-section-image {
+  background: url('https://as1.ftcdn.net/jpg/00/90/13/90/500_F_90139065_S2YsJXMAugOGPIIS3IBjyuZhK2AbHG0a.jpg') center top no-repeat;
+  height: 400px;
+}

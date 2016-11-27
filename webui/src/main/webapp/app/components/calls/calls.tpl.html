@@ -1,0 +1,55 @@
+<md-card id="calls-widget">
+    <md-toolbar class="md-table-toolbar md-default" ng-show="!filter" aria-hidden="false">
+        <div class="md-toolbar-tools">
+            <span>Calls</span>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Search" ng-click="filter=true">
+                <md-icon md-font-library="material-icons">search</md-icon>
+                <md-tooltip md-direction="left">
+                    Search calls
+                </md-tooltip>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-toolbar class="md-table-toolbar md-default" ng-show="filter" aria-hidden="false">
+        <div class="md-toolbar-tools">
+            <p class="md-body-1">From</p>
+            <md-datepicker class="right15" ng-model="startDate" md-placeholder="dd/mm/yyyy" ng-change="updateView()"></md-datepicker>
+            <p class="md-body-1">To</p>
+            <md-datepicker ng-model="endDate" md-placeholder="dd/mm/yyyy" ng-change="updateView()"></md-datepicker>
+            <span flex></span>
+            <md-button class="md-icon-button md-button md-ink-ripple" type="button" aria-label="close" ng-click="filter=false">
+                <md-icon class="material-icons">close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-table-container>
+        <table md-table md-progress="deferred">
+            <thead md-head md-order="query.order" md-on-reorder="onOrderChange">
+            <tr md-row>
+                <th md-column md-order-by="created">Date</th>
+                <th md-column md-order-by="from">From</th>
+                <th md-column md-order-by="to">To</th>
+                <th md-column md-order-by="status">Status</th>
+                <th md-column md-order-by="answerBy">By</th>
+                <th md-column md-order-by="duration">Duration</th>
+                <th md-column md-order-by="cost">Cost</th>
+            </tr>
+            </thead>
+            <tbody md-body>
+                <tr md-row ng-repeat="call in calls.calls | orderBy: query.order | limitTo: query.limit: (query.page - 1) * query.limit">
+                    <td md-cell>{{call.created | asCalendar}}</td>
+                    <td md-cell>{{formatLocal(user.countryCode, call.from)}}</td>
+                    <td md-cell>{{formatLocal(user.countryCode, call.to)}}</td>
+                    <td md-cell>{{call.status | humanize}}</td>
+                    <td md-cell>{{call.answerBy | humanize}}</td>
+                    <td md-cell>{{call.duration}}</td>
+                    <td md-cell>{{call.cost}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="query.limit" md-page="query.page" md-total="{{calls.total}}" md-on-paginate="onPageChange" md-page-select></md-table-pagination>
+</md-card>

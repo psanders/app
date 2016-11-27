@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.fonoster</groupId>
+	<artifactId>fonoster</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+
+	<name>Fonoster - Telephony API</name>
+
+	<scm>
+		<developerConnection>scm:git:http://github.com/fonoster/fonoster</developerConnection>
+	</scm>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<timestamp>${maven.build.timestamp}</timestamp>
+		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+		<jdk.version>1.8</jdk.version>
+		<skip.image.build>true</skip.image.build>
+		<skip.integration.tests>true</skip.integration.tests>
+		<skip.unit.tests>false</skip.unit.tests>
+		<skip.docs>true</skip.docs>
+		<docker.image.tag>latest</docker.image.tag> <!-- Overwrite using -Ddocker.image.tag -->
+
+		<!-- Validation dependencies -->
+		<hibernate.version>5.2.4.Final</hibernate.version>
+		<validation-api.version>1.1.0.Final</validation-api.version>
+		<javax.el-api.version>2.2.4</javax.el-api.version>
+
+		<!-- Persistence dependencies -->
+		<mongo-driver.version>3.2.2</mongo-driver.version>
+		<morphia.version>1.1.1</morphia.version>
+
+		<!-- Testing dependencies -->
+		<joda.version>2.9.3</joda.version>
+		<junit.version>4.10</junit.version>
+		<junit-dep.version>4.10</junit-dep.version>
+
+		<!-- Logging dependencies -->
+		<slf4j.version>1.7.21</slf4j.version>
+		<logback.version>1.1.7</logback.version>
+		<log4j.version>1.2.17</log4j.version>
+		<commons-lang3.version>3.4</commons-lang3.version>
+		<jersey.version>1.19.1</jersey.version>
+
+		<!-- Build dependencies -->
+		<docker-maven-plugin.version>0.15.1</docker-maven-plugin.version>
+		<maven-war-plugin.version>2.6</maven-war-plugin.version>
+		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+		<exec-maven.version>1.4.0</exec-maven.version>
+
+		<!-- Other -->
+		<commons-configuration.version>1.10</commons-configuration.version>
+		<commons-codec.version>1.10</commons-codec.version>
+		<braintree.version>2.61.0</braintree.version>
+		<commons-httpclient.version>3.1</commons-httpclient.version>
+		<astive.version>1.0.5</astive.version>
+		<maven-dependency.version>2.10</maven-dependency.version>
+		<jsr311-api.version>1.1.1</jsr311-api.version>
+	</properties>
+
+	<modules>
+		<module>commons</module>
+		<module>core</module>
+		<module>voice</module>
+		<module>resources</module>
+		<module>rest</module>
+		<module>webui</module>
+		<module>utils</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.fonoster</groupId>
+				<artifactId>core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fonoster</groupId>
+				<artifactId>voice</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fonoster</groupId>
+				<artifactId>commons</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fonoster</groupId>
+				<artifactId>utils</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.astivetoolkit</groupId>
+				<artifactId>atk-commons</artifactId>
+				<version>${astive.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.astivetoolkit</groupId>
+				<artifactId>atk-server-core</artifactId>
+				<version>${astive.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.astivetoolkit</groupId>
+				<artifactId>atk-server-client</artifactId>
+				<version>${astive.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.astivetoolkit</groupId>
+				<artifactId>atk-api-agi</artifactId>
+				<version>${astive.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.braintreepayments.gateway</groupId>
+				<artifactId>braintree-java</artifactId>
+				<version>${braintree.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb.morphia</groupId>
+				<artifactId>morphia</artifactId>
+				<version>${morphia.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${mongo-driver.version}</version>
+			</dependency>
+			<!-- Testing -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit-dep</artifactId>
+				<version>${junit-dep.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>commons-codec</groupId>
+				<artifactId>commons-codec</artifactId>
+				<version>${commons-codec.version}</version>
+			</dependency>
+			<!-- Others -->
+			<dependency>
+				<groupId>commons-configuration</groupId>
+				<artifactId>commons-configuration</artifactId>
+				<version>${commons-configuration.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-core</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-server</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.jersey</groupId>
+				<artifactId>jersey-servlet</artifactId>
+				<version>${jersey.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.ws.rs</groupId>
+				<artifactId>jsr311-api</artifactId>
+				<version>${jsr311-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${joda.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.jettison</groupId>
+				<artifactId>jettison</artifactId>
+				<version>1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.validation</groupId>
+				<artifactId>validation-api</artifactId>
+				<version>${validation-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-httpclient</groupId>
+				<artifactId>commons-httpclient</artifactId>
+				<version>${commons-httpclient.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator</artifactId>
+				<version>${hibernate.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-validator-annotation-processor</artifactId>
+				<version>${hibernate.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.el</groupId>
+				<artifactId>javax.el-api</artifactId>
+				<version>${javax.el-api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>${exec-maven.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>${maven-shade-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.10</version>
+					<executions>
+						<execution>
+							<id>analyze</id>
+							<goals>
+								<goal>analyze-only</goal>
+							</goals>
+							<configuration>
+								<failOnWarning>true</failOnWarning>
+								<outputXML>true</outputXML>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.5.1</version>
+					<configuration>
+						<source>${jdk.version}</source>
+						<target>${jdk.version}</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>io.fabric8</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>${docker-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.18</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.18</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
+					<skipTests>${skip.unit.tests}</skipTests>
+					<!-- Excludes integration tests when unit tests are run -->
+					<excludes>
+						<exclude>**/IT*.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<!-- The Configuration of the integration-test profile -->
+		<profile>
+			<id>it</id>
+			<properties>
+				<build.profile.id>it</build.profile.id>
+				<skip.integration.tests>false</skip.integration.tests>
+				<skip.unit.tests>true</skip.unit.tests>
+				<skip.image.build>false</skip.image.build>
+			</properties>
+		</profile>
+	</profiles>
+
+	<description>
+		Fonoster is a Unified Communication Platform and Telephony API,
+		that helps developers and engineers create amazing
+		communication solutions
+	</description>
+	<organization>
+		<name>Fonoster Inc</name>
+		<url>http://fonoster.com</url>
+	</organization>
+	<developers>
+		<developer>
+			<name>Fonoster Team</name>
+			<email>fonosterteam@fonoster.com</email>
+			<organization>Fonoster Inc</organization>
+			<organizationUrl>http://www.fonoster.com</organizationUrl>
+		</developer>
+	</developers>
+</project>

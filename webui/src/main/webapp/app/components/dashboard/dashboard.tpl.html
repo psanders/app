@@ -1,0 +1,39 @@
+<div  layout="row">
+    <md-card id="traffic-widget">
+        <md-card-header>
+            <md-card-avatar>
+                <md-icon md-font-library="material-icons">show_chart</md-icon>
+            </md-card-avatar>
+            <md-card-header-text>
+                <span class="md-title">Traffic</span>
+                <span class="md-subhead">By {{period | humanize}}</span>
+            </md-card-header-text>
+            <md-menu>
+                <md-button style="margin-top: -25px" aria-label="Open Account Menu" class="md-icon-button" ng-click="$mdOpenMenu($event)">
+                    <md-icon md-font-library="material-icons">keyboard_arrow_down</md-icon>
+                </md-button>
+                <md-menu-content width="2">
+                    <md-menu-item>
+                        <md-button ng-click="drawAnalytics('HOUR')">
+                            Hour
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="drawAnalytics('DAY')">
+                            Day
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="drawAnalytics('MONTH')">
+                            Month
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
+        </md-card-header>
+        <md-card-content>
+            <small ng-hide="data.length > 1" >Nothing yet</small>
+            <nvd3 ng-show="data.length > 1" options="options" data="data" com.fonoster.config="{refreshDataOnly: false}"></nvd3>
+        </md-card-content>
+    </md-card>
+</div>

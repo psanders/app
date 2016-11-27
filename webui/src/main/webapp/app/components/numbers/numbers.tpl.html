@@ -1,0 +1,67 @@
+<md-card id="numbers-widget" ng-controller="NumbersCtrl" ng-show="numbers.total > 0">
+    <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
+        <div class="md-toolbar-tools">
+            <span>Numbers</span>
+            <span flex></span>
+            <md-button ng-click="numberRequest($event)" class="md-icon-button" aria-label="Add">
+                <md-tooltip md-direction="left">
+                    Add new number
+                </md-tooltip>
+                <md-icon md-font-library="material-icons">add</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-table-container>
+        <table md-table md-progress="deferred">
+            <thead md-head md-order="query.order" md-on-reorder="onOrderChange">
+                <tr md-row>
+                    <th md-column></th>
+                    <th md-column class="no-padding" order-by="number">Number</th>
+                    <th md-column md-order-by="countryISOCode">Country Code</th>
+                    <th md-column md-order-by="tech">Tech</th>
+                    <!--<th md-column md-order-by="app">Inbound App</th>-->
+                    <th md-column md-order-by="modified">Modified</th>
+                </tr>
+            </thead>
+            <tbody md-body>
+                <!-- WARNING: Inline css here! -->
+                <tr md-row ng-repeat="number in numbers.phoneNumbers | orderBy: query.order | limitTo: query.limit: (query.page - 1) * query.limit">
+                    <td md-cell style="padding: 0" layout-align="center end" layout="row">
+                        <md-button style="margin: 0"  ng-show="number.preferred" class="md-icon-button" ng-click="setPreferred(number)">
+                            <md-icon md-font-library="material-icons">radio_button_checked</md-icon>
+                            <md-tooltip md-direction="left">
+                                Default test number
+                            </md-tooltip>
+                        </md-button>
+                        <md-button style="margin:0" ng-show="!number.preferred" class="md-icon-button" ng-click="setPreferred(number)">
+                            <md-icon md-font-library="material-icons">radio_button_unchecked</md-icon>
+                            <md-tooltip md-direction="left">
+                                Click to select as test number
+                            </md-tooltip>
+                        </md-button>
+                    </td>
+                    <td md-cell style="padding: 0">
+                        {{formatLocal(user.countryCode, number.number)}}
+                    </td>
+                    <td md-cell>{{number.countryISOCode}}</td>
+                    <td md-cell>
+                        <span ng-show="number.voiceEnabled">Voice</span>
+                        <span ng-show="number.smsEnabled">, SMS</span>
+                        <span ng-show="number.mmsEnabled">, MMS</span>
+                    </td>
+                    <!--<td md-cell>
+                        <span>None<md-icon md-font-library="material-icons">arrow_drop_down</md-icon></span>
+                    </td>-->
+                    <td md-cell>{{number.modified | asCalendar}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+
+    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="query.limit" md-page="query.page" md-total="{{numbers.total}}" md-on-paginate="onPageChange" md-page-select></md-table-pagination>
+</md-card>
+
+<div ng-show="numbers.total == 0" layout="column" layout-align="center center" layout-padding class="not-found-card" >
+    <h2 class="md-headline">Not items found!</h2>
+</div>

@@ -1,0 +1,37 @@
+<md-sidenav
+    class="sidenav"
+    layout-fill
+    md-component-id="sidenav"
+    md-is-open="ctrl.navOpen"
+    md-is-locked-open="ctrl.navOpen && $mdMedia('gt-xs')">
+
+    <md-content>
+        <md-list flex>
+            <md-list-item id="dashboard-item" ng-class="{'nav-active': ctrl.currentSec('dashboard')}" ng-click="ctrl.go('dashboard')">
+                <md-icon md-font-library="material-icons" class="md-24">dashboard</md-icon>
+                <p>Dashboard</p>
+            </md-list-item>
+            <md-list-item id="numbers-item" ng-class="{'nav-active': ctrl.currentSec('numbers')}" ng-click="ctrl.go('numbers')">
+                <md-icon md-font-library="material-icons" class="md-24">phone</md-icon>
+                <p>Numbers</p>
+            </md-list-item>
+            <md-list-item id="apps-item" ng-class="{'nav-active': ctrl.currentSec('apps')}" ng-click="ctrl.go('apps')">
+                <md-icon md-font-library="material-icons" class="md-24">apps</md-icon>
+                <p>Apps</p>
+            </md-list-item>
+            <md-list-item id="recordings-item" ng-class="{'nav-active': ctrl.currentSec('recordings')}" ng-click="ctrl.go('recordings')">
+                <md-icon md-font-library="material-icons" class="md-24">record_voice_over</md-icon>
+                <p >Recordings</p>
+            </md-list-item>
+            <md-list-item id="calls-item" ng-class="{'nav-active': ctrl.currentSec('calls')}" ng-click="ctrl.go('calls')">
+                <md-icon md-font-library="material-icons" class="md-24">view_list</md-icon>
+                <p>Logs</p>
+            </md-list-item>
+            <md-divider></md-divider>
+            <md-list-item id="settings-item" ng-class="{'nav-active': ctrl.currentSec('settings')}" ng-click="ctrl.go('settings')">
+                <md-icon md-font-library="material-icons" class="md-24">settings</md-icon>
+                <p>Settings</p>
+            </md-list-item>
+        </md-list>
+    </md-content>
+</md-sidenav>

@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.fonoster</groupId>
+		<artifactId>fonoster</artifactId>
+		<version>1.0</version>
+	</parent>
+	<packaging>jar</packaging>
+	<artifactId>core</artifactId>
+	<name>Fonoster :: Core</name>
+
+	<properties>
+		<!-- [Asterisk-Java] Currently using asterisk-java 1.0.0.M3 (last in maven
+		central). The CI version of asterisk-java seems to have a bug that will always
+		report onNoAnswer. Asterisk status of the channel begin been DOWN and asterisk-java
+		ask if channel.wasInState(ChannelStatus.DOWN) to trigger the onNoAnswer.
+		Seems to me that this is a bug. Other observations: - AJ[1.0.0.M3] is reporting
+		Asterisk 1.6 when in reality I have the version 1.8.28-cert - Same with version
+		11.15.0 -->
+		<asterisk-java.version>1.0.0.M3</asterisk-java.version>
+		<braintree.version>2.39.2</braintree.version>
+		<libphonenumber.version>7.0.1</libphonenumber.version>
+		<commons-csv.version>1.0</commons-csv.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.fonoster</groupId>
+			<artifactId>commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fonoster</groupId>
+			<artifactId>utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.asteriskjava</groupId>
+			<artifactId>asterisk-java</artifactId>
+			<version>${asterisk-java.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>${commons-csv.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.braintreepayments.gateway</groupId>
+			<artifactId>braintree-java</artifactId>
+			<version>${braintree.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${joda.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.libphonenumber</groupId>
+			<artifactId>libphonenumber</artifactId>
+			<version>${libphonenumber.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+		</dependency>
+		<!-- Mongodb dependencies -->
+		<dependency>
+			<groupId>org.mongodb.morphia</groupId>
+			<artifactId>morphia</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+		</dependency>
+		<!-- Logging  -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<!-- Is not possible to add the following dependencies directly:
+			- javax.jms:jms:jar:1.1
+			- com.sun.jdmk:jmxtools:jar:1.2.1
+			- com.sun.jmx:jmxri:jar:1.2.1
+			However adding log4j solves the issues.
+			Cover at http://stackoverflow.com/questions/4908651/the-following-artifacts-could-not-be-resolved-javax-jmsjmsjar1-1
+		 -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>io.fabric8</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

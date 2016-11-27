@@ -1,0 +1,76 @@
+<md-toolbar ng-controller="TopnavCtrl as ctrl" class="md-whiteframe-z1">
+    <div class="md-toolbar-tools" style="background-color: #444444">
+        <md-button ng-hide="ctrl.navOpen" ng-click="ctrl.toggleSidebar()" class="md-icon-button" aria-label="Settings">
+            <md-icon md-font-library="material-icons" style="color: #27ae60">menu</md-icon>
+        </md-button>
+
+        <a ng-show="ctrl.navOpen" href="/#/dashboard" id="console">
+            <img style="height: 40px" src="static/assets/images/logo_console.png">
+        </a>
+        <span flex></span>
+        <span style="color: #fff" class="md-body-2" ng-hide="user.company">{{user.firstName}}.</span><span style="color: #fff" class="md-body-2" ng-show="user.company">{{user.company}}.</span>
+        <!--<span class="md-body-1 navbar-text" layout-margin>{{user.pmntInfo.balance | currency:"USD$":2}}</span>-->
+        <md-menu >
+            <md-button aria-label="Open Notification Menu" class="md-icon-button" ng-click="ctrl.showActivities(); $mdOpenMenu($event)">
+                <md-icon style="color: #fff" smd-font-library="material-icons">notifications</md-icon>
+                <md-tooltip md-direction="down">
+                    Notifications
+                </md-tooltip>
+            </md-button>
+            <md-menu-content id="notifications" width="5">
+                <md-subheader>
+                    <md-icon md-font-library="material-icons">notifications</md-icon>
+                    Notifications
+                </md-subheader>
+                <md-list>
+                    <div ng-repeat="activity in ctrl.activities">
+                        <md-list-item class="md-2-line">
+                            <!-- WARNING: Inline css here -->
+                            <md-icon md-font-library="material-icons" style="margin-right: 10px">
+                                <span ng-if="activity.type=='PAYMENT'">payment</span>
+                                <span ng-if="activity.type=='INFO'">info_outline</span>
+                                <span ng-if="activity.type=='SETTING'">settings</span>
+                                <span ng-if="activity.type=='BUG'">BUG</span>
+                            </md-icon>
+                            <div class="md-list-item-text">
+                                <span class="md-body-1" ng-bind-html="activity.description"></span>
+                                <br/>
+                                <span class="md-caption"> {{ activity.created | asCalendar }}</span>
+                            </div>
+                        </md-list-item>
+                    </div>
+                </md-list>
+            </md-menu-content>
+        </md-menu>
+        <!--<span class="md-body-1 navbar-text" layout-margin>{{user.pmntInfo.balance | currency:"USD$":2}}</span>-->
+        <md-button class="md-icon-button " href="https://fonoster.com/docs">
+            <md-icon md-font-library="material-icons" style="color: #fff">help</md-icon>
+            <md-tooltip md-direction="down">
+                Help
+            </md-tooltip>
+        </md-button>
+        <md-menu>
+            <md-button aria-label="Open Account Menu" class="md-icon-button" ng-click="$mdOpenMenu($event)">
+                <md-icon md-font-library="material-icons" style="color: #fff">account_circle</md-icon>
+                <md-tooltip md-direction="down">
+                    Account
+                </md-tooltip>
+            </md-button>
+            <md-menu-content width="4">
+                <md-menu-item>
+                    <md-button href="#/settings">
+                        <md-icon md-font-library="material-icons">settings</md-icon>
+                        Settings
+                    </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-controller="AuthCtrl as auth" ng-click="auth.logout()">
+                        <md-icon md-font-library="material-icons">exit_to_app</md-icon>
+                        Logout
+                    </md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+    </div>
+</md-toolbar>
+
