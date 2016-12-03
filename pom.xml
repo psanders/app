@@ -12,6 +12,16 @@
 		<developerConnection>scm:git:http://github.com/fonoster/fonoster</developerConnection>
 	</scm>
 
+	<modules>
+		<module>commons</module>
+		<module>core</module>
+		<module>voice</module>
+		<module>resources</module>
+		<module>rest</module>
+		<module>webui</module>
+		<module>utils</module>
+	</modules>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -60,16 +70,6 @@
 		<maven-dependency.version>2.10</maven-dependency.version>
 		<jsr311-api.version>1.1.1</jsr311-api.version>
 	</properties>
-
-	<modules>
-		<module>commons</module>
-		<module>core</module>
-		<module>voice</module>
-		<module>resources</module>
-		<module>rest</module>
-		<module>webui</module>
-		<module>utils</module>
-	</modules>
 
 	<dependencyManagement>
 		<dependencies>
