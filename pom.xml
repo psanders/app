@@ -28,11 +28,7 @@
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 		<jdk.version>1.8</jdk.version>
-		<skip.image.build>true</skip.image.build>
-		<skip.integration.tests>true</skip.integration.tests>
 		<skip.unit.tests>false</skip.unit.tests>
-		<skip.docs>true</skip.docs>
-		<docker.image.tag>latest</docker.image.tag> <!-- Overwrite using -Ddocker.image.tag -->
 
 		<!-- Validation dependencies -->
 		<hibernate.version>5.2.4.Final</hibernate.version>
@@ -302,19 +298,6 @@
 		</plugins>
 	</build>
 
-	<profiles>
-		<!-- The Configuration of the integration-test profile -->
-		<profile>
-			<id>it</id>
-			<properties>
-				<build.profile.id>it</build.profile.id>
-				<skip.integration.tests>false</skip.integration.tests>
-				<skip.unit.tests>true</skip.unit.tests>
-				<skip.image.build>false</skip.image.build>
-			</properties>
-		</profile>
-	</profiles>
-
 	<description>
 		Fonoster is a Unified Communication Platform and Telephony API,
 		that helps developers and engineers create amazing
@@ -322,14 +305,14 @@
 	</description>
 	<organization>
 		<name>Fonoster Inc</name>
-		<url>http://fonoster.com</url>
+		<url>https://fonoster.com</url>
 	</organization>
 	<developers>
 		<developer>
 			<name>Fonoster Team</name>
 			<email>fonosterteam@fonoster.com</email>
 			<organization>Fonoster Inc</organization>
-			<organizationUrl>http://www.fonoster.com</organizationUrl>
+			<organizationUrl>https://www.fonoster.com</organizationUrl>
 		</developer>
 	</developers>
 </project>

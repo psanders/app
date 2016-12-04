@@ -53,11 +53,6 @@
                             <contextPath>/static</contextPath>
                             <resourceBase>${project.basedir}/../resources/src/main/resources/META-INF/resources</resourceBase>
                         </contextHandler>
-                        <contextHandler implementation="org.eclipse.jetty.maven.plugin.JettyWebAppContext">
-                            <contextPath>/site</contextPath>
-                            <resourceBase>${project.basedir}/../site/src/main/webapp</resourceBase>
-                            <descriptor>${project.basedir}/../site/src/main/resources/web.xml</descriptor>
-                        </contextHandler>
                     </contextHandlers>
                 </configuration>
             </plugin>

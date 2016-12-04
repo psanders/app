@@ -74,23 +74,24 @@
                 newScript = true;
             }
 
-            if (getCurrentScript() !== undefined && !force) {
-                var e = getEditorById(getCurrentScript().name);
-                e.save();
-                if (getCurrentScript().source == e.getValue() && !force) return;
-                self.currentScript.source = e.getValue();
+            var e = getEditorById(getCurrentScript().name);
+            e.save();
+
+            if (getCurrentScript().source != e.getValue()) {
+                self.loading = true;
             }
 
-            self.loading = true;
+            self.currentScript.source = e.getValue();
 
             Apps.save(self.app).$promise
             .then(function(result){
-                if (newScript) {
+                if (newScript == true) {
                     self.app = result;
                     self.currentScript = getScriptByName("main.js");
+                    console.log("cebo this is not a new script");
                 }
 
-                // This is split second is enought to allow the GUI to render
+                // This is split second is enough to allow the GUI to render
                 $timeout(function() {
                     self.select(self.currentScript);
                 }, 1);
