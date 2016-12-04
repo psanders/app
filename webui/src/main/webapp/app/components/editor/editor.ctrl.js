@@ -74,21 +74,21 @@
                 newScript = true;
             }
 
-            var e = getEditorById(getCurrentScript().name);
-            e.save();
+            if( getCurrentScript() !== undefined) {
+                var e = getEditorById(getCurrentScript().name);
+                e.save();
 
-            if (getCurrentScript().source != e.getValue()) {
-                self.loading = true;
+                if (getCurrentScript().source != e.getValue()) {
+                    self.loading = true;
+                }
+                self.currentScript.source = e.getValue();
             }
-
-            self.currentScript.source = e.getValue();
 
             Apps.save(self.app).$promise
             .then(function(result){
                 if (newScript == true) {
                     self.app = result;
                     self.currentScript = getScriptByName("main.js");
-                    console.log("cebo this is not a new script");
                 }
 
                 // This is split second is enough to allow the GUI to render
