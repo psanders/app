@@ -362,7 +362,6 @@
         }
 
         function setApp() {
-            console.log('appId ' + $location.search().appId);
             var appId = $location.search().appId;
             if (appId) {
                 Apps.get({appId: appId}).$promise
