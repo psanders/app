@@ -50,11 +50,6 @@
             });
         }
 
-        self.hasCode = function() {
-            if(code === undefined) return false;
-            return true;
-        }
-
         self.logout = function() {
             CredentialsService.destroyCredentials();
             Users.destroyUser();
@@ -85,18 +80,12 @@
         }
 
         self.signup = function() {
-            var c = $base64.encode(self.user.email);
-
-            if (self.hasCode() && c !== code) {
-                toastMe("Ups! Something bad happen :(", 15000);
-                return;
-            }
-
+            console.log(self.user);
             Users.getResource().save(self.user).$promise
             .then(function(result) {
                 loginNow(self.user.email, self.user.password);
             }).catch(function(error) {
-                if (error.data === undefined) {
+                if (error.data === undefined || error.data.message === undefined) {
                     toastMe("Unable to create account. Code #0009");
                 } else {
                     toastMe(error.data.message);
@@ -125,8 +114,7 @@
                $location.url('apps');
             }
 
-            if(self.hasCode()) {
-                self.user.email = $base64.decode(code);
+            if($location.search().signup !== undefined) {
                 view = 'signup';
             }
         }
