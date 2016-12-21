@@ -60,13 +60,13 @@
     <dependency>
       <groupId>org.astivetoolkit</groupId>
       <artifactId>atk-server-client</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.6</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.astivetoolkit</groupId>
       <artifactId>atk-api-agi</artifactId>
-      <version>1.0.5</version>
+      <version>1.0.6</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>

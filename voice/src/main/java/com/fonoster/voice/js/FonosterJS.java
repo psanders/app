@@ -25,7 +25,6 @@ public class FonosterJS extends Astivlet {
     // Eventually I will migrate this to any js engine supporting EMACS 6
     private static final Logger LOG = LoggerFactory.getLogger(FonosterJS.class);
     private static final CommonsConfig commonsConfig = CommonsConfig.getInstance();
-    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByExtension("js");
 
     @Override
     public void service(AstivletRequest request, AstivletResponse response) {
@@ -127,6 +126,8 @@ public class FonosterJS extends Astivlet {
             ASRFactory asrFactory = new ASRFactory(callDetailRecord.getAccount().getUser());
 
             // Call context
+            ScriptEngine engine = new ScriptEngineManager().getEngineByExtension("js");
+
             ScriptContext callContext = new SimpleScriptContext();
             callContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
             Bindings engineScope = callContext.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -159,6 +160,13 @@ public class FonosterJS extends Astivlet {
             // Perhaps is a server error, such as unable to find an audio file or connect with a service provider
             // This type of exception will only be reported to the staff.
             LOG.warn("Server error, cause by: ", e);
+        }
+
+        // WARNING: Not yet tested
+        try {
+            response.hangup();
+        } catch (AgiException e) {
+            LOG.debug("Hang up call: Double kill");
         }
 
         LOG.debug("Call complete. Performing post call computations...");

@@ -1,6 +1,5 @@
 package com.fonoster.core;
 
-
 import com.fonoster.voice.conversation.Conversation;
 import org.junit.Before;
 import org.junit.Test;
