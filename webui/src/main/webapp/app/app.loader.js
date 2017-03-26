@@ -1,4 +1,4 @@
-head.js('/static/lib/bower_components/angular/angular.min.js',
+head.load('/static/lib/bower_components/angular/angular.min.js',
     '/static/lib/bower_components/angular-ui-router/release/angular-ui-router.min.js',
     '/static/lib/bower_components/angular-sanitize/angular-sanitize.min.js',
     '/static/lib/bower_components/angular-resource/angular-resource.min.js',
@@ -74,8 +74,9 @@ head.js('/static/lib/bower_components/angular/angular.min.js',
     'app/shared/sidenav/sidenav.ctrl.js',
     'app/shared/tour.ctrl.js',
     'app/app.config.js',
-    'app/app.module.js',
-function() {
+    'app/app.module.js');
+
+head.ready('app.module.js', function() {
     // all done
     angular.bootstrap(document, ['fonoster']);
 });
