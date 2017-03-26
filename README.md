@@ -10,3 +10,5 @@ Once the system is up, you can run Jetty using the following command line instru
 cd fonoster-app/webui
 mvn jetty:run
 ```
+
+Then the console will be available at http://localhost:8181
