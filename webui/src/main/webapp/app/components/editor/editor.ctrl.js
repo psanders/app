@@ -31,7 +31,7 @@
         var oldAppName;
         var removedScript;
         var editors = [];
-        var starterScript = "// Go to https://goo.gl/3Q7ktJ for more examples\nsay(\"Hello World!\", {voice: 'allison'});\n";
+        var starterScript = "// Go to https://goo.gl/DfU3RM for more examples\nsay(\"Hello World!\", {voice: 'allison'});\n";
         var oPhone;
 
         init();
