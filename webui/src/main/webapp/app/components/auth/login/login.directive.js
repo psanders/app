@@ -2,9 +2,9 @@
 
     'use strict';
 
-    var auth = angular.module('fnAuth');
+    var app = angular.module('fnAuth');
 
-    auth.directive('login', function(){
+    app.directive('login', function() {
         return {
             restrict: 'E',
             templateUrl: 'app/components/auth/login/login.tpl.html'

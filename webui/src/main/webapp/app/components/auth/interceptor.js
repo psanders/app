@@ -8,7 +8,8 @@
         $httpProvider.interceptors.push('TokenInterceptor');
     }]);
 
-    auth.factory('TokenInterceptor', function ($rootScope, $window, $q, $base64, CredentialsService) {
+    auth.factory('TokenInterceptor', ['$rootScope', '$window', '$q', '$base64', 'CredentialsService',
+        function ($rootScope, $window, $q, $base64, CredentialsService) {
         return {
             request: function (config) {
                 config.headers = config.headers || {};
@@ -39,6 +40,6 @@
                 return $q.reject(rejection);
             }
         };
-    });
+    }]);
 
 })();

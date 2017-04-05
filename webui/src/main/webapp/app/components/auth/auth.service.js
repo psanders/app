@@ -2,9 +2,9 @@
 
     'use strict';
 
-    var auth = angular.module('fnAuth', ['base64', 'ngResource']);
+    var app = angular.module('fnAuth', ['base64', 'ngResource']);
 
-    auth.service('CredentialsService', function($window) {
+    app.service('CredentialsService', ['$window', function($window) {
 
         this.setCredentials = function(credentials) {
             $window.localStorage.credentials = JSON.stringify(credentials);
@@ -23,14 +23,14 @@
             if ($window.localStorage.credentials) return true;
             return false;
         };
-    });
+    }]);
 
-    auth.service('LoginService', function($resource, $rootScope) {
+    app.service('LoginService', ['$resource', '$rootScope', function($resource, $rootScope) {
         var credentials = $resource($rootScope.apiUrl + '/users/credentials?result=json');
 
         this.getResource = function() {
           return credentials;
         }
-    });
+    }]);
 
 })();

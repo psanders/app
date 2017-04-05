@@ -2,18 +2,22 @@
 
     'use strict';
 
-    angular.module('fnAuth').config(['$stateProvider', function($stateProvider) {
-      $stateProvider.state('login', {
-        url: '/login',
-        templateUrl: 'app/components/auth/auth.tpl.html',
-        controller: 'AuthCtrl'
-      });
-    }]);
+    angular.module('fnAuth')
+        .config(['$stateProvider', config])
+        .controller('AuthCtrl', AuthCtrl);
 
-    angular.module('fnAuth').controller('AuthCtrl', ['$http', '$location', '$state', '$base64', '$window', '$mdToast', '$document',
-        'LoginService', 'CredentialsService', 'Users',
-        function($http, $location, $state, $base64, $window, $mdToast, $document, LoginService, CredentialsService, Users) {
+    AuthCtrl.$inject = ['$http',
+        '$location',
+        '$state',
+        '$base64',
+        '$window',
+        '$mdToast',
+        '$document',
+        'LoginService',
+        'CredentialsService',
+        'Users'];
 
+    function AuthCtrl($http, $location, $state, $base64, $window, $mdToast, $document, LoginService, CredentialsService, Users) {
         var self = this;
         var view = 'login';
         var code = $location.search().code;
@@ -153,6 +157,14 @@
             });
         }
 
-    }]);
+    }
+
+    function config($stateProvider) {
+        $stateProvider.state('login', {
+            url: '/login',
+            templateUrl: 'app/components/auth/auth.tpl.html',
+            controller: 'AuthCtrl'
+        });
+    }
 
 })();
