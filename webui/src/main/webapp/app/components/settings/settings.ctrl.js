@@ -1,17 +1,22 @@
 (function() {
     'use strict';
 
-    angular.module('fnSettings', ['ngResource']);
+    var app = angular.module('fnSettings', ['ngResource']);
 
-    angular.module('fnSettings').config(['$stateProvider', function($stateProvider) {
-      $stateProvider.state('settings', {
-        url: '/settings',
-        templateUrl: 'app/components/settings/settings.tpl.html',
-        controller: 'SettingsCtrl'
-      });
-    }]);
+    app.config(['$stateProvider', config])
+       .controller('SettingsCtrl', SettingsCtrl);
 
-    angular.module('fnSettings').controller('SettingsCtrl', ['$scope', function($scope) {
-        // Nothing yet
-    }]);
+    SettingsCtrl.$inject = [];
+
+    function SettingsCtrl() {
+        // Nothing goes here
+    }
+
+    function config($stateProvider) {
+        $stateProvider.state('settings', {
+            url: '/settings',
+            templateUrl: 'app/components/settings/settings.tpl.html',
+            controller: 'SettingsCtrl'
+        });
+    }
 })();
