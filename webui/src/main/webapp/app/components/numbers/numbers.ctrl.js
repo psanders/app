@@ -97,7 +97,7 @@ import * as moment from 'moment-timezone';
         function toastMe(msg, hideDelay) {
             if (!hideDelay) hideDelay = 2000;
             $mdToast.show($mdToast.simple()
-                .position('top right')
+                .position('bottom right')
                 .parent($document[0].querySelector('#numbers'))
                 .content(msg)
                 .hideDelay(hideDelay))
