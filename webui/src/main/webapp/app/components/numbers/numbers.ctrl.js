@@ -1,3 +1,5 @@
+import * as moment from 'moment-timezone';
+
 (function() {
     'use strict';
 
@@ -5,8 +7,7 @@
         .config(['$stateProvider', config])
         .controller('NumbersCtrl', NumbersCtrl);
 
-    NumbersCtrl.$inject = [
-        '$window', 
+    NumbersCtrl.$inject = ['$window',
         '$q', 
         '$timeout', 
         '$document', 
@@ -16,10 +17,13 @@
         'Numbers', 
         'Users'];
 
-    function NumbersCtrl($window, $q, $timeout, $document, $mdToast, $filter, $mdDialog, Numbers, User) {
+    function NumbersCtrl($window, $q, $timeout, $document, $mdToast, $filter, $mdDialog, Numbers, Users) {
         var self = this;
         self.formatLocal = formatLocal;
-        self.user = User.getUser();
+        self.user = Users.getUser();
+
+        // Sets proper timezone for 'asCalendar' filter
+        moment.tz.setDefault(Users.getUser().timezone)
 
         self.query = {
             order: '-modified',

@@ -1,3 +1,5 @@
+import * as moment from 'moment-timezone';
+
 (function() {
     'use strict';
 
@@ -5,12 +7,15 @@
         .config(['$stateProvider', config])
         .controller('RecordingsCtrl', RecordingsCtrl);
 
-    RecordingsCtrl.$inject = ['$window', '$q', '$timeout',  'Recordings', 'ngAudio', '$mdDialog'];
+    RecordingsCtrl.$inject = ['$window', '$q', '$timeout',  'Recordings', 'ngAudio', '$mdDialog', 'Users'];
 
-    function RecordingsCtrl($window, $q, $timeout, Recordings, ngAudio, $mdDialog) {
+    function RecordingsCtrl($window, $q, $timeout, Recordings, ngAudio, $mdDialog, Users) {
         var self = this;
         self.startDate = new Date();
         self.endDate = new Date();
+
+        // Sets proper timezone for 'asCalendar' filter
+        moment.tz.setDefault(Users.getUser().timezone)
 
         self.query = {
             order: '-modified',

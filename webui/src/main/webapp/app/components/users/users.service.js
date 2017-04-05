@@ -2,13 +2,13 @@
 
     'use strict';
 
-    var apps = angular.module('fnUsers', ['ngResource']);
+    var app = angular.module('fnUsers', ['ngResource']);
 
-    apps.service('Users', function($resource, $window, $rootScope, CredentialsService) {
+    app.service('Users', ['$resource', '$window', '$rootScope', 'CredentialsService',
+        function($resource, $window, $rootScope, CredentialsService) {
 
         this.setUser = function(user) {
             $window.localStorage.user = JSON.stringify(user);
-            moment.tz.setDefault(user.timezone);
         };
 
         this.getUser = function() {
@@ -29,6 +29,6 @@
                 email: "@email"
             });
         }
-    });
+    }]);
 
 })();

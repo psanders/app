@@ -1,9 +1,9 @@
 <md-card id="calls-widget" ng-controller="CallsCtrl as ctrl">
-    <md-toolbar class="md-table-toolbar md-default" ng-show="!filter" aria-hidden="false">
+    <md-toolbar class="md-table-toolbar md-default" ng-show="!ctrl.filter" aria-hidden="false">
         <div class="md-toolbar-tools">
             <span>Calls</span>
             <span flex></span>
-            <md-button class="md-icon-button" aria-label="Search" ng-click="filter=true">
+            <md-button class="md-icon-button" aria-label="Search" ng-click="ctrl.filter=true">
                 <md-icon md-font-library="material-icons">search</md-icon>
                 <md-tooltip md-direction="left">
                     Search calls
@@ -12,14 +12,14 @@
         </div>
     </md-toolbar>
 
-    <md-toolbar class="md-table-toolbar md-default" ng-show="filter" aria-hidden="false">
+    <md-toolbar class="md-table-toolbar md-default" ng-show="ctrl.filter" aria-hidden="false">
         <div class="md-toolbar-tools">
             <p class="md-body-1">From</p>
             <md-datepicker class="right15" ng-model="ctrl.startDate" md-placeholder="dd/mm/yyyy" ng-change="ctrl.updateView()"></md-datepicker>
             <p class="md-body-1">To</p>
             <md-datepicker ng-model="ctrl.endDate" md-placeholder="dd/mm/yyyy" ng-change="ctrl.updateView()"></md-datepicker>
             <span flex></span>
-            <md-button class="md-icon-button md-button md-ink-ripple" type="button" aria-label="close" ng-click="filter=false">
+            <md-button class="md-icon-button md-button md-ink-ripple" type="button" aria-label="close" ng-click="ctrl.filter=false">
                 <md-icon class="material-icons">close</md-icon>
             </md-button>
         </div>
@@ -41,10 +41,8 @@
             <tbody md-body>
                 <tr md-row ng-repeat="call in ctrl.calls.calls | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
                     <td md-cell>{{call.created | asCalendar}}</td>
-                   <!-- <td md-cell>{{formatLocal(user.countryCode, call.from)}}</td>-->
-                    <td md-cell>{{call.from}}</td>
-                    <!-- <td md-cell>{{formatLocal(user.countryCode, call.to)}}</td> -->
-                    <td md-cell>{{call.to}}</td>
+                    <td md-cell>{{ctrl.formatLocal(user.countryCode, call.from)}}</td>
+                    <td md-cell>{{ctrl.formatLocal(user.countryCode, call.to)}}</td>
                     <td md-cell>{{call.status | humanize}}</td>
                     <td md-cell>{{call.answerBy | humanize}}</td>
                     <td md-cell>{{call.duration}}</td>

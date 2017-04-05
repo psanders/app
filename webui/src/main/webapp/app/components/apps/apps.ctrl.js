@@ -1,5 +1,9 @@
+import * as moment from 'moment-timezone';
+
 (function() {
     'use strict';
+
+    console.log('DEBUG 0001');
 
     angular.module('fnApps')
         .config(['$stateProvider', config])
@@ -12,9 +16,13 @@
         '$mdToast',
         '$document',
         'CredentialsService',
-        'Apps'];
+        'Apps',
+        'Users'
+        ];
 
-    function AppsCtrl($location, $window, $q, $timeout, $mdToast, $document, CredentialsService, Apps) {
+    function AppsCtrl($location, $window, $q, $timeout, $mdToast, $document, CredentialsService, Apps, Users) {
+        // Sets proper timezone for 'asCalendar' filter
+        moment.tz.setDefault(Users.getUser().timezone)
 
         var self = this;
 

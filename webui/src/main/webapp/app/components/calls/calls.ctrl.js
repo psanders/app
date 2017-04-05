@@ -1,3 +1,5 @@
+import * as moment from 'moment-timezone';
+
 (function() {
     'use strict';
 
@@ -5,13 +7,16 @@
         .config(['$stateProvider', config])
         .controller('CallsCtrl', CallsCtrl);
 
-    CallsCtrl.$inject = ['$window', '$q', '$timeout', 'Calls'];
+    CallsCtrl.$inject = ['$window', '$q', '$timeout', 'Calls', 'Users'];
 
-    function CallsCtrl($window, $q, $timeout, Calls) {
+    function CallsCtrl($window, $q, $timeout, Calls, Users) {
         var self = this;
         self.formatLocal = formatLocal;
         self.startDate = new Date();
         self.endDate = new Date();
+
+        // Sets proper timezone for 'asCalendar' filter
+        moment.tz.setDefault(Users.getUser().timezone)
 
         self.query = {
             order: '-modified',

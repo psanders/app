@@ -1,3 +1,19 @@
+import * as CodeMirror from 'codemirror';
+
+require('../../node_modules/codemirror/addon/fold/foldcode.js');
+require('../../node_modules/codemirror/addon/fold/brace-fold.js');
+require('../../node_modules/codemirror/addon/fold/foldgutter.js');
+require('../../node_modules/codemirror/addon/fold/comment-fold.js');
+require('../../node_modules/codemirror/addon/lint/lint.js');
+require('../../node_modules/codemirror/addon/lint/javascript-lint.js');
+require('../../node_modules/codemirror/addon/selection/active-line.js');
+require('../../node_modules/codemirror/addon/edit/closebrackets.js');
+require('../../node_modules/codemirror/addon/dialog/dialog.js');
+require('../../node_modules/codemirror/addon/search/searchcursor.js');
+require('../../node_modules/codemirror/addon/search/search.js');
+require('../../node_modules/codemirror/mode/javascript/javascript.js');
+require('../../node_modules/jshint/dist/jshint.js');
+
 (function() {
     'use strict';
 
@@ -579,7 +595,7 @@
     function config($stateProvider) {
         $stateProvider.state('/editor', {
             url: '/editor',
-            templateUrl: 'app/components/editor/editor.tpl.html',
+            templateUrl: '../../components/editor/editor.tpl.html',
             controller: 'EditorCtrl'
         });
     }

@@ -1,3 +1,6 @@
+import * as moment from 'moment-timezone';
+import * as braintree from 'braintree-web';
+
 (function() {
     'use strict';
 
@@ -14,6 +17,9 @@
         $scope.newPntInfo.method = {};
         $scope.pntNote = '';
         $scope.card = {};
+
+        // Sets proper timezone for 'asCalendar' filter
+        moment.tz.setDefault(Users.getUser().timezone)
 
         var cView = 'PNT_DETAIL';
         var editCard = false;
@@ -211,7 +217,7 @@
          var toastMe = function(msg, hideDelay) {
              if (!hideDelay) hideDelay = 2000;
                 $mdToast.show($mdToast.simple()
-                     .position('top right')
+                     .position('bottom right')
                      .parent($document[0].querySelector('#content'))
                      .content(msg)
                      .hideDelay(hideDelay))

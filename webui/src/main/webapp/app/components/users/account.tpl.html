@@ -1,13 +1,13 @@
-<div ng-controller="AccountCtrl" layout-padding>
-    <form ng-submit="login($event)" >
+<div ng-controller="AccountCtrl as ctrl" layout-padding>
+    <form ng-submit="ctrl.login($event)" >
         <div layout="column" >
             <md-input-container>
                 <label>Account ID</label>
-                <input  ng-model="account.accountId" disabled>
+                <input  ng-model="ctrl.account.accountId" disabled>
             </md-input-container>
             <md-input-container>
                 <label>Token</label>
-                <input ng-model="account.token" disabled>
+                <input ng-model="ctrl.account.token" disabled>
             </md-input-container>
         </div>
         <div layout="row">
