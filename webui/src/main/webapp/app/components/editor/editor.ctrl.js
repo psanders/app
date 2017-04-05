@@ -2,12 +2,11 @@
     'use strict';
 
     angular.module('fnEditor')
-        .config(config)
-        .filter('keyboardShortcut', keyboardShortcut)
+        .config(['$stateProvider', config])
+        .filter('keyboardShortcut', ['$window', keyboardShortcut])
         .controller('EditorCtrl', EditorCtrl);
 
-    EditorCtrl.$inject = ['$scope',
-        '$window',
+    EditorCtrl.$inject = ['$window',
         '$mdMedia',
         '$mdSidenav',
         '$mdDialog',
@@ -22,8 +21,8 @@
         'Users',
         'ConfigService'];
 
-    function EditorCtrl($scope, $window, $mdMedia, $mdSidenav, $mdDialog, $interval, $mdToast, $location, $timeout,
-        $document,  Apps, Calls, Numbers , Users, ConfigService) {
+    function EditorCtrl($window, $mdMedia, $mdSidenav, $mdDialog, $interval, $mdToast, $location, $timeout,
+        $document, Apps, Calls, Numbers , Users, ConfigService) {
 
         var self = this;
         var cm;
@@ -306,19 +305,19 @@
 
             Calls.save(callRequest).$promise
             .then(function(cdr) {
-               $scope.connected = true;
-               $scope.callId = cdr.callId;
+               self.connected = true;
+               self.callId = cdr.callId;
                // Show toast here
                // Check every 5 seconds for change on the call status
                var monitorId;
                monitorId = $interval(function() {
-                   if(!$scope.callId) {
+                   if(!self.callId) {
                         $interval.cancel(monitorId);
                         return;
                    }
 
                    // Getting status
-                   Calls.get({callId: $scope.callId}).$promise
+                   Calls.get({callId: self.callId}).$promise
                    .then(function(cRecord) {
 
                        if (cRecord.status == 'FAILED'    ||
@@ -343,9 +342,9 @@
                            return;
                        }
 
-                       if ($scope.oldStatus != cRecord.status) {
+                       if (self.oldStatus != cRecord.status) {
                            simpleToast(getStatus(cRecord.status), 7000);
-                           $scope.oldStatus = cRecord.status;
+                           self.oldStatus = cRecord.status;
                        }
                    }).catch(function(error) {
                         $interval.cancel(monitorId);

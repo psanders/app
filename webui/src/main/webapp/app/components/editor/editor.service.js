@@ -2,18 +2,19 @@
 
     'use strict';
 
-    angular.module('fnEditor', ['ngResource']);
+    var app = angular.module('fnEditor', ['ngResource']);
 
-    angular.module('fnEditor').service('ConfigService', function($window) {
+    app.service('ConfigService', ['$window', function($window) {
+        var self = this;
 
-        this.setTheme = function(theme) {
+        self.setTheme = function(theme) {
             $window.localStorage.theme = theme;
         };
 
-        this.getTheme = function() {
+        self.getTheme = function() {
             if (!$window.localStorage.theme) return "base16-light";
             return $window.localStorage.theme;
         };
-    });
+    }]);
 
 })();
