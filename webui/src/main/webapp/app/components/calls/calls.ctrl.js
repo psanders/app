@@ -1,46 +1,41 @@
 (function() {
     'use strict';
 
-    var app = angular.module('fnCalls');
+    angular.module('fnCalls')
+        .config(['$stateProvider', config])
+        .controller('CallsCtrl', CallsCtrl);
 
-    app.config(['$stateProvider', function($stateProvider) {
-      $stateProvider.state('calls', {
-        url: '/calls',
-        templateUrl: 'app/components/calls/calls.tpl.html',
-        controller: 'CallsCtrl'
-      });
-    }]);
+    CallsCtrl.$inject = ['$window', '$q', '$timeout', 'Calls'];
 
-    app.controller('CallsCtrl', ['$scope','$window', '$q', '$timeout', 'Calls',
-        function($scope, $window, $q, $timeout, Calls) {
+    function CallsCtrl($window, $q, $timeout, Calls) {
+        var self = this;
+        self.formatLocal = formatLocal;
+        self.startDate = new Date();
+        self.endDate = new Date();
 
-        $scope.formatLocal = formatLocal;
-        $scope.startDate = new Date();
-        $scope.endDate = new Date();
-
-        $scope.query = {
+        self.query = {
             order: '-modified',
             limit: 10,
             page: 1
         };
 
-        $scope.updateView = function() {
-            if(!$scope.startDate || !$scope.endDate) return;
+        self.updateView = function() {
+            if(!self.startDate || !self.endDate) return;
 
-            var cRequest = {start: moment($scope.startDate).format("YYYY-MM-DD"), end: moment($scope.endDate).format("YYYY-MM-DD")};
+            var cRequest = {start: moment(self.startDate).format("YYYY-MM-DD"), end: moment(self.endDate).format("YYYY-MM-DD")};
 
             Calls.get(cRequest).$promise
             .then(function(result) {
-                $scope.calls = result;
+                self.calls = result;
             })
             .catch(function(error) {
                 console.error(JSON.stringify(error));
             });
 
-            $scope.filter = false;
+            self.filter = false;
         }
 
-        $scope.onPageChange = function(page, limit) {
+        self.onPageChange = function(page, limit) {
             var deferred = $q.defer();
 
             $timeout(function () {
@@ -50,7 +45,7 @@
             return deferred.promise;
         };
 
-        $scope.onOrderChange = function(order) {
+        self.onOrderChange = function(order) {
             var deferred = $q.defer();
 
             $timeout(function () {
@@ -60,7 +55,15 @@
             return deferred.promise;
         };
 
-        $scope.updateView();
-    }]);
+        self.updateView();
+    }
+
+    function config($stateProvider) {
+        $stateProvider.state('calls', {
+            url: '/calls',
+            templateUrl: 'app/components/calls/calls.tpl.html',
+            controller: 'CallsCtrl'
+        });
+    }
 
 })();
