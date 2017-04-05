@@ -1,57 +1,60 @@
 // Authentication
-import _ from './components/auth/auth.service.js'
-import _ from './components/auth/auth.directive.js'
-import _ from './components/auth/auth.ctrl.js'
-import _ from './components/auth/interceptor.js'
-import _ from './components/auth/login/login.directive.js'
-import _ from './components/auth/forgot/forgot.directive.js'
-import _ from './components/auth/signup/signup.directive.js'
-
+require('./components/auth/auth.service.js');
+require('./components/auth/auth.directive.js');
+require('./components/auth/auth.ctrl.js');
+require('./components/auth/interceptor.js');
+require('./components/auth/login/login.directive.js');
+require('./components/auth/forgot/forgot.directive.js');
+require('./components/auth/signup/signup.directive.js');
 // Shared
-import _ from './config.js'
-import _ from './shared/common-directives.js'
-import _ from './shared/common-filters.js'
-import _ from './shared/sidenav/sidenav.service.js'
-import _ from './shared/sidenav/sidenav.directive.js'
-import _ from './shared/sidenav/sidenav.ctrl.js'
-import _ from './shared/topnav/topnav.service.js'
-import _ from './shared/topnav/topnav.directive.js'
-import _ from './shared/topnav/topnav.ctrl.js'
-import _ from './shared/tour.ctrl.js'
-import _ from './shared/countries.js'
-import _ from './shared/timezones.js'
-
+require('./config.js');
+require('./shared/common-directives.js');
+require('./shared/common-filters.js');
+require('./shared/sidenav/sidenav.service.js');
+require('./shared/sidenav/sidenav.directive.js');
+require('./shared/sidenav/sidenav.ctrl.js');
+require('./shared/topnav/topnav.service.js');
+require('./shared/topnav/topnav.directive.js');
+require('./shared/topnav/topnav.ctrl.js');
+require('./shared/tour.ctrl.js');
+require('./shared/countries.js');
+require('./shared/timezones.js');
 // Users stuff
-import _ from './components/users/users.service.js'
-import _ from './components/users/users.directive.js'
-import _ from './components/users/users.ctrl.js'
+require('./components/users/users.service.js');
+require('./components/users/users.directive.js');
+require('./components/users/users.ctrl.js');
 // Applications
-import _ from './components/apps/apps.service.js'
-import _ from './components/apps/apps.ctrl.js'
+require('./components/apps/apps.service.js');
+require('./components/apps/apps.ctrl.js');
 // Billing
-import _ from './components/billing/billing.service.js'
-import _ from './components/billing/billing.directive.js'
-import _ from './components/billing/billing.ctrl.js'
+require('./components/billing/billing.service.js');
+require('./components/billing/billing.directive.js');
+require('./components/billing/billing.ctrl.js');
 // Calls
-import _ from './components/calls/calls.service.js'
-import _ from './components/calls/calls.ctrl.js'
+require('./components/calls/calls.service.js');
+require('./components/calls/calls.ctrl.js');
 // Dashboard
-import _ from './components/dashboard/dashboard.service.js'
-import _ from './components/dashboard/dashboard.ctrl.js'
+require('./components/dashboard/dashboard.service.js');
+require('./components/dashboard/dashboard.ctrl.js');
 // Phone/Sip Numbers
-import _ from './components/numbers/numbers.service.js'
-import _ from './components/numbers/numbers.ctrl.js'
+require('./components/numbers/numbers.service.js');
+require('./components/numbers/numbers.ctrl.js');
 // Recordings
-import _ from './components/recordings/recordings.service.js'
-import _ from './components/recordings/recordings.ctrl.js'
+require('./components/recordings/recordings.service.js');
+require('./components/recordings/recordings.ctrl.js');
 // Settings
-import _ from './components/settings/settings.ctrl.js'
+require('./components/settings/settings.ctrl.js');
+// Editor
+require('./components/editor/editor.service.js');
+require('./components/editor/editor.directive.js');
+require('./components/editor/topbar.directive.js');
+require('./components/editor/editor.ctrl.js');
 
 (function() {
 
     'use strict';
 
-    angular.module('fonoster',
+    var app = angular.module('fonoster',
         ['ui.router',
         'ngMaterial',
         'md.data.table',
@@ -69,12 +72,13 @@ import _ from './components/settings/settings.ctrl.js'
         'fnSettings',
         'fnDashboard',
         'fnNumbers',
-        'fnApps',
         'fnRecordings',
-        'fnCalls'
+        'fnCalls',
+        'fnEditor',
+        'fnApps'
         ]);
 
-    angular.module('fonoster').config(['$stateProvider', '$urlRouterProvider', '$mdThemingProvider',
+    app.config(['$stateProvider', '$urlRouterProvider', '$mdThemingProvider',
         function($stateProvider, $urlRouterProvider, $mdThemingProvider) {
 
         $urlRouterProvider.otherwise('/dashboard');
