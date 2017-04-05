@@ -4,6 +4,9 @@ timestamp() {
   date +"%Y%m%d%H%M"
 }
 
+#
+cd webui/src/main/webapp/app && npm i && webpack -p
+
 # Build without assembly first
 mvn package -Dmaven.test.skip=true
 
