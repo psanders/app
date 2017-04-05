@@ -156,7 +156,6 @@
                     // Nothing to do
             });
         }
-
     }
 
     function config($stateProvider) {
