@@ -2,19 +2,20 @@
 
     'use strict';
 
-    angular.module('fnNumbers', ['ngResource']);
+    var app = angular.module('fnNumbers', ['ngResource']);
 
-    angular.module('fnNumbers', ['ngResource']).service('Numbers', function($resource, $rootScope, CredentialsService) {
+    app.service('Numbers', ['$resource', '$rootScope', 'CredentialsService', function($resource, $rootScope, CredentialsService) {
         var accountId = CredentialsService.getCredentials().accountId;
+        var self = this;
 
-        this.getResource = function() {
+        self.getResource = function() {
             return $resource($rootScope.apiUrl + '/accounts/:accountId/numbers/:number?result=json', {accountId: accountId});
         }
 
         // Preferred number for testing
-        this.getPreferredResource = function() {
+        self.getPreferredResource = function() {
             return $resource($rootScope.apiUrl + '/accounts/:accountId/numbers/preferred?result=json', {accountId: accountId, number: '@number'});
         }
-    });
+    }]);
 
 })();

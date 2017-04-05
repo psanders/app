@@ -1,4 +1,4 @@
-<md-card id="numbers-widget" ng-controller="NumbersCtrl" ng-show="numbers.total > 0">
+<md-card id="numbers-widget" ng-controller="NumbersCtrl as ctrl" ng-show="numbers.total > 0">
     <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
         <div class="md-toolbar-tools">
             <span>Numbers</span>
@@ -14,7 +14,7 @@
 
     <md-table-container>
         <table md-table md-progress="deferred">
-            <thead md-head md-order="query.order" md-on-reorder="onOrderChange">
+            <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
                 <tr md-row>
                     <th md-column></th>
                     <th md-column class="no-padding" order-by="number">Number</th>
@@ -26,15 +26,15 @@
             </thead>
             <tbody md-body>
                 <!-- WARNING: Inline css here! -->
-                <tr md-row ng-repeat="number in numbers.phoneNumbers | orderBy: query.order | limitTo: query.limit: (query.page - 1) * query.limit">
+                <tr md-row ng-repeat="number in ctrl.numbers.phoneNumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
                     <td md-cell style="padding: 0" layout-align="center end" layout="row">
-                        <md-button style="margin: 0"  ng-show="number.preferred" class="md-icon-button" ng-click="setPreferred(number)">
+                        <md-button style="margin: 0"  ng-show="number.preferred" class="md-icon-button" ng-click="ctrl.setPreferred(number)">
                             <md-icon md-font-library="material-icons">radio_button_checked</md-icon>
                             <md-tooltip md-direction="left">
                                 Default test number
                             </md-tooltip>
                         </md-button>
-                        <md-button style="margin:0" ng-show="!number.preferred" class="md-icon-button" ng-click="setPreferred(number)">
+                        <md-button style="margin:0" ng-show="!number.preferred" class="md-icon-button" ng-click="ctrl.setPreferred(number)">
                             <md-icon md-font-library="material-icons">radio_button_unchecked</md-icon>
                             <md-tooltip md-direction="left">
                                 Click to select as test number
@@ -42,7 +42,7 @@
                         </md-button>
                     </td>
                     <td md-cell style="padding: 0">
-                        {{formatLocal(user.countryCode, number.number)}}
+                        {{ctrl.formatLocal(ctrl.user.countryCode, number.number)}}
                     </td>
                     <td md-cell>{{number.countryISOCode}}</td>
                     <td md-cell>
@@ -50,18 +50,15 @@
                         <span ng-show="number.smsEnabled">, SMS</span>
                         <span ng-show="number.mmsEnabled">, MMS</span>
                     </td>
-                    <!--<td md-cell>
-                        <span>None<md-icon md-font-library="material-icons">arrow_drop_down</md-icon></span>
-                    </td>-->
                     <td md-cell>{{number.modified | asCalendar}}</td>
                 </tr>
             </tbody>
         </table>
     </md-table-container>
 
-    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="query.limit" md-page="query.page" md-total="{{numbers.total}}" md-on-paginate="onPageChange" md-page-select></md-table-pagination>
+    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page" md-total="{{ctrl.numbers.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
 </md-card>
 
-<div ng-show="numbers.total == 0" layout="column" layout-align="center center" layout-padding class="not-found-card" >
+<div ng-show="ctrl.numbers.total == 0" layout="column" layout-align="center center" layout-padding class="not-found-card" >
     <h2 class="md-headline">Not items found!</h2>
 </div>
