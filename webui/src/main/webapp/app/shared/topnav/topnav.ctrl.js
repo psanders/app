@@ -3,8 +3,7 @@
 
     angular.module('fnTopnav').controller('TopnavCtrl', TopnavCtrl);
 
-    TopnavCtrl.$inject =
-        ['$interval',
+    TopnavCtrl.$inject = ['$interval',
         '$scope',
         '$state',
         '$location',

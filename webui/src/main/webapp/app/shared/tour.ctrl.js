@@ -1,3 +1,5 @@
+import * as tour from 'tour';
+
 (function() {
     'use strict';
 
@@ -6,7 +8,8 @@
     angular.module('fnTour').controller('TourCtrl',
         ['$window', '$state', '$location', function($window, $state, $location) {
         var self = this;
-        var Tour = window.Tour.default;
+        var Tour = tour.default;
+
         var mainTour = {
             canExit: true,
             showPrevious: false,

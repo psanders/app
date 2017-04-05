@@ -2,14 +2,14 @@
 
     'use strict';
 
-    angular.module('fnSidenav', []);
+    var app = angular.module('fnSidenav', []);
 
-    angular.module('fnSidenav').service('SidenavStatus', function($mdSidenav) {
+    app.service('SidenavStatus', ['$mdSidenav', function($mdSidenav) {
         this.toggleSidebar = function() {
             $mdSidenav('sidenav').toggle()
             .then(function () {
                 //
             });
         };
-    });
+    }]);
 })();

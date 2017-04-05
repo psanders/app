@@ -1,5 +1,6 @@
-(function() {
+import * as moment from 'moment-timezone';
 
+(function() {
     'use strict';
 
     var filters = angular.module('fnFilters',[]);
@@ -36,6 +37,7 @@
     });
 
     filters.filter('asCalendar', function () {
+
         return function (date) {
             if (moment().format("DDMMYYYY") == moment(date).format("DDMMYYYY")) {
                 return moment(date).calendar();
