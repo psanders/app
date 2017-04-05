@@ -14,26 +14,15 @@
             display: none !important;
         }
     </style>
-    <link rel="stylesheet" href="/static/lib/bower_components/angular-material/layouts/angular-material.layouts.min.css"/>
-    <link rel="stylesheet" href="/static/lib/bower_components/angular-material/angular-material.min.css"/>
-    <link href="/static/lib/bower_components/angular-material-data-table/dist/md-data-table.min.css" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="/static/lib/bower_components/robotodraft/robotodraft.css"/>
-    <link rel="stylesheet" href="/static/lib/bower_components/nvd3/build/nv.d3.css"/>
-    <!-- Todo: Install w/ bower -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://npmcdn.com/tour@latest/dist/tour.css"/>
+    <link rel="stylesheet" href="app/node_modules/angular-material/layouts/angular-material.layouts.min.css"/>
+    <link rel="stylesheet" href="app/node_modules/angular-material/angular-material.min.css"/>
+    <link href="app/node_modules/angular-material-data-table/dist/md-data-table.min.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="app/node_modules/nvd3/build/nv.d3.css"/>
+    <link rel="stylesheet" href="app/node_modules/tour/dist/tour.css"/>
     <link rel="stylesheet" href="/static/assets/fonts/fonts.css">
     <link rel="stylesheet" href="/static/assets/css/main.css">
     <link rel="icon" href="/static/assets/images/favicon.png" type="image/x-icon" />
-    <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-        ga('create', 'UA-71722942-1', 'auto');
-        ga('send', 'pageview');
-    </script>
     <style>
         .md-subheader.md-default-theme, .md-subheader {
             color: rgba(0,0,0,0.54);
@@ -64,7 +53,6 @@
     </style>
 </head>
 <body ng-controller="AuthCtrl as ctrl" layout="column" ng-cloak>
-
     <auth ng-if="!ctrl.isAuthenticated()" layout-fill></auth>
     <topnav ng-if="ctrl.isAuthenticated()" layout="row"></topnav>
     <div flex
@@ -81,10 +69,22 @@
             </section>
         </md-content>
     </div>
+    <script src="app/node_modules/phoneformat/phoneformat.min.js"></script>
+    <script src="app/dist/base.bundle.js"></script>
+    <script src="app/dist/main.bundle.js"></script>
+    <script>
+        // Run app
+        angular.bootstrap(document, ['fonoster']);
 
-    <!- JS dependencies -->
-    <script data-main="app" src="/static/lib/head.load.min.js"></script>
-    <script src="https://npmcdn.com/tour@latest/dist/tour.js"></script>
-    <script src="app/app.loader.js"></script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-71722942-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <script src="app/dist/extra.bundle.js"></script>
 </body>
 </html>
