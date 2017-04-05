@@ -1,37 +1,36 @@
 (function() {
     'use strict';
 
-    angular.module('fnApps');
+    angular.module('fnApps')
+        .config(['$stateProvider', config])
+        .controller('AppsCtrl', AppsCtrl);
 
-    angular.module('fnApps').config(['$stateProvider', function($stateProvider) {
-      $stateProvider.state('apps', {
-        url: '/apps',
-        templateUrl: 'app/components/apps/apps.tpl.html',
-        controller: 'AppsCtrl'
-      });
-    }]);
+    AppsCtrl.$inject = ['$location',
+        '$window',
+        '$q',
+        '$timeout',
+        '$mdToast',
+        '$document',
+        'CredentialsService',
+        'Apps'];
 
-    angular.module('fnApps').controller('AppsCtrl', ['$location', '$window', '$scope', '$q', '$timeout', '$mdToast', '$document',
-        'CredentialsService', 'Apps',
-        function($location, $window, $scope, $q, $timeout, $mdToast, $document, CredentialsService, Apps) {
+    function AppsCtrl($location, $window, $q, $timeout, $mdToast, $document, CredentialsService, Apps) {
 
-        $scope.topDirections = ['left', 'up'];
-        $scope.bottomDirections = ['down', 'right'];
-        $scope.isOpen = false;
-        $scope.availableModes = ['md-fling', 'md-scale'];
-        $scope.selectedMode = 'md-fling';
+        var self = this;
 
-        $scope.selected = [];
-        $scope.removed = [];
+        self.topDirections = ['left', 'up'];
+        self.bottomDirections = ['down', 'right'];
+        self.isOpen = false;
+        self.availableModes = ['md-fling', 'md-scale'];
+        self.selectedMode = 'md-fling';
 
-        $scope.query = {
-            order: '-modified',
-            limit: 10,
-            page: 1
-        };
+        self.selected = [];
+        self.removed = [];
+
+        self.query = {order: '-modified', limit: 10, page: 1};
 
         // Create or open and app
-        $scope.open = function(appId) {
+        self.open = function(appId) {
             if (appId) {
                 console.debug('open appId ->' + appId);
                 $window.location.href = 'app.html#app/editor?appId=' + appId;
@@ -41,53 +40,53 @@
             }
         }
 
-        var getApps = function() {
+        getApps();
+
+        self.remove = function() {
+            self.selected.forEach(function(app) {
+                Apps.remove({appId: app.id}).$promise
+                .then(function(data) {
+                    findAndRemove(self.apps.apps, 'id', app.id);
+                }).catch(function(error) {
+                    console.log(JSON.stringify(error));
+                });
+            });
+            self.removed = self.selected;
+            self.selected = [];
+            removeToast("Removed " + self.removed.length + " app/s", 7000);
+        }
+
+        self.onPageChange = function(page, limit) {
+            var deferred = $q.defer();
+
+            $timeout(function () {
+              deferred.resolve();
+            }, 2000);
+
+            return deferred.promise;
+        };
+
+        self.onOrderChange = function(order) {
+            var deferred = $q.defer();
+
+            $timeout(function () {
+              deferred.resolve();
+            }, 2000);
+
+            return deferred.promise;
+        };
+
+        function getApps() {
             Apps.get().$promise
             .then(function(result) {
-                $scope.apps = result;
+                self.apps = result;
             })
             .catch(function(error) {
                 console.log(JSON.stringify(error));
             });
         }
 
-        getApps();
-
-        $scope.remove = function() {
-            $scope.selected.forEach(function(app) {
-                Apps.remove({appId: app.id}).$promise
-                .then(function(data) {
-                    findAndRemove($scope.apps.apps, 'id', app.id);
-                }).catch(function(error) {
-                    console.log(JSON.stringify(error));
-                });
-            });
-            $scope.removed = $scope.selected;
-            $scope.selected = [];
-            removeToast("Removed " + $scope.removed.length + " app/s", 7000);
-        }
-
-        $scope.onPageChange = function(page, limit) {
-            var deferred = $q.defer();
-
-            $timeout(function () {
-              deferred.resolve();
-            }, 2000);
-
-            return deferred.promise;
-        };
-
-        $scope.onOrderChange = function(order) {
-            var deferred = $q.defer();
-
-            $timeout(function () {
-              deferred.resolve();
-            }, 2000);
-
-            return deferred.promise;
-        };
-
-        var findAndRemove = function(array, property, value) {
+        function findAndRemove(array, property, value) {
           array.forEach(function(result, index) {
             if(result[property] === value) {
               //Remove from array
@@ -96,7 +95,7 @@
           });
         }
 
-        var removeToast = function(msg, hideDelay) {
+        function removeToast(msg, hideDelay) {
             if (!hideDelay) hideDelay = 2000;
             $mdToast.show($mdToast.simple()
                     .position('bottom right')
@@ -106,7 +105,7 @@
                     .hideDelay(hideDelay))
             .then(function(response) {
                 if ( response == 'ok' ) {
-                    $scope.removed.forEach(function(app) {
+                    self.removed.forEach(function(app) {
                         // This selected apps are in their original status
                         Apps.save(app).$promise
                         .then(function(data) {
@@ -119,6 +118,14 @@
                 }
             });
         }
-    }]);
+    };
+
+    function config($stateProvider) {
+        $stateProvider.state('apps', {
+            url: '/apps',
+            templateUrl: 'app/components/apps/apps.tpl.html',
+            controller: 'AppsCtrl'
+        });
+    }
 
 })();
