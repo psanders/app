@@ -5,7 +5,7 @@
         .config(['$stateProvider', config])
         .controller('DashboardCtrl', DashboardCtrl);
 
-    DashboardCtrl.$inject = [$window', '$timeout', '$interval', 'Analytics'];
+    DashboardCtrl.$inject = ['$window', '$timeout', '$interval', 'Analytics'];
 
     function DashboardCtrl($window, $timeout, $interval, Analytics) {
         var self = this;
