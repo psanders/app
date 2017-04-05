@@ -1,38 +1,33 @@
 (function() {
     'use strict';
 
-    angular.module('fnRecordings');
+    angular.module('fnRecordings')
+        .config(['$stateProvider', config])
+        .controller('RecordingsCtrl', RecordingsCtrl);
 
-    angular.module('fnRecordings').config(['$stateProvider', function($stateProvider) {
-      $stateProvider.state('recordings', {
-        url: '/recordings',
-        templateUrl: 'app/components/recordings/recordings.tpl.html',
-        controller: 'RecordingsCtrl'
-      });
-    }]);
+    RecordingsCtrl.$inject = ['$window', '$q', '$timeout',  'Recordings', 'ngAudio', '$mdDialog'];
 
-    angular.module('fnRecordings').controller('RecordingsCtrl', ['$scope','$window', '$q', '$timeout',  'Recordings', 'ngAudio', '$mdDialog',
-        function($scope, $window, $q, $timeout, Recordings, ngAudio, $mdDialog) {
+    function RecordingsCtrl($window, $q, $timeout, Recordings, ngAudio, $mdDialog) {
+        var self = this;
+        self.startDate = new Date();
+        self.endDate = new Date();
 
-        $scope.startDate = new Date();
-        $scope.endDate = new Date();
-
-        $scope.query = {
+        self.query = {
             order: '-modified',
             limit: 10,
             page: 1
         };
 
-        $scope.load = function(r) {
+        self.load = function(r) {
             r.audio = ngAudio.load(r.uri + '?result=mp3');
         }
 
-        $scope.play = function(r) {
+        self.play = function(r) {
             r.audio.play();
         }
 
         // Available?
-        $scope.isAva = function(r) {
+        self.isAva = function(r) {
             if(!r || !r.audio || !r.audio.audio) return false;
             if(r.audio.audio.duration == 0) return false;
             return true;
@@ -40,41 +35,30 @@
 
         // Using stop() or restart() is causing:
         // Uncaught (in promise) DOMException: The element has no supported sources.
-        $scope.stop = function(r) {
+        self.stop = function(r) {
             r.audio.pause();
             r.audio.currentTime = 0;
         }
 
-        // Internal method
-        function showAlert() {
-          alert = $mdDialog.alert({
-            title: 'Attention',
-            content: 'This is an example of how easy dialogs can be!',
-            ok: 'Close'
-          });
-          $mdDialog
-            .show( alert )
-            .finally(function() {
-              alert = undefined;
-            });
-        }
+        self.updateView = function() {
+            if(!self.startDate || !self.endDate) return;
 
-        $scope.updateView = function() {
-            if(!$scope.startDate || !$scope.endDate) return;
-
-            var rRequest = {start: moment($scope.startDate).format("YYYY-MM-DD"), end: moment($scope.endDate).format("YYYY-MM-DD")};
+            var rRequest = {
+                start: moment(self.startDate).format("YYYY-MM-DD"),
+                end: moment(self.endDate).format("YYYY-MM-DD")
+            };
 
             Recordings.get(rRequest).$promise
             .then(function(result) {
-                $scope.recordings = result;
+                self.recordings = result;
             })
             .catch(function(error) {
                 console.log(JSON.stringify(error));
             });
-            $scope.filter = false;
+            self.filter = false;
         }
 
-        $scope.onPageChange = function(page, limit) {
+        self.onPageChange = function(page, limit) {
             var deferred = $q.defer();
 
             $timeout(function () {
@@ -84,7 +68,7 @@
             return deferred.promise;
         };
 
-        $scope.onOrderChange = function(order) {
+        self.onOrderChange = function(order) {
             var deferred = $q.defer();
 
             $timeout(function () {
@@ -94,34 +78,15 @@
             return deferred.promise;
         };
 
-        $scope.filterBy = function(ev) {
-            $mdDialog.show({
-                controller: DialogController,
-                templateUrl: '/app/components/recordings/filter_dialog.tpl.html',
-                parent: angular.element(document.body),
-                targetEvent: ev,
-                clickOutsideToClose:true
-            })
-            .then(function(request) {
-                regenerate(request);
-            }, function() {
-                // Do nothing
-            });
-        };
+        self.updateView();
+    }
 
-        function DialogController($scope, $mdDialog) {
-            $scope.hide = function() {
-                $mdDialog.hide();
-            };
-            $scope.cancel = function() {
-                $mdDialog.cancel();
-            };
-            $scope.regenerate = function(r) {
-                $mdDialog.hide(r);
-            };
-        }
-
-        $scope.updateView();
-    }]);
+    function config($stateProvider) {
+        $stateProvider.state('recordings', {
+            url: '/recordings',
+            templateUrl: 'app/components/recordings/recordings.tpl.html',
+            controller: 'RecordingsCtrl'
+        });
+    }
 
 })();

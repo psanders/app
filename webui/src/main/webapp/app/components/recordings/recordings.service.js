@@ -2,11 +2,12 @@
 
     'use strict';
 
-    angular.module('fnRecordings', ['ngResource']);
+    var app = angular.module('fnRecordings', ['ngResource']);
 
-    angular.module('fnRecordings').service('Recordings', function($resource, $rootScope, CredentialsService) {
-        var accountId = CredentialsService.getCredentials().accountId;
-        return $resource($rootScope.apiUrl + '/accounts/:accountId/recordings/:recordingId?result=json', {accountId: accountId});
-    });
+    app.service('Recordings', ['$resource', '$rootScope', 'CredentialsService',
+        function($resource, $rootScope, CredentialsService) {
+            var accountId = CredentialsService.getCredentials().accountId;
+            return $resource($rootScope.apiUrl + '/accounts/:accountId/recordings/:recordingId?result=json', {accountId: accountId});
+    }]);
 
 })();
