@@ -2,7 +2,7 @@
 body, html {
     margin: 0;
     padding: 0;
-    font-family: 'RobotoDraft', sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 /* Use for the table */
@@ -138,7 +138,7 @@ a.yellow, a.yellow:link , a.yellow:visited, a.yellow:hover, a.yellow:active {
 }
 
 h1, h2, h3, h4 {
-    font-family: "open sans",arial,sans-serif;
+    font-family: "open sans", arial,sans-serif;
 }
 
 .intro-paragraph {

@@ -19,8 +19,14 @@ import * as moment from 'moment-timezone';
 
     function NumbersCtrl($window, $q, $timeout, $document, $mdToast, $filter, $mdDialog, Numbers, Users) {
         var self = this;
-        self.formatLocal = formatLocal;
+
         self.user = Users.getUser();
+
+        function formatLocal(code, number) {
+            return number;
+        }
+
+        self.formatLocal = formatLocal;
 
         // Sets proper timezone for 'asCalendar' filter
         moment.tz.setDefault(Users.getUser().timezone)
@@ -50,7 +56,7 @@ import * as moment from 'moment-timezone';
         self.setPreferred = function(number) {
             Numbers.getPreferredResource().save(number).$promise
             .then(function(result) {
-                toastMe('Your test number changed to ' + formatLocal(self.user.countryCode, number.number), 4000);
+                toastMe('Your test number changed to ' + self.formatLocal(self.user.countryCode, number.number), 4000);
                 init();
             })
             .catch(function(error){

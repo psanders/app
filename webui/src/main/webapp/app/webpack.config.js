@@ -5,9 +5,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = function(env) {
     return {
         entry: {
-            main: './app.js',
-            base: [
+            main: [
                 'angular',
+                './app.js',
                 'angular-ui-router',
                 'angular-route',
                 'angular-base64',
@@ -16,39 +16,32 @@ module.exports = function(env) {
                 'angular-material-data-table',
                 'angular-sanitize',
                 'angular-audio',
-                'angular-nvd3'
-            ],
-            extra: [
-                'showdown',
-                'smoothscroll',
-                'angular-aria',
-                'angular-animate',
+                'angular-nvd3',
                 'jquery-creditcardvalidator'
+                /* 'angular-aria',
+                'angular-animate',
+                'showdown',
+                'smoothscroll',*/
             ]
         },
         output: {
             filename: '[name].bundle.js',
-            path: path.resolve(__dirname, 'dist')
+            path: path.resolve(__dirname, 'dist'),
+            publicPath: 'http://localhost:8181/app/dist/'   /* WATCH THIS FOR PROD */
         },
         plugins: [
             new webpack.ProvidePlugin({
                 $: "jquery",
                 jQuery: "jquery"
             }),
-            new HtmlWebpackPlugin({ title: 'Tree-shaking' })
-        ],
-        /*module: {
-            rules: [
-                {
-                    test: /\.js$/,
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            [ 'es2015', { modules: false } ]
-                        ]
-                    }
+            new HtmlWebpackPlugin({ title: 'Tree-shaking' }),
+            new webpack.optimize.CommonsChunkPlugin({
+                name: 'vendor',
+                minChunks: function (module) {
+                   // this assumes your vendor imports exist in the node_modules directory
+                   return module.context && module.context.indexOf('node_modules') !== -1;
                 }
-            ]
-        }*/
+            })
+        ]
     }
 }

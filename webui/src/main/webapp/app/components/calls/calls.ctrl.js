@@ -11,9 +11,14 @@ import * as moment from 'moment-timezone';
 
     function CallsCtrl($window, $q, $timeout, Calls, Users) {
         var self = this;
-        self.formatLocal = formatLocal;
         self.startDate = new Date();
         self.endDate = new Date();
+
+        function formatLocal(code, number) {
+            return number;
+        }
+
+        self.formatLocal = formatLocal;
 
         // Sets proper timezone for 'asCalendar' filter
         moment.tz.setDefault(Users.getUser().timezone)

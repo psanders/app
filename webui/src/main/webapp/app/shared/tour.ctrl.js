@@ -1,5 +1,3 @@
-import * as tour from 'tour';
-
 (function() {
     'use strict';
 
@@ -8,7 +6,6 @@ import * as tour from 'tour';
     angular.module('fnTour').controller('TourCtrl',
         ['$window', '$state', '$location', function($window, $state, $location) {
         var self = this;
-        var Tour = tour.default;
 
         var mainTour = {
             canExit: true,
@@ -68,16 +65,21 @@ import * as tour from 'tour';
         init();
 
         function startTour(tourObj, name) {
-            setTimeout(
-                function() {
-                    Tour.start(tourObj)
-                    .then(function() {
-                        completeTour(name, 'completed');
-                    })
-                    .catch(function () {
-                        completeTour(name, 'interrupted');
-                    });
-            }, 1500);
+            import('tour').then(function(tour) {
+                var Tour = tour.default;
+                setTimeout(
+                     function() {
+                         Tour.start(tourObj)
+                         .then(function() {
+                             completeTour(name, 'completed');
+                         })
+                         .catch(function () {
+                             completeTour(name, 'interrupted');
+                         });
+                 }, 1500);
+            }).catch(function(err) {
+                console.log('Failed to load tour', err);
+            });
         }
 
         function completeTour(name, status) {

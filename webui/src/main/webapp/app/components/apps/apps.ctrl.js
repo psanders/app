@@ -3,8 +3,6 @@ import * as moment from 'moment-timezone';
 (function() {
     'use strict';
 
-    console.log('DEBUG 0001');
-
     angular.module('fnApps')
         .config(['$stateProvider', config])
         .controller('AppsCtrl', AppsCtrl);
