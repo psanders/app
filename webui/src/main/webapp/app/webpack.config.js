@@ -1,13 +1,16 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ChunkManifestPlugin = require("chunk-manifest-webpack-plugin");
+const WebpackChunkHash = require("webpack-chunk-hash");
+const InlineManifestWebpackPlugin = require("inline-manifest-webpack-plugin");
 
 module.exports = function(env) {
     return {
         entry: {
-            main: [
+            app: ['./app.js'],
+            vendor: [
                 'angular',
-                './app.js',
                 'angular-ui-router',
                 'angular-route',
                 'angular-base64',
@@ -22,26 +25,72 @@ module.exports = function(env) {
                 'angular-animate',
                 'showdown',
                 'smoothscroll',*/
+            ],
+            init: './init.js'
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: [ 'style-loader', 'css-loader' ]
+                }
             ]
         },
         output: {
-            filename: '[name].bundle.js',
+            filename: "[name].[chunkhash].js",
+            chunkFilename: "[name].[chunkhash].js",
             path: path.resolve(__dirname, 'dist'),
-            publicPath: 'http://localhost:8181/app/dist/'   /* WATCH THIS FOR PROD */
+            publicPath: '/app/dist/'
         },
         plugins: [
             new webpack.ProvidePlugin({
                 $: "jquery",
                 jQuery: "jquery"
             }),
-            new HtmlWebpackPlugin({ title: 'Tree-shaking' }),
             new webpack.optimize.CommonsChunkPlugin({
-                name: 'vendor',
-                minChunks: function (module) {
-                   // this assumes your vendor imports exist in the node_modules directory
-                   return module.context && module.context.indexOf('node_modules') !== -1;
+                name: ["vendor", "manifest"], // vendor libs + extracted manifest
+                minChunks: Infinity,
+            }),
+           new webpack.HashedModuleIdsPlugin(),
+             /*new WebpackChunkHash(),
+            new ChunkManifestPlugin({
+              filename: "chunk-manifest.json",
+              manifestVariable: "webpackManifest"
+            }),
+            /*new webpack.LoaderOptionsPlugin({
+                minimize: false,
+                debug: false
+            }),*/
+            new webpack.optimize.UglifyJsPlugin({
+                compress: {
+                warnings: false,
+                screw_ie8: true,
+                conditionals: true,
+                unused: true,
+                comparisons: true,
+                sequences: true,
+                dead_code: true,
+                evaluate: true,
+                if_return: true,
+                join_vars: true,
+                },
+                output: {
+                  comments: false,
                 }
+            }),
+            new InlineManifestWebpackPlugin({
+                name: 'webpackManifest'
+            }),
+            new HtmlWebpackPlugin({
+                template: './index.ejs',
+                filename: '../../index.html',
+                inject: 'body'
+            }),
+            new HtmlWebpackPlugin({
+                template: './app.ejs',
+                filename: '../../app.html',
+                inject: 'body'
             })
-        ]
+        ],
     }
 }
