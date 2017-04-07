@@ -109,7 +109,12 @@ public class CoreConfig extends AbstractConfig {
     }
 
     public Environment getBraintreeEnvironment() {
-        String env = config.getString("braintree.environment");
+        String env;
+        if (System.getenv("BRAINTREE_ENV") != null) {
+            env = System.getenv("BRAINTREE_ENV");
+        } else {
+            env = config.getString("braintree.environment");
+        }
 
         if (env.equals("SANDBOX")) {
             return Environment.SANDBOX;
