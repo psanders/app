@@ -4,7 +4,8 @@
 
     var apps = angular.module('fnBilling', ['ngResource']);
 
-    apps.service('Billing', function($resource, $window, $rootScope, CredentialsService, Users) {
+    apps.service('Billing', ['$resource', '$window', '$rootScope', 'CredentialsService', 'Users',
+        function($resource, $window, $rootScope, CredentialsService, Users) {
 
         this.getResource = function() {
             return $resource($rootScope.apiUrl + '/billing/:email/payment_method/:nonce?result=json', {
@@ -30,6 +31,6 @@
         this.getBraintreeResource = function() {
             return $resource($rootScope.apiUrl + '/billing/braintree_token?result=json');
         }
-    });
+    }]);
 
 })();

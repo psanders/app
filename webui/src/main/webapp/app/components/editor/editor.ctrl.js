@@ -275,20 +275,19 @@ import * as CodeMirror from 'codemirror';
             self.loading = false;
             Promise.all([
                 import('codemirror/addon/fold/foldcode'),
-                import('../../node_modules/codemirror/addon/fold/brace-fold'),
-                import('../../node_modules/codemirror/addon/fold/foldgutter'),
-                import('../../node_modules/codemirror/addon/fold/comment-fold'),
-                import('../../node_modules/codemirror/addon/lint/lint'),
-                import('../../node_modules/codemirror/addon/lint/javascript-lint'),
-                import('../../node_modules/codemirror/addon/selection/active-line'),
-                import('../../node_modules/codemirror/addon/edit/closebrackets'),
-                import('../../node_modules/codemirror/addon/dialog/dialog'),
-                import('../../node_modules/codemirror/addon/search/searchcursor'),
-                import('../../node_modules/codemirror/addon/search/search'),
-                import('../../node_modules/codemirror/mode/javascript/javascript'),
-                import('../../node_modules/jshint/dist/jshint')
+                import('codemirror/addon/fold/brace-fold'),
+                import('codemirror/addon/fold/foldgutter'),
+                import('codemirror/addon/fold/comment-fold'),
+                import('codemirror/addon/lint/lint'),
+                import('codemirror/addon/lint/javascript-lint'),
+                import('codemirror/addon/selection/active-line'),
+                import('codemirror/addon/edit/closebrackets'),
+                import('codemirror/addon/dialog/dialog'),
+                import('codemirror/addon/search/searchcursor'),
+                import('codemirror/addon/search/search'),
+                import('codemirror/mode/javascript/javascript'),
+                import('jshint/dist/jshint')
             ]).then(function () {
-                console.log('Foldcode is yeah!');
                 angular.element(document).ready(function() {
                     setApp();
                     preferredNumber();
@@ -598,7 +597,7 @@ import * as CodeMirror from 'codemirror';
     function config($stateProvider) {
         $stateProvider.state('/editor', {
             url: '/editor',
-            templateUrl: '../../components/editor/editor.tpl.html',
+            templateUrl: 'app/components/editor/editor.tpl.html',
             controller: 'EditorCtrl'
         });
     }

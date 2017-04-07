@@ -53,6 +53,7 @@
 
         self.drawAnalytics("HOUR");
     }
+
     function config($stateProvider) {
         $stateProvider.state('dashboard', {
             url: '/dashboard',
