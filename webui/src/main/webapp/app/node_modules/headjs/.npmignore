@@ -1,9 +1,0 @@
-# git ignore file
-.idea/
-_site/
-*.sln
-*.suo
-*.config
-*.bundle
-sauce_connect.*
-node_modules/

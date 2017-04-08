@@ -14,4 +14,4 @@ mvn package -Dmaven.test.skip=true
 mvn package -Dmaven.test.skip=true -P assemble
 
 docker build -t gcr.io/fonoster-app/fnapp:latest .
-docker build -t gcr.io/fonoster-app/fnapp:1.0.$(timestamp) .
+docker tag gcr.io/fonoster-app/fnapp:latest gcr.io/fonoster-app/fnapp:1.0.$(timestamp)
