@@ -77,7 +77,7 @@ import * as braintree from 'braintree-web';
             .then(function(ok){
                  status = 'off';
                  if (autopay) status = 'on';
-                 toastMe("Autopay turned " + status);
+                 toastMe("Autopay turned '" + status.toUpperCase() + "'");
                  $scope.getPntInfo();
             }).catch(function(error) {
                 toastMe(error.data.message);
@@ -105,7 +105,7 @@ import * as braintree from 'braintree-web';
 
                 updatePntNote();
             }).catch(function(error) {
-                toastMe(error.data.message);
+                 toastMe('Unable to retrieve payment information. Code #0011', 5000);
             });
         };
 
@@ -119,7 +119,7 @@ import * as braintree from 'braintree-web';
                 Users.setUser(user);
                 $scope.getPntInfo();
             }).catch(function(error) {
-                toastMe(error.data.message);
+                toastMe('Unable to process payment. Code #0010', 5000);
             });
         };
 
