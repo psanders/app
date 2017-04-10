@@ -90,11 +90,13 @@
     }
 
     function PasswordCtrl($mdToast, $document, Users) {
+        var self = this;
 
         self.request = angular.copy({password: "", confirmPassword: ""});
 
         self.update = function(request) {
-            Users.getPasswordResource().save({email: Users.getUser().email, password: request.password}).$promise
+            console.log('DBG0001');
+            Users.getPasswordResource().save({email: Users.getUser().email, password: self.request.password}).$promise
             .then(function(data) {
                 toastMe("Done.");
             }).catch(function(error) {
