@@ -1,14 +1,12 @@
 package com.fonoster.rest;
 
-import com.fonoster.rest.filters.AuthUtil;
 import com.fonoster.core.api.AppsAPI;
 import com.fonoster.core.api.DBManager;
-import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
-import com.fonoster.model.Activity;
 import com.fonoster.model.App;
+import com.fonoster.rest.filters.AuthUtil;
 import com.sun.xml.txw2.annotation.XmlElement;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -116,13 +114,6 @@ public class AppsService {
                 appFromDB.setStarred(app.isStarred());
 
                 DBManager.getInstance().getDS().save(appFromDB);
-            }
-
-            // This is a new app; therefore...
-            if (app.getId() == null) {
-                UsersAPI.getInstance().createActivity(account.getUser(), "You've created a " +
-                                "<a href=\"/editor?appId=" + appFromDB.getId() + "\" class=\"ng-binding\">new app</a>",
-                        Activity.Type.INFO);
             }
 
             return Response.ok(appFromDB).build();
