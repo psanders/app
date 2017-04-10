@@ -31,6 +31,10 @@
                                 <span ng-if="activity.type=='INFO'">info_outline</span>
                                 <span ng-if="activity.type=='SETTING'">settings</span>
                                 <span ng-if="activity.type=='BUG'">BUG</span>
+                                <span ng-if="activity.type != 'PAYMENT' &&
+                                    activity.type != 'INFO' &&
+                                    activity.type != 'SETTING' &&
+                                    activity.type != 'BUG' ">info_outline</span>
                             </md-icon>
                             <div class="md-list-item-text">
                                 <span class="md-body-1" ng-bind-html="activity.description"></span>
