@@ -1,5 +1,5 @@
 Copyright (C) ${year} Fonoster
-http://fonoster.com
+https://fonoster.com
 
 This file is part of Fonoster
 
