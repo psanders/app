@@ -8,18 +8,22 @@
  */
 package com.fonoster.rest;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.AnalyticsAPI;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallStats;
 import org.joda.time.DateTime;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+@Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/accounts/{accountId}/analytics")
 public class AnalyticsService {
 

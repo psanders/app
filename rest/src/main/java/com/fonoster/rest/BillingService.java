@@ -22,16 +22,19 @@ import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.PaymentInfo;
 import com.fonoster.model.User;
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import org.joda.time.DateTime;
+
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.joda.time.DateTime;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/billing")
 public class BillingService {
   private final CoreConfig config = CoreConfig.getInstance();

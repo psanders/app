@@ -14,21 +14,24 @@ import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Recording;
-import java.io.File;
-import java.util.List;
+import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.io.File;
+import java.util.List;
 
 @Since("1.0")
-@Path("/accounts/{accountId}/recordings")
+@RolesAllowed({"USER"})
 @PermitAll
+@Path("/accounts/{accountId}/recordings")
 public class RecordingsService {
 
   @GET

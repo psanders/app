@@ -19,18 +19,21 @@ import com.fonoster.model.CallDetailRecord.AnswerBy;
 import com.fonoster.model.CallDetailRecord.Status;
 import com.fonoster.model.CallRequest;
 import com.fonoster.model.Recording;
-import java.security.InvalidParameterException;
-import java.util.List;
+import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import java.security.InvalidParameterException;
+import java.util.List;
 
 @Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/accounts/{accountId}/calls")
 public class CallsService {
 

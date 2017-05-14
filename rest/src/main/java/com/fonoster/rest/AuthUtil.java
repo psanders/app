@@ -8,18 +8,19 @@
  */
 package com.fonoster.rest;
 
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.User;
-import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.internal.util.Base64;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.StringTokenizer;
+
+import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
 @Since("1.0")
 public class AuthUtil {
@@ -51,11 +52,15 @@ public class AuthUtil {
   }
 
   // Verify admin
-  public static boolean isAdmin(HttpServletRequest httpRequest) throws UnauthorizedAccessException {
+  public static boolean isAdmin(HttpServletRequest httpRequest) {
     final Credentials credentials = getCredentialsFromRequest(httpRequest);
+    return isAdmin(credentials.getUsername(), credentials.getSecret());
+  }
 
-    return CommonsConfig.getInstance().getAdminUsername().equals(credentials.getUsername())
-        && CommonsConfig.getInstance().getAdminSecret().equals(credentials.getSecret());
+  // Verify admin
+  public static boolean isAdmin(String username, String secret)  {
+    return CommonsConfig.getInstance().getAdminUsername().equals(username)
+            && CommonsConfig.getInstance().getAdminSecret().equals(secret);
   }
 
   static Credentials getCredentialsFromRequest(HttpServletRequest request) {

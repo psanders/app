@@ -8,6 +8,7 @@
  */
 package com.fonoster.rest;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
@@ -15,6 +16,7 @@ import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import org.bson.types.ObjectId;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -22,6 +24,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+@Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/accounts")
 public class AccountsService {
   @POST

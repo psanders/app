@@ -9,9 +9,12 @@
 package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
+
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Path;
 
 @Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/accounts/{accountId}/domains")
 public class DomainsService {
   // Coming soon :)

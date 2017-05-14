@@ -95,7 +95,6 @@
         self.request = angular.copy({password: "", confirmPassword: ""});
 
         self.update = function(request) {
-            console.log('DBG0001');
             Users.getPasswordResource().save({email: Users.getUser().email, password: self.request.password}).$promise
             .then(function(data) {
                 toastMe("Done.");

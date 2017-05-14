@@ -18,20 +18,23 @@ import com.fonoster.exception.UserAlreadyExistException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.User;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.internal.util.Base64;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
+
 @Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/users")
 public class UsersService {
   private static final Logger LOG = LoggerFactory.getLogger(CredentialsService.class);

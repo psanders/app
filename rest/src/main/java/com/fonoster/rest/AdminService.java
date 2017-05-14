@@ -9,16 +9,17 @@
 package com.fonoster.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.AgentsAPI;
 import com.fonoster.core.api.DomainsAPI;
 import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.ResourceNotFoundException;
-import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.*;
 import org.bson.types.ObjectId;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -27,8 +28,9 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 
+@Since("1.0")
+@RolesAllowed({"ADMIN"})
 @Path("/admin")
-// TODO: This service should be accessible only from valid hosts(ie.: localhost)
 public class AdminService {
 
   @POST
@@ -71,13 +73,8 @@ public class AdminService {
   public Response getDomains(
       @QueryParam("filter") String filter, @Context HttpServletRequest httpRequest)
       throws ApiException {
-
-    if (!AuthUtil.isAdmin(httpRequest)) throw new UnauthorizedAccessException();
-
     List<Domain> result = DomainsAPI.getInstance().getDomains(filter);
-
     if (result == null || result.isEmpty()) throw new ResourceNotFoundException();
-
     return Response.ok(result).build();
   }
 
@@ -86,13 +83,8 @@ public class AdminService {
   @Path("/domains/{uri}")
   public Response getDomainsByUri(
       @PathParam("uri") URI uri, @Context HttpServletRequest httpRequest) throws ApiException {
-
-    if (!AuthUtil.isAdmin(httpRequest)) throw new UnauthorizedAccessException();
-
     Domain result = DomainsAPI.getInstance().getDomainByUri(uri);
-
     if (result == null) throw new ResourceNotFoundException();
-
     return Response.ok(result).build();
   }
 
@@ -104,12 +96,8 @@ public class AdminService {
       @QueryParam("filter") String filter,
       @Context HttpServletRequest httpRequest)
       throws ApiException {
-
-    if (!AuthUtil.isAdmin(httpRequest)) throw new UnauthorizedAccessException();
-
     List<Agent> result = AgentsAPI.getInstance().getAgents(domainUri, filter);
     if (result == null || result.isEmpty()) throw new ResourceNotFoundException();
-
     return Response.ok(result).build();
   }
 

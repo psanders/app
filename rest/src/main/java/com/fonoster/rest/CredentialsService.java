@@ -14,16 +14,19 @@ import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.User;
+import org.glassfish.jersey.internal.util.Base64;
+
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.glassfish.jersey.internal.util.Base64;
 
 /** This service is intended to be use from the webapp (or any future clients). */
 @Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/users/credentials")
 public class CredentialsService {
 

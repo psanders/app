@@ -16,4 +16,4 @@ cd fonoster/app/webui
 gradle farmRun 
 ```
 
->> Then the console will be available at http://localhost:8080
+> Then the console will be available at http://localhost:8080

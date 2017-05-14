@@ -8,11 +8,14 @@
  */
 package com.fonoster.rest;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.exception.*;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+@Since("1.0")
 @Provider
 public class ApiExceptionMapper implements ExceptionMapper<ApiException> {
   private com.fonoster.rest.Response response;

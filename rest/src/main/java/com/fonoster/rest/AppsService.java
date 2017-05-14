@@ -8,20 +8,26 @@
  */
 package com.fonoster.rest;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.AppsAPI;
 import com.fonoster.core.api.DBManager;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.Account;
 import com.fonoster.model.App;
-import java.util.List;
+import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
+
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
+import java.util.List;
 
+
+@Since("1.0")
+@RolesAllowed({"USER"})
 @Path("/accounts/{accountId}/apps")
 public class AppsService {
 
