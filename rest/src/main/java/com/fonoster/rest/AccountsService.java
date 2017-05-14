@@ -1,11 +1,10 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.rest;
 
@@ -15,6 +14,7 @@ import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import org.bson.types.ObjectId;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -24,86 +24,89 @@ import java.util.List;
 
 @Path("/accounts")
 public class AccountsService {
+  @POST
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  public Response createAccount(String name, @Context HttpServletRequest httpRequest)
+      throws ApiException {
+    Account main = AuthUtil.getAccount(httpRequest);
+    Account sub = UsersAPI.getInstance().createSubAccount(main, name);
+    UsersAPI.getInstance()
+        .createActivity(
+            main.getUser(), "New account created " + sub.getId().toString(), Activity.Type.INFO);
 
-    @POST
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createAccount(String name, @Context HttpServletRequest httpRequest) throws ApiException {
-        Account main = AuthUtil.getAccount(httpRequest);
-        Account sub = UsersAPI.getInstance().createSubAccount(main, name);
+    return Response.ok(sub).build();
+  }
 
-        UsersAPI.getInstance().createActivity(main.getUser(), "New account created " + sub.getId ().toString (),
-                Activity.Type.INFO);
+  @GET
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  public Response getAccounts(@Context HttpServletRequest httpRequest) throws ApiException {
+    Account main = AuthUtil.getAccount(httpRequest);
+    List<Account> accounts = UsersAPI.getInstance().getAccountsFor(main.getUser());
+    return Response.ok(accounts).build();
+  }
 
-        return Response.ok(sub).build();
+  @POST
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{accountId}")
+  public Response updateAccount(Account account, @Context HttpServletRequest httpRequest)
+      throws ApiException {
+    Account acct = AuthUtil.getAccount(httpRequest);
+    Account a = UsersAPI.getInstance().getAccountById(account.getId());
+    a.setName(account.getName());
+
+    // Requesting user owns this resource.
+    if (!a.getUser().equals(acct.getUser())) throw new UnauthorizedAccessException();
+
+    Activity activity =
+        UsersAPI.getInstance()
+            .createActivity(
+                account.getUser(), "Updated account " + a.getId().toString(), Activity.Type.INFO);
+
+    return Response.ok(account).build();
+  }
+
+  @GET
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{accountId}")
+  public Response getAccount(
+      @PathParam("accountId") String accountId, @Context HttpServletRequest httpRequest)
+      throws ApiException {
+    Account acct = AuthUtil.getAccount(httpRequest);
+    Account a = UsersAPI.getInstance().getAccountById(new ObjectId(accountId));
+
+    // Requesting user owns this resource.
+    if (!a.getUser().equals(acct.getUser())) {
+      throw new UnauthorizedAccessException();
     }
 
-    @GET
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getAccounts(@Context HttpServletRequest httpRequest) throws ApiException {
-        Account main = AuthUtil.getAccount(httpRequest);
-        List<Account> accounts = UsersAPI.getInstance().getAccountsFor(main.getUser());
-        return Response.ok(accounts).build();
+    return Response.ok(a).build();
+  }
+
+  @DELETE
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{accountId}")
+  // This will only work for sub-accounts otherwise an error will be reported
+  public Response removeAccount(
+      @PathParam("accountId") String accountId, @Context HttpServletRequest httpRequest)
+      throws ApiException {
+    Account parent = AuthUtil.getAccount(httpRequest);
+    Account sub = UsersAPI.getInstance().getAccountById(new ObjectId(accountId));
+
+    if (sub.isSubAccount() && sub.getParentAccount().getId().equals(parent.getId())) {
+      UsersAPI.getInstance().removeSubAccount(sub);
+    } else {
+      throw new UnauthorizedAccessException();
     }
 
-    @POST
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{accountId}")
-    public Response updateAccount(Account account, @Context HttpServletRequest httpRequest) throws ApiException {
-        Account acct = AuthUtil.getAccount(httpRequest);
+    UsersAPI.getInstance()
+        .createActivity(
+            parent.getUser(), "Removed account " + sub.getId().toString(), Activity.Type.INFO);
 
-        Account a = UsersAPI.getInstance().getAccountById(account.getId());
-        a.setName(account.getName());
-
-        // Requesting user owns this resource.
-        if (!a.getUser().equals(acct.getUser())) throw new UnauthorizedAccessException();
-
-        Activity activity = UsersAPI.getInstance().createActivity(account.getUser(), "Updated account " + a.getId().toString(),
-                Activity.Type.INFO);
-
-        return Response.ok(account).build();
-    }
-
-    @GET
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{accountId}")
-    public Response getAccount(@PathParam("accountId") String accountId,
-        @Context HttpServletRequest httpRequest) throws ApiException {
-
-        Account acct = AuthUtil.getAccount(httpRequest);
-        Account a = UsersAPI.getInstance().getAccountById(new ObjectId(accountId));
-
-        // Requesting user owns this resource.
-        if (!a.getUser().equals(acct.getUser())) {
-            throw new UnauthorizedAccessException();
-        }
-
-        return Response.ok(a).build();
-    }
-
-    @DELETE
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{accountId}")
-    // This will only work for sub-accounts otherwise an error will be reported
-    public Response removeAccount(@PathParam("accountId") String accountId,
-        @Context HttpServletRequest httpRequest) throws ApiException {
-
-        Account parent = AuthUtil.getAccount(httpRequest);
-        Account sub = UsersAPI.getInstance().getAccountById(new ObjectId(accountId));
-
-        if (sub.isSubAccount() && sub.getParentAccount().getId().equals(parent.getId())) {
-            UsersAPI.getInstance().removeSubAccount(sub);
-        } else {
-            throw new UnauthorizedAccessException();
-        }
-
-        UsersAPI.getInstance().createActivity(parent.getUser(), "Removed account " + sub.getId().toString(),
-                Activity.Type.INFO);
-
-        return Response.ok().build();
-    }
+    return Response.ok().build();
+  }
 }

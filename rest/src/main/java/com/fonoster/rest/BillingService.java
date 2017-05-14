@@ -1,11 +1,10 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.rest;
 
@@ -23,135 +22,138 @@ import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.PaymentInfo;
 import com.fonoster.model.User;
-import org.joda.time.DateTime;
-
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import org.joda.time.DateTime;
 
 @Since("1.0")
 @Path("/billing")
 public class BillingService {
-    private final CoreConfig config = CoreConfig.getInstance();
-    private BraintreeGateway gateway = new BraintreeGateway(
-        config.getBraintreeEnvironment(),
-        config.getBraintreeMerchantId(),
-        config.getBraintreePublicKey(),
-        config.getBraintreePrivateKey()
-    );
+  private final CoreConfig config = CoreConfig.getInstance();
+  private BraintreeGateway gateway =
+      new BraintreeGateway(
+          config.getBraintreeEnvironment(),
+          config.getBraintreeMerchantId(),
+          config.getBraintreePublicKey(),
+          config.getBraintreePrivateKey());
 
-    @GET
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_ATOM_XML, MediaType.APPLICATION_JSON})
-    @Path("/braintree_token")
-    public Response getClientToken(@Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
-        String clientToken = gateway.clientToken().generate();
+  @GET
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_ATOM_XML, MediaType.APPLICATION_JSON})
+  @Path("/braintree_token")
+  public Response getClientToken(@Context HttpServletRequest httpRequest)
+      throws UnauthorizedAccessException {
+    String clientToken = gateway.clientToken().generate();
 
-        // WARNING: Why are we doing this?
-        JsonNodeFactory factory = JsonNodeFactory.instance;
-        ObjectNode json = factory.objectNode();
-        json.put("token", clientToken);
+    // WARNING: Why are we doing this?
+    JsonNodeFactory factory = JsonNodeFactory.instance;
+    ObjectNode json = factory.objectNode();
+    json.put("token", clientToken);
 
-        return Response.ok(json).build();
-    }
+    return Response.ok(json).build();
+  }
 
-    @POST
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{email}/funds/{amount}")
-    public Response addFunds(@PathParam("amount") Float amount,
-        @Context HttpServletRequest httpRequest) throws ApiException {
+  @POST
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{email}/funds/{amount}")
+  public Response addFunds(
+      @PathParam("amount") Float amount, @Context HttpServletRequest httpRequest)
+      throws ApiException {
 
-        Account account = AuthUtil.getAccount(httpRequest);
-        User user = account.getUser();
+    Account account = AuthUtil.getAccount(httpRequest);
+    User user = account.getUser();
 
-        TransactionRequest request = new TransactionRequest()
+    TransactionRequest request =
+        new TransactionRequest()
             .amount(new BigDecimal(amount))
             .paymentMethodToken(user.getPmntInfo().getMethod().getToken());
 
-        Result<Transaction> result = gateway.transaction().sale(request);
+    Result<Transaction> result = gateway.transaction().sale(request);
 
-        if (result.isSuccess()) {
-            user.getPmntInfo().setBalance(user.getPmntInfo().getBalance().add(new BigDecimal(amount)));
-            user.getPmntInfo().setLastTrans(amount);
+    if (result.isSuccess()) {
+      user.getPmntInfo().setBalance(user.getPmntInfo().getBalance().add(new BigDecimal(amount)));
+      user.getPmntInfo().setLastTrans(amount);
 
-            if (user.getPmntInfo().getTransactions() == null) {
-                user.getPmntInfo().setTransactions(new ArrayList<PaymentInfo.Transaction>());
-            }
+      if (user.getPmntInfo().getTransactions() == null) {
+        user.getPmntInfo().setTransactions(new ArrayList<PaymentInfo.Transaction>());
+      }
 
-            PaymentInfo.Transaction t = new PaymentInfo.Transaction();
-            t.setAmount(result.getTarget().getAmount());
-            t.setCreated(new DateTime(result.getTarget().getCreatedAt().getTime()));
-            t.setId(result.getTarget().getId());
-            t.setDescription(user.getPmntInfo().getMethod().getDescription());
-            t.setStatus(result.getTarget().getStatus().name());
-            t.setMethod(result.getTarget().getPaymentInstrumentType());
+      PaymentInfo.Transaction t = new PaymentInfo.Transaction();
+      t.setAmount(result.getTarget().getAmount());
+      t.setCreated(new DateTime(result.getTarget().getCreatedAt().getTime()));
+      t.setId(result.getTarget().getId());
+      t.setDescription(user.getPmntInfo().getMethod().getDescription());
+      t.setStatus(result.getTarget().getStatus().name());
+      t.setMethod(result.getTarget().getPaymentInstrumentType());
 
-            user.getPmntInfo().getTransactions().add(t);
+      user.getPmntInfo().getTransactions().add(t);
 
-            UsersAPI.getInstance().updateUser(user);
+      UsersAPI.getInstance().updateUser(user);
 
-            UsersAPI.getInstance().createActivity(user, "We've received your payment for USD$" + amount,
-                    Activity.Type.PAYMENT);
-        }
-
-        return Response.ok().build();
+      UsersAPI.getInstance()
+          .createActivity(
+              user, "We've received your payment for USD$" + amount, Activity.Type.PAYMENT);
     }
 
-    @POST
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{email}/autopay/{autopay}")
-    public Response autoCharge(@PathParam("autopay")Boolean autopay,
-        @Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
+    return Response.ok().build();
+  }
 
-        Account account = AuthUtil.getAccount(httpRequest);
+  @POST
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{email}/autopay/{autopay}")
+  public Response autoCharge(
+      @PathParam("autopay") Boolean autopay, @Context HttpServletRequest httpRequest)
+      throws UnauthorizedAccessException {
 
-        User u = account.getUser();
-        u.getPmntInfo().setAutopay(autopay);
-        UsersAPI.getInstance().updateUser(u);
+    Account account = AuthUtil.getAccount(httpRequest);
 
-        String status = "off";
+    User u = account.getUser();
+    u.getPmntInfo().setAutopay(autopay);
+    UsersAPI.getInstance().updateUser(u);
 
-        if (autopay)  {
-            status = "on";
-        } else {
-            status = "off";
-        }
+    String status = "off";
 
-        UsersAPI.getInstance().createActivity(account.getUser(), "Autopay turned " + status,
-                Activity.Type.SETTING);
-
-        return Response.ok().build();
+    if (autopay) {
+      status = "on";
+    } else {
+      status = "off";
     }
 
-    @POST
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{email}/payment_method/{nonce}")
-    public Response addMethod(PaymentMethodRequest pr,
-        @Context HttpServletRequest httpRequest) throws ApiException {
+    UsersAPI.getInstance()
+        .createActivity(account.getUser(), "Autopay turned " + status, Activity.Type.SETTING);
 
-        Account account = AuthUtil.getAccount(httpRequest);
+    return Response.ok().build();
+  }
 
-        User user = account.getUser();
-        Customer customer = null;
+  @POST
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{email}/payment_method/{nonce}")
+  public Response addMethod(PaymentMethodRequest pr, @Context HttpServletRequest httpRequest)
+      throws ApiException {
 
-        CustomerSearchRequest csq =
-            new CustomerSearchRequest()
-                .email().contains(user.getEmail());
+    Account account = AuthUtil.getAccount(httpRequest);
 
-        try {
-            customer = gateway.customer().search(csq).getFirst();
-        } catch (IndexOutOfBoundsException e) {
-            throw new ApiException();
-        }
+    User user = account.getUser();
+    Customer customer = null;
 
-        CustomerRequest request = new CustomerRequest()
+    CustomerSearchRequest csq = new CustomerSearchRequest().email().contains(user.getEmail());
+
+    try {
+      customer = gateway.customer().search(csq).getFirst();
+    } catch (IndexOutOfBoundsException e) {
+      throw new ApiException();
+    }
+
+    CustomerRequest request =
+        new CustomerRequest()
             .firstName(user.getFirstName())
             .lastName(user.getLastName())
             .company(user.getCompany())
@@ -159,85 +161,87 @@ public class BillingService {
             .paymentMethodNonce(pr.getNonce())
             .phone(user.getPhone());
 
-        Result<Customer> r = gateway.customer().create(request);
-        customer = r.getTarget();
+    Result<Customer> r = gateway.customer().create(request);
+    customer = r.getTarget();
 
-        if (r.isSuccess()) {
-            PaymentInfo.PaymentMethod pm = new PaymentInfo.PaymentMethod();
-            pm.setCountryCode(pr.getCountryCode());
-            pm.setDescription(pr.getDescription());
-            pm.setExpMonth(pr.getExpMonth());
-            pm.setExpYear(pr.getExpYear());
-            pm.setPostalCode(pr.getPostalCode());
-            pm.setToken(customer.getPaymentMethods().get(0).getToken());
-            pm.setType(pr.getType());
+    if (r.isSuccess()) {
+      PaymentInfo.PaymentMethod pm = new PaymentInfo.PaymentMethod();
+      pm.setCountryCode(pr.getCountryCode());
+      pm.setDescription(pr.getDescription());
+      pm.setExpMonth(pr.getExpMonth());
+      pm.setExpYear(pr.getExpYear());
+      pm.setPostalCode(pr.getPostalCode());
+      pm.setToken(customer.getPaymentMethods().get(0).getToken());
+      pm.setType(pr.getType());
 
-            if (user.getPmntInfo() == null) {
-                PaymentInfo pntInfo = new PaymentInfo();
-                pntInfo.setMethod(pm);
-                user.setPmntInfo(pntInfo);
-            } else {
-                user.getPmntInfo().setMethod(pm);
-            }
+      if (user.getPmntInfo() == null) {
+        PaymentInfo pntInfo = new PaymentInfo();
+        pntInfo.setMethod(pm);
+        user.setPmntInfo(pntInfo);
+      } else {
+        user.getPmntInfo().setMethod(pm);
+      }
 
-            UsersAPI.getInstance().updateUser(user);
-        } else {
-            throw new InvalidPaymentMethodException();
-        }
-
-        UsersAPI.getInstance().createActivity(account.getUser(), "Added new payment method",
-                Activity.Type.INFO);
-
-        return Response.ok(user.getPmntInfo()).build();
+      UsersAPI.getInstance().updateUser(user);
+    } else {
+      throw new InvalidPaymentMethodException();
     }
 
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{email}/payment_method")
-    public Response getPntInfo(@Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
+    UsersAPI.getInstance()
+        .createActivity(account.getUser(), "Added new payment method", Activity.Type.INFO);
 
-        Account account = AuthUtil.getAccount(httpRequest);
-        User user = account.getUser();
+    return Response.ok(user.getPmntInfo()).build();
+  }
 
-        return Response.ok(user.getPmntInfo()).build();
+  @GET
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{email}/payment_method")
+  public Response getPntInfo(@Context HttpServletRequest httpRequest)
+      throws UnauthorizedAccessException {
+
+    Account account = AuthUtil.getAccount(httpRequest);
+    User user = account.getUser();
+
+    return Response.ok(user.getPmntInfo()).build();
+  }
+
+  // Yes this class must be static or it will cause a :
+  // java.lang.ArrayIndexOutOfBoundsException: 3
+  // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)
+  // Solution found here: http://stackoverflow.com/questions/7625783/jsonmappingexception-no-suitable-constructor-found-for-type-simple-type-class
+  static class PaymentMethodRequest extends PaymentInfo.PaymentMethod {
+    private String nonce;
+
+    public PaymentMethodRequest() {}
+
+    // Not marking this with JsonProperty was causing;
+    //  No suitable constructor found for type [simple type,
+    // class CredentialsService$CredentialsRequest]:
+    // can not instantiate from JSON object (need to add/enable type information?)
+    public PaymentMethodRequest(
+        @JsonProperty("nonce") String nonce,
+        @JsonProperty("type") PaymentInfo.PaymentType type,
+        @JsonProperty("description") String description,
+        @JsonProperty("expMonth") int expMonth,
+        @JsonProperty("expYear") int expYear,
+        @JsonProperty("countryCode") String countryCode,
+        @JsonProperty("postalCode") String postalCode) {
+
+      this.setNonce(nonce);
+      this.setType(type);
+      this.setDescription(description);
+      this.setExpMonth(expMonth);
+      this.setExpYear(expYear);
+      this.setCountryCode(countryCode);
+      this.setPostalCode(postalCode);
     }
 
-    // Yes this class must be static or it will cause a :
-    // java.lang.ArrayIndexOutOfBoundsException: 3
-    // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)
-    // Solution found here: http://stackoverflow.com/questions/7625783/jsonmappingexception-no-suitable-constructor-found-for-type-simple-type-class
-    static class PaymentMethodRequest extends PaymentInfo.PaymentMethod {
-        private String nonce;
-
-        public PaymentMethodRequest() {}
-
-        // Not marking this with JsonProperty was causing;
-        //  No suitable constructor found for type [simple type,
-        // class CredentialsService$CredentialsRequest]:
-        // can not instantiate from JSON object (need to add/enable type information?)
-        public PaymentMethodRequest(@JsonProperty("nonce") String nonce,
-            @JsonProperty("type") PaymentInfo.PaymentType type,
-            @JsonProperty("description") String description,
-            @JsonProperty("expMonth") int expMonth,
-            @JsonProperty("expYear") int expYear,
-            @JsonProperty("countryCode") String countryCode,
-            @JsonProperty("postalCode") String postalCode) {
-
-            this.setNonce(nonce);
-            this.setType(type);
-            this.setDescription(description);
-            this.setExpMonth(expMonth);
-            this.setExpYear(expYear);
-            this.setCountryCode(countryCode);
-            this.setPostalCode(postalCode);
-        }
-
-        public String getNonce() {
-            return nonce;
-        }
-
-        public void setNonce(String nonce) {
-            this.nonce = nonce;
-        }
+    public String getNonce() {
+      return nonce;
     }
+
+    public void setNonce(String nonce) {
+      this.nonce = nonce;
+    }
+  }
 }
