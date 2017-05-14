@@ -98,9 +98,7 @@ public class RecordingsAPI {
     public Recording getRecordingById(Account account, ObjectId id) throws ApiException {
         if (account == null || id == null)
             throw new ApiException("You must provide this resource with a valid accountId and callId");
-        return ds.createQuery(Recording.class)
-            .field("account").equal(account)
-            .field("_id").equal(id).get();
+        return ds.createQuery(Recording.class).field("account").equal(account).field("_id").equal(id).get();
     }
 
     public File getRecordingFileById(Account account, ObjectId recordingId, Recording.AudioFormat format) throws ApiException {
@@ -117,9 +115,7 @@ public class RecordingsAPI {
         // Not tested yet
         if (format.equals(Recording.AudioFormat.MP3)) {
             // Then file must be converted
-            boolean success = WavToMp3Util.convert(
-                path.concat(".")
-                .concat(Recording.AudioFormat.WAV.toString().toLowerCase()));
+            boolean success = WavToMp3Util.convert(path.concat(".").concat(Recording.AudioFormat.WAV.toString().toLowerCase()));
             if (!success) {
                 throw new ApiException("Temporarily unable to provide this file in '" + ext + "' format");
             }
@@ -134,38 +130,29 @@ public class RecordingsAPI {
     public List<Recording> getRecordings(Account account, CallDetailRecord callDetailRecord) throws ApiException {
         if (account == null || callDetailRecord == null)
             throw new ApiException("You must provide this resource with a valid accountId and callId");
-        return ds.createQuery(Recording.class)
-            .field("account").equal(account)
-            .field("callDetailRecord").equal(callDetailRecord)
-            .asList();
+        return ds.createQuery(Recording.class).field("account").equal(account).field("callDetailRecord").equal(callDetailRecord).asList();
     }
 
-    public List<Recording> getRecordings(Account account,
-        DateTime start, DateTime end) throws ApiException {
+    public List<Recording> getRecordings(Account account, DateTime start, DateTime end) throws ApiException {
 
         if (account == null) throw new ApiException("Invalid account.");
 
-        Query<Recording> q = ds.createQuery(Recording.class)
-        .field("account").equal(account);
+        Query<Recording> q = ds.createQuery(Recording.class).field("account").equal(account);
 
         // All recordings from start date
         if (start != null) {
-        q.filter("created >=", start);
+            q.filter("created >=", start);
         }
 
         // All recordings until end date
         if (end != null) {
-        q.filter("created <=", end);
+            q.filter("created <=", end);
         }
 
         return q.limit(1000).asList();
     }
 
-    public List<Recording> getRecordings(Account account,
-        DateTime start,
-        DateTime end,
-        int maxResults,
-        int firstResult) throws ApiException {
+    public List<Recording> getRecordings(Account account, DateTime start, DateTime end, int maxResults, int firstResult) throws ApiException {
 
         if (account == null) throw new ApiException("Invalid account.");
 
@@ -175,8 +162,7 @@ public class RecordingsAPI {
         if (firstResult < 0) firstResult = 0;
         if (firstResult > 1000) firstResult = 1000;
 
-        Query<Recording> q = ds.createQuery(Recording.class)
-                .field("account").equal(account);
+        Query<Recording> q = ds.createQuery(Recording.class).field("account").equal(account);
 
         // All recordings from start date
         if (start != null) {
@@ -192,8 +178,7 @@ public class RecordingsAPI {
     }
 
     public List<Recording> getRecordingsFor(Account account) throws ApiException {
-        if (account == null)
-            throw new ApiException("Invalid account");
+        if (account == null) throw new ApiException("Invalid account");
         return ds.createQuery(Recording.class).field("account").equal(account).asList();
     }
 

@@ -123,19 +123,13 @@ public class UsersAPI {
     // Should put accounts in cache
     public List<Account> getAccountsFor(User user) {
         if (user == null) return new ArrayList<>();
-        return ds.createQuery(Account.class)
-            .field("user").equal(user)
-            .field("deleted").equal(false)
-            .asList();
+        return ds.createQuery(Account.class).field("user").equal(user).field("deleted").equal(false).asList();
     }
 
     // Should put accounts in cache
     public Account getAccountById(ObjectId id) {
         if (id == null) return null;
-        return ds.createQuery(Account.class)
-            .field("_id").equal(id)
-            .field("deleted").equal(false)
-            .get();
+        return ds.createQuery(Account.class).field("_id").equal(id).field("deleted").equal(false).get();
     }
 
     // Only sub-accounts can set deleted = true;
@@ -161,8 +155,7 @@ public class UsersAPI {
     }
 
     public List<Activity> getActivitiesFor(User user, int maxResults) throws ApiException {
-        if (user == null)
-            throw new ApiException("Invalid user");
+        if (user == null) throw new ApiException("Invalid user");
         return ds.find(Activity.class).order("-created").field("user").equal(user).limit(maxResults).asList();
     }
 
@@ -176,15 +169,14 @@ public class UsersAPI {
     public List<Service> addService(User user, Service service) throws ApiException {
 
         if (user.getServices() == null || user.getServices().isEmpty()) {
-            user.setServices (new ArrayList<> ());
+            user.setServices(new ArrayList<>());
         }
 
         Iterator i = user.getServices().iterator();
 
-        while(i.hasNext()) {
+        while (i.hasNext()) {
             Service s = (Service) i.next();
-            if (s.getName ().equals(service.getName ()))
-                throw new ApiException("Service name must be unique");
+            if (s.getName().equals(service.getName())) throw new ApiException("Service name must be unique");
         }
 
         user.getServices().add(service);
@@ -195,12 +187,11 @@ public class UsersAPI {
     public Service getService(User user, String name) throws ApiException {
         Iterator i = user.getServices().iterator();
 
-        while(i.hasNext()) {
+        while (i.hasNext()) {
             Service service = (Service) i.next();
-            if (service.getName().equals(name))
-                return service;
+            if (service.getName().equals(name)) return service;
         }
 
-        throw new ApiException("Service " + name +  " does not exist.");
+        throw new ApiException("Service " + name + " does not exist.");
     }
 }

@@ -37,10 +37,7 @@ public class AnalyticsAPI {
 
     // NOTICE: This method could add more data, like duration avg etc.
     // WARN: Should I remove synchronized from this method?
-    public synchronized void aggregateCall(Account account,
-        CallDetailRecord.Status status,
-        CallDetailRecord.AnswerBy answerBy,
-        CallDetailRecord.Direction dir) {
+    public synchronized void aggregateCall(Account account, CallDetailRecord.Status status, CallDetailRecord.AnswerBy answerBy, CallDetailRecord.Direction dir) {
 
         TrafficInfo tInfo = new TrafficInfo();
 
@@ -87,22 +84,15 @@ public class AnalyticsAPI {
     // TODO: Add support for datetime range
     public CallStats getStats(Account account, CallStats.Period period, DateTime dt) {
 
-        Query<CallStats> q = ds.createQuery(CallStats.class)
-                .field("account").equal(account)
-                .field("period").equal(period);
+        Query<CallStats> q = ds.createQuery(CallStats.class).field("account").equal(account).field("period").equal(period);
 
         if (period.equals(CallStats.Period.DAY)) {
-            dt = dt.withMinuteOfHour(0)
-                .withSecondOfMinute(0)
-                .withMillisOfSecond(0);
+            dt = dt.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             q.field("datetime").equal(dt);
         }
 
         if (period.equals(CallStats.Period.MONTH)) {
-            dt = dt.withHourOfDay(0)
-                .withMinuteOfHour(0)
-                .withSecondOfMinute(0)
-                .withMillisOfSecond(0);
+            dt = dt.withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             q.field("datetime").equal(dt);
         }
 

@@ -1,183 +1,177 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 @Since("1.0")
 public class CallRequest {
-    @NotNull
-    private String appId;
-    private String callId;
-    @NotNull
-    private String accountId;
-    @NotNull
-    private String from;
-    @NotNull
-    private String to;
-    private String callerId;
-    private CallDetailRecord.AnswerBy answerBy;
-    // Call will be drop after timeout
-    // Default is 60
-    private long timeout;
-    private String sendDigits;
-    // Default is false
-    private boolean record;
-    private boolean billable;
-    @NotNull
-    private String apiVersion;
+  @NotNull private String appId;
+  private String callId;
+  @NotNull private String accountId;
+  @NotNull private String from;
+  @NotNull private String to;
+  private String callerId;
+  private CallDetailRecord.AnswerBy answerBy;
+  // Call will be drop after timeout
+  // Default is 60
+  private long timeout;
+  private String sendDigits;
+  // Default is false
+  private boolean record;
+  private boolean billable;
+  @NotNull private String apiVersion;
 
-    public CallRequest() {
-        timeout = 60;
-        record = false;
-        billable = true;
-        this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+  public CallRequest() {
+    timeout = 60;
+    record = false;
+    billable = true;
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+  }
+
+  public CallRequest(
+      @JsonProperty("appId") String appId,
+      @JsonProperty("callId") String callId,
+      @JsonProperty("accountId") String accountId,
+      @JsonProperty("from") String from,
+      @JsonProperty("to") String to,
+      @JsonProperty("callerId") String callerId,
+      @JsonProperty("timeout") Integer timeout,
+      @JsonProperty("sendDigits") String sendDigits,
+      @JsonProperty("record") boolean record,
+      @JsonProperty("apiVersion") String apiVersion,
+      @JsonProperty("billable") Boolean billable) {
+
+    this.setAppId(appId);
+    this.setCallId(callId);
+    this.setAccountId(accountId);
+    this.setFrom(from);
+    this.setTo(to);
+    this.setCallerId(callerId);
+    this.setSendDigits(sendDigits);
+    this.setApiVersion(apiVersion);
+    this.setRecord(record);
+
+    if (timeout == null) this.timeout = 60;
+
+    if (billable == null) {
+      this.billable = true;
+    } else {
+      this.billable = billable;
     }
 
-    public CallRequest(
-        @JsonProperty("appId") String appId,
-        @JsonProperty("callId") String callId,
-        @JsonProperty("accountId") String accountId,
-        @JsonProperty("from") String from,
-        @JsonProperty("to") String to,
-        @JsonProperty("callerId") String callerId,
-        @JsonProperty("timeout") Integer timeout,
-        @JsonProperty("sendDigits") String sendDigits,
-        @JsonProperty("record") boolean record,
-        @JsonProperty("apiVersion") String apiVersion,
-        @JsonProperty("billable") Boolean billable) {
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+  }
 
-        this.setAppId(appId);
-        this.setCallId(callId);
-        this.setAccountId(accountId);
-        this.setFrom(from);
-        this.setTo(to);
-        this.setCallerId(callerId);
-        this.setSendDigits(sendDigits);
-        this.setApiVersion(apiVersion);
-        this.setRecord(record);
+  public String getAppId() {
+    return appId;
+  }
 
-        if (timeout == null) this.timeout = 60;
+  public void setAppId(String appId) {
+    this.appId = appId;
+  }
 
-        if (billable == null) {
-            this.billable = true;
-        } else {
-            this.billable = billable;
-        }
+  public String getCallId() {
+    return callId;
+  }
 
-        this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
-    }
+  public void setCallId(String callId) {
+    this.callId = callId;
+  }
 
-    public String getAppId() {
-        return appId;
-    }
+  public String getAccountId() {
+    return accountId;
+  }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
+  public void setAccountId(String accountId) {
+    this.accountId = accountId;
+  }
 
-    public String getCallId() {
-        return callId;
-    }
+  public String getFrom() {
+    return from;
+  }
 
-    public void setCallId(String callId) {
-        this.callId = callId;
-    }
+  public void setFrom(String from) {
+    this.from = from;
+  }
 
-    public String getAccountId() {
-        return accountId;
-    }
+  public String getTo() {
+    return to;
+  }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
+  public void setTo(String to) {
+    this.to = to;
+  }
 
-    public String getFrom() {
-        return from;
-    }
+  public String getCallerId() {
+    return callerId;
+  }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
+  public void setCallerId(String callerId) {
+    this.callerId = callerId;
+  }
 
-    public String getTo() {
-        return to;
-    }
+  public CallDetailRecord.AnswerBy getAnswerBy() {
+    return answerBy;
+  }
 
-    public void setTo(String to) {
-        this.to = to;
-    }
+  public void setAnswerBy(CallDetailRecord.AnswerBy answerBy) {
+    this.answerBy = answerBy;
+  }
 
-    public String getCallerId() {
-        return callerId;
-    }
+  public long getTimeout() {
+    return timeout;
+  }
 
-    public void setCallerId(String callerId) {
-        this.callerId = callerId;
-    }
+  public void setTimeout(long timeout) {
+    this.timeout = timeout;
+  }
 
-    public CallDetailRecord.AnswerBy getAnswerBy() {
-        return answerBy;
-    }
+  public String getSendDigits() {
+    return sendDigits;
+  }
 
-    public void setAnswerBy(CallDetailRecord.AnswerBy answerBy) {
-        this.answerBy = answerBy;
-    }
+  public void setSendDigits(String sendDigits) {
+    this.sendDigits = sendDigits;
+  }
 
-    public long getTimeout() {
-        return timeout;
-    }
+  public boolean isRecord() {
+    return record;
+  }
 
-    public void setTimeout(long timeout) {
-        this.timeout = timeout;
-    }
+  public void setRecord(boolean record) {
+    this.record = record;
+  }
 
-    public String getSendDigits() {
-        return sendDigits;
-    }
+  public String getApiVersion() {
+    return apiVersion;
+  }
 
-    public void setSendDigits(String sendDigits) {
-        this.sendDigits = sendDigits;
-    }
+  public void setApiVersion(String apiVersion) {
+    this.apiVersion = apiVersion;
+  }
 
-    public boolean isRecord() {
-        return record;
-    }
+  public boolean isBillable() {
+    return billable;
+  }
 
-    public void setRecord(boolean record) {
-        this.record = record;
-    }
+  public void setBillable(boolean billable) {
+    this.billable = billable;
+  }
 
-    public String getApiVersion() {
-        return apiVersion;
-    }
-
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
-
-    public boolean isBillable() {
-        return billable;
-    }
-
-    public void setBillable(boolean billable) {
-        this.billable = billable;
-    }
-
-    // Creates toString using reflection
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  // Creates toString using reflection
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

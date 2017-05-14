@@ -42,13 +42,9 @@ public final class DBManager {
     private DBManager() {
         ServerAddress addr = new ServerAddress(config.getDbHost(), config.getDbPort());
         List<MongoCredential> credentialsList = new ArrayList<>();
-        MongoCredential credential = MongoCredential.createCredential(
-                config.getDbUsername(), config.getDbName(), config.getDbSecret().toCharArray());
+        MongoCredential credential = MongoCredential.createCredential(config.getDbUsername(), config.getDbName(), config.getDbSecret().toCharArray());
 
-        LOG.info("Creating datastore for {"
-                + " host: " + config.getDbHost ()
-                + ", port: " + config.getDbPort ()
-                + ", dbname: " + config.getDbName () + " }");
+        LOG.info("Creating datastore for {" + " host: " + config.getDbHost() + ", port: " + config.getDbPort() + ", dbname: " + config.getDbName() + " }");
 
         credentialsList.add(credential);
         MongoClient client = new MongoClient(addr, credentialsList);

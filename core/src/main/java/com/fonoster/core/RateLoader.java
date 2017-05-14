@@ -36,7 +36,7 @@ import java.math.BigDecimal;
 public class RateLoader {
     private static final Logger LOG = LoggerFactory.getLogger(RateLoader.class);
     //CSV file header
-    private static final String [] FILE_HEADER_MAPPING = {"Destination","Rate","Numberplan"};
+    private static final String[] FILE_HEADER_MAPPING = {"Destination", "Rate", "Numberplan"};
     //Student attributes
     private static final String DESCRIPTION = "Destination";
     private static final String RATE = "Rate";
@@ -45,54 +45,6 @@ public class RateLoader {
 
     public RateLoader() {
         ds = DBManager.getInstance().getDS();
-    }
-
-    public void loadRates(ServiceProvider provider, String fileName, BigDecimal sellPercent) {
-
-        FileReader fileReader = null;
-
-        CSVParser csvFileParser = null;
-
-        //Create the CSVFormat object with the header mapping
-        CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING);
-
-        try {
-            //initialize FileReader object
-            fileReader = new FileReader(fileName);
-
-            //initialize CSVParser object
-            csvFileParser = new CSVParser(fileReader, csvFileFormat);
-
-            //Read the CSV file records starting from the second record to skip the header
-            for (CSVRecord record:csvFileParser.getRecords()) {
-                if(record.get(RATE).equals(RATE)) continue;
-
-                BigDecimal buying = new BigDecimal(record.get(RATE));
-                BigDecimal selling = buying.multiply(sellPercent);
-                selling = selling.add(buying);
-
-                Rate r = new Rate();
-                r.setPrefix(record.get(PREFIX));
-                r.setProvider(provider);
-                r.setDescription(record.get(DESCRIPTION));
-                r.setBuying(buying);
-                r.setSelling(selling);
-
-                ds.save(r);
-            }
-
-        }
-        catch (Exception e) {
-            LOG.error("Something happen while loading the new rate. Cause by: ", e);
-        } finally {
-            try {
-                fileReader.close();
-                csvFileParser.close();
-            } catch (IOException e) {
-                LOG.error("Error while closing fileReader/csvFileParser", e);
-            }
-        }
-
     }
 
     static public void main(String... args) {
@@ -113,5 +65,52 @@ public class RateLoader {
 
         LOG.info("Adding new rates.");
         new RateLoader().loadRates(provider, csvFile, sellingPercent);
+    }
+
+    public void loadRates(ServiceProvider provider, String fileName, BigDecimal sellPercent) {
+
+        FileReader fileReader = null;
+
+        CSVParser csvFileParser = null;
+
+        //Create the CSVFormat object with the header mapping
+        CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING);
+
+        try {
+            //initialize FileReader object
+            fileReader = new FileReader(fileName);
+
+            //initialize CSVParser object
+            csvFileParser = new CSVParser(fileReader, csvFileFormat);
+
+            //Read the CSV file records starting from the second record to skip the header
+            for (CSVRecord record : csvFileParser.getRecords()) {
+                if (record.get(RATE).equals(RATE)) continue;
+
+                BigDecimal buying = new BigDecimal(record.get(RATE));
+                BigDecimal selling = buying.multiply(sellPercent);
+                selling = selling.add(buying);
+
+                Rate r = new Rate();
+                r.setPrefix(record.get(PREFIX));
+                r.setProvider(provider);
+                r.setDescription(record.get(DESCRIPTION));
+                r.setBuying(buying);
+                r.setSelling(selling);
+
+                ds.save(r);
+            }
+
+        } catch (Exception e) {
+            LOG.error("Something happen while loading the new rate. Cause by: ", e);
+        } finally {
+            try {
+                fileReader.close();
+                csvFileParser.close();
+            } catch (IOException e) {
+                LOG.error("Error while closing fileReader/csvFileParser", e);
+            }
+        }
+
     }
 }

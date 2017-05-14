@@ -1,128 +1,116 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
-import javax.validation.constraints.NotNull;
-
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 public class ServiceProvider {
-    @Id
-    private ObjectId id;
-    @NotNull
-    private DateTime created;
-    @NotNull
-    private DateTime modified;
-    @NotNull
-    private String name;
-    @NotNull
-    private String address;
-    @NotNull
-    private String contactNumber;
-    @NotNull
-    private String trunk;
-    @NotNull
-    private String context;
-    @NotNull
-    private String apiVersion;
+  @Id private ObjectId id;
+  @NotNull private DateTime created;
+  @NotNull private DateTime modified;
+  @NotNull private String name;
+  @NotNull private String address;
+  @NotNull private String contactNumber;
+  @NotNull private String trunk;
+  @NotNull private String context;
+  @NotNull private String apiVersion;
 
-    public ServiceProvider() {
-    }
+  public ServiceProvider() {}
 
-    public ServiceProvider(String name, String address, String contactNumber) {
-        this.name = name;
-        this.address = address;
-        this.contactNumber = contactNumber;
-        this.created = DateTime.now();
-        this.modified = DateTime.now();
-        this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
-    }
+  public ServiceProvider(String name, String address, String contactNumber) {
+    this.name = name;
+    this.address = address;
+    this.contactNumber = contactNumber;
+    this.created = DateTime.now();
+    this.modified = DateTime.now();
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+  }
 
-    public ObjectId getId() {
-        return id;
-    }
+  public ObjectId getId() {
+    return id;
+  }
 
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
+  public void setId(ObjectId id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public String getAddress() {
-        return address;
-    }
+  public String getAddress() {
+    return address;
+  }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
-    public String getContactNumber() {
-        return contactNumber;
-    }
+  public String getContactNumber() {
+    return contactNumber;
+  }
 
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
+  public void setContactNumber(String contactNumber) {
+    this.contactNumber = contactNumber;
+  }
 
-    public String getTrunk() {
-        return trunk;
-    }
+  public String getTrunk() {
+    return trunk;
+  }
 
-    public void setTrunk(String trunk) {
-        this.trunk = trunk;
-    }
+  public void setTrunk(String trunk) {
+    this.trunk = trunk;
+  }
 
-    public DateTime getCreated() {
-        return created;
-    }
+  public DateTime getCreated() {
+    return created;
+  }
 
-    public void setCreated(DateTime created) {
-        this.created = created;
-    }
+  public void setCreated(DateTime created) {
+    this.created = created;
+  }
 
-    public DateTime getModified() {
-        return modified;
-    }
+  public DateTime getModified() {
+    return modified;
+  }
 
-    public void setModified(DateTime modified) {
-        this.modified = modified;
-    }
+  public void setModified(DateTime modified) {
+    this.modified = modified;
+  }
 
-    public String getContext() {
-        return context;
-    }
+  public String getContext() {
+    return context;
+  }
 
-    public void setContext(String context) {
-        this.context = context;
-    }
+  public void setContext(String context) {
+    this.context = context;
+  }
 
-    public String getApiVersion() {
-        return apiVersion;
-    }
+  public String getApiVersion() {
+    return apiVersion;
+  }
 
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
+  public void setApiVersion(String apiVersion) {
+    this.apiVersion = apiVersion;
+  }
 }

@@ -4,6 +4,7 @@
         "http://www.eclipse.org/jetty/configure_9_0.dtd">
 
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
-    <Set name="war"><SystemProperty name="jetty.base" default="."/>/webapps/rest.war</Set>
+    <Set name="war"><SystemProperty name="jetty.base" default="."/>/webapps/rest.war
+    </Set>
     <Set name="contextPath">/</Set>
 </Configure>

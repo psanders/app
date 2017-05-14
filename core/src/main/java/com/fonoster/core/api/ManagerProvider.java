@@ -23,15 +23,12 @@ import org.asteriskjava.live.DefaultAsteriskServer;
 @Since("1.0")
 public class ManagerProvider {
     private final static ManagerProvider INSTANCE = new ManagerProvider();
-    private static AsteriskServer asteriskServer;
     protected static CoreConfig config;
+    private static AsteriskServer asteriskServer;
 
     private ManagerProvider() {
         config = CoreConfig.getInstance();
-        asteriskServer = new DefaultAsteriskServer(
-            config.getManagerHost(),
-            config.getManagerUsername(),
-            config.getManagerSecret());
+        asteriskServer = new DefaultAsteriskServer(config.getManagerHost(), config.getManagerUsername(), config.getManagerSecret());
     }
 
     public static ManagerProvider getInstance() {

@@ -50,7 +50,7 @@ public class DomainsAPI {
     }
 
     public Domain createDomain(User user, URI uri, String desc) throws ApiException {
-        if(getDomainByUri(uri) != null) throw new ApiException("This domain already exist.");
+        if (getDomainByUri(uri) != null) throw new ApiException("This domain already exist.");
 
         Domain.Spec.Context context = new Domain.Spec.Context(uri);
         Domain domain = new Domain(user, desc, context);
@@ -90,8 +90,8 @@ public class DomainsAPI {
         List<Domain> result;
 
         try {
-             jsonInString= mapper.writeValueAsString(domains);
-             result = JsonPath.parse(jsonInString).read(filter);
+            jsonInString = mapper.writeValueAsString(domains);
+            result = JsonPath.parse(jsonInString).read(filter);
         } catch (JsonProcessingException e) {
             throw new ApiException(e.getMessage());
         } catch (Exception e) {

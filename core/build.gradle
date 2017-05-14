@@ -2,6 +2,7 @@
 // https://plugins.gradle.org/plugin/com.github.hierynomus.license
 plugins {
     id "com.github.hierynomus.license" version "0.14.0"
+    id 'com.github.sherter.google-java-format' version '0.6'
 }
 
 license {
@@ -15,5 +16,5 @@ description = 'Fonoster :: Core'
 dependencies {
     compile project(':commons')
     compile project(':utils')
-    compile group: 'org.asteriskjava', name: 'asterisk-java', version:'1.0.0-final'
+    compile group: 'org.asteriskjava', name: 'asterisk-java', version: '1.0.0-final'
 }

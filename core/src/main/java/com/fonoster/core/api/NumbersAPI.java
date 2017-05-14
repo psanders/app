@@ -50,13 +50,9 @@ public class NumbersAPI {
         return INSTANCE;
     }
 
-    public PhoneNumber createPhoneNumber(
-        User user,
-        ServiceProvider provider,
-        String number,
-        String countryISOCode) throws ApiException {
+    public PhoneNumber createPhoneNumber(User user, ServiceProvider provider, String number, String countryISOCode) throws ApiException {
 
-        if(getPhoneNumber(user, number) != null) throw new ApiException("This number has been assigned.");
+        if (getPhoneNumber(user, number) != null) throw new ApiException("This number has been assigned.");
 
         PhoneNumber phoneNumber = new PhoneNumber(user, provider, number, countryISOCode);
 
@@ -81,10 +77,7 @@ public class NumbersAPI {
     // WARNING: This is for internal use only
     public PhoneNumber getPhoneNumber(String number) throws ApiException {
         LOG.debug("Getting obj PhoneNumber for: " + number);
-        PhoneNumber pn = ds.createQuery(PhoneNumber.class)
-            .field("number").equal(number)
-            .field("status").equal(PhoneNumber.Status.ACTIVE)
-            .get();
+        PhoneNumber pn = ds.createQuery(PhoneNumber.class).field("number").equal(number).field("status").equal(PhoneNumber.Status.ACTIVE).get();
 
         if (pn == null) throw new ApiException("Unable to find number " + number);
 
@@ -95,11 +88,7 @@ public class NumbersAPI {
     // Therefore user must replace '+' by %2B
     // TODO: Validate/reformat number if necessary
     public PhoneNumber getPhoneNumber(User user, String number) throws ApiException {
-        PhoneNumber pn = ds.createQuery(PhoneNumber.class)
-            .field("user").equal(user)
-            .field("number").equal(number)
-            .field("status").equal(PhoneNumber.Status.ACTIVE)
-            .get();
+        PhoneNumber pn = ds.createQuery(PhoneNumber.class).field("user").equal(user).field("number").equal(number).field("status").equal(PhoneNumber.Status.ACTIVE).get();
 
         //if (pn == null) throw new ApiException("Unable to find number " + number);
 
@@ -111,8 +100,7 @@ public class NumbersAPI {
 
         if (user == null) throw new ApiException("Invalid user.");
 
-        Query<PhoneNumber> q = ds.createQuery(PhoneNumber.class)
-                .field("user").equal(user);
+        Query<PhoneNumber> q = ds.createQuery(PhoneNumber.class).field("user").equal(user);
 
         if (status != null) {
             q.field("status").equal(status);
@@ -131,8 +119,7 @@ public class NumbersAPI {
         if (firstResult < 0) firstResult = 0;
         if (firstResult > 1000) firstResult = 1000;
 
-        Query<PhoneNumber> q = ds.createQuery(PhoneNumber.class)
-                .field("user").equal(user);
+        Query<PhoneNumber> q = ds.createQuery(PhoneNumber.class).field("user").equal(user);
 
         if (status != null) {
             q.field("status").equal(status);
@@ -144,7 +131,7 @@ public class NumbersAPI {
     public void setDefault(User user, PhoneNumber phone) throws ApiException {
         Iterator<PhoneNumber> phones = getPhoneNumbersFor(user, PhoneNumber.Status.ACTIVE).iterator();
 
-        while(phones.hasNext()) {
+        while (phones.hasNext()) {
             PhoneNumber pn = phones.next();
             if (phone.getId().equals(pn.getId())) {
                 pn.setPreferred(true);
@@ -159,7 +146,7 @@ public class NumbersAPI {
     public PhoneNumber getDefault(User user) throws ApiException {
         Iterator<PhoneNumber> phones = getPhoneNumbersFor(user, PhoneNumber.Status.ACTIVE).iterator();
 
-        while(phones.hasNext()) {
+        while (phones.hasNext()) {
             PhoneNumber pn = phones.next();
             if (pn.isPreferred()) return pn;
         }

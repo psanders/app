@@ -73,6 +73,10 @@ public class CoreConfig extends AbstractConfig {
         }
     }
 
+    public static CoreConfig getInstance() {
+        return INSTANCE;
+    }
+
     public String getManagerHost() {
         return config.getString("manager.host");
     }
@@ -153,9 +157,5 @@ public class CoreConfig extends AbstractConfig {
 
     public String getBluemixPassword() {
         return config.getString("bluemix.password");
-    }
-
-    public static CoreConfig getInstance() {
-        return INSTANCE;
     }
 }

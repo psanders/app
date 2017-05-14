@@ -47,8 +47,21 @@ public class AgentsAPI {
         return INSTANCE;
     }
 
+    static public void main(String... args) throws ApiException {
+        User user = UsersAPI.getInstance().getUserByEmail("john@doe.com");
+        Agent agent = AgentsAPI.getInstance().createAgent(user, "Janie Doe", "janie", "1234");
+
+        ArrayList<String> domains = new ArrayList<String>();
+        domains.add("sip.ocean.com");
+
+        Agent.Spec spec = agent.getSpec();
+        spec.setDomains(domains);
+
+        AgentsAPI.getInstance().updateAgent(agent);
+    }
+
     public Agent createAgent(User user, String name, String username, String secret) throws ApiException {
-       // if(getDomainByUri(uri) != null) throw new ApiException("This domain already exist.");
+        // if(getDomainByUri(uri) != null) throw new ApiException("This domain already exist.");
 
         Agent.Spec.Credentials credentials = new Agent.Spec.Credentials(username, secret);
         Agent agent = new Agent(user, name, credentials);
@@ -68,32 +81,15 @@ public class AgentsAPI {
         return agent;
     }
 
-    static public void main(String... args) throws ApiException {
-        User user = UsersAPI.getInstance().getUserByEmail("john@doe.com");
-        Agent agent = AgentsAPI.getInstance().createAgent(user, "Janie Doe", "janie", "1234");
-
-        ArrayList<String> domains = new ArrayList<String>();
-        domains.add("sip.ocean.com");
-
-        Agent.Spec spec = agent.getSpec();
-        spec.setDomains(domains);
-
-        AgentsAPI.getInstance().updateAgent(agent);
-    }
-
     public Agent updateAgent(Agent agent) {
         ds.save(agent);
         return agent;
     }
 
     public Agent getAgent(URI uri, String username) {
-        List<Agent> agents = ds.createQuery(Agent.class)
-            .field("spec.access.username").equal(username)
-                .field("deleted").equal(false).asList();
+        List<Agent> agents = ds.createQuery(Agent.class).field("spec.access.username").equal(username).field("deleted").equal(false).asList();
 
-        return agents.stream()
-            .filter(agent -> hasDomain(agent.getSpec().getDomains(), uri.toString()))
-                .findFirst().get();
+        return agents.stream().filter(agent -> hasDomain(agent.getSpec().getDomains(), uri.toString())).findFirst().get();
     }
 
     // Only for admin account (Including Sip I/O integration)
@@ -110,15 +106,13 @@ public class AgentsAPI {
         List<Agent> agents = ds.createQuery(Agent.class).field("deleted").equal(false).asList();
 
         if (domainUri != null) {
-            agents = agents.stream()
-                .filter(agent -> hasDomain(agent.getSpec().getDomains(), domainUri.toString()))
-                    .collect(Collectors.toList());
+            agents = agents.stream().filter(agent -> hasDomain(agent.getSpec().getDomains(), domainUri.toString())).collect(Collectors.toList());
         }
 
         List<Agent> result;
 
         try {
-            jsonInString= mapper.writeValueAsString(agents);
+            jsonInString = mapper.writeValueAsString(agents);
             result = JsonPath.parse(jsonInString).read(filter);
         } catch (JsonProcessingException e) {
             throw new ApiException(e.getMessage());
@@ -130,15 +124,11 @@ public class AgentsAPI {
     }
 
     public List<Agent> getAgents() {
-        return ds.createQuery(Agent.class).field("deleted").equal(false)
-            .asList();
+        return ds.createQuery(Agent.class).field("deleted").equal(false).asList();
     }
 
     public List<Agent> getAgentsFor(User user) {
-        if (user == null) return new ArrayList<>();
-
-        return ds.createQuery(Agent.class).field("user").equal(user)
-            .field("deleted").equal(false).asList();
+        return ds.createQuery(Agent.class).field("user").equal(user).field("deleted").equal(false).asList();
     }
 
     public boolean agentExist(URI domainUri, String username) {
@@ -152,7 +142,7 @@ public class AgentsAPI {
     }
 
     private boolean hasDomain(List<String> domains, String domainUri) {
-        for (String dUri: domains) {
+        for (String dUri : domains) {
             if (domainUri.equals(dUri)) return true;
         }
         return false;

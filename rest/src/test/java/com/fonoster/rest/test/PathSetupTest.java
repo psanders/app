@@ -9,19 +9,14 @@ import java.util.Set;
 import static junit.framework.TestCase.assertEquals;
 
 /**
- *
  * @author ecabrerar
- * @date   Feb 12, 2016
+ * @date Feb 12, 2016
  */
 public class PathSetupTest {
-
-	@Test
-	public void testClassLoadWithReflection() {
-
-		Reflections reflections = new Reflections("com.fonoster.rest");
-
-		Set<Class<?>> r = reflections.getTypesAnnotatedWith(Path.class);
-		
-		assertEquals(11, r.size());
-	}
+    @Test
+    public void testClassLoadWithReflection() {
+        Reflections reflections = new Reflections("com.fonoster.rest");
+        Set<Class<?>> r = reflections.getTypesAnnotatedWith(Path.class);
+        assertEquals(11, r.size());
+    }
 }

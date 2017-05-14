@@ -29,6 +29,8 @@ confirm && SKIP_TEST=false && PACK='-p'
 
 $(cd webui/src/main/webapp/app && npm i --verbose && webpack --verbose $PACK)
 
+gradle
+gradle goJf
 gradle build
 
 docker build -t gcr.io/fonoster-app/fnapp:latest .

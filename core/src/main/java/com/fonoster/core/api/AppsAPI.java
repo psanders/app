@@ -32,7 +32,8 @@ public class AppsAPI {
     private static final AppsAPI INSTANCE = new AppsAPI();
     final private Datastore ds = DBManager.getInstance().getDS();
 
-    private AppsAPI() {}
+    private AppsAPI() {
+    }
 
     public static AppsAPI getInstance() {
         return INSTANCE;
@@ -44,7 +45,7 @@ public class AppsAPI {
 
         App app = new App(user, name);
 
-        Script main = new Script ("main.js", Script.Type.JAVASCRIPT);
+        Script main = new Script("main.js", Script.Type.JAVASCRIPT);
         main.setSource(script);
         List<Script> scripts = app.getScripts();
         scripts.add(main);
@@ -56,30 +57,20 @@ public class AppsAPI {
 
     public App getAppById(User user, ObjectId id, boolean ignoreStatus) throws ApiException {
 
-        if (user == null)
-            throw new ApiException("Invalid User.");
+        if (user == null) throw new ApiException("Invalid User.");
 
-        if (id == null)
-            throw new ApiException("Invalid Id.");
+        if (id == null) throw new ApiException("Invalid Id.");
 
-        Query<App> q = ds.createQuery(App.class)
-            .field("_id").equal(id)
-            .field("user").equal(user);
+        Query<App> q = ds.createQuery(App.class).field("_id").equal(id).field("user").equal(user);
 
-        if(!ignoreStatus) {
+        if (!ignoreStatus) {
             q.field("status").notEqual(App.Status.DELETED);
         }
 
         return q.get();
     }
 
-    public List<App> getApps(User user,
-        DateTime start,
-        DateTime end,
-        int maxResults,
-        int firstResult,
-        boolean starred,
-        App.Status status) throws ApiException {
+    public List<App> getApps(User user, DateTime start, DateTime end, int maxResults, int firstResult, boolean starred, App.Status status) throws ApiException {
 
         if (user == null) throw new ApiException("Invalid user.");
 
@@ -89,8 +80,7 @@ public class AppsAPI {
         if (firstResult < 0) firstResult = 0;
         if (firstResult > 1000) firstResult = 1000;
 
-        Query<App> q = ds.createQuery(App.class)
-                .field("user").equal(user);
+        Query<App> q = ds.createQuery(App.class).field("user").equal(user);
 
         // All recordings from start date
         if (start != null) {

@@ -1,11 +1,10 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.model;
 
@@ -17,6 +16,9 @@ import com.fonoster.exception.InvalidPhoneNumberException;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
+import java.util.Locale;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -24,228 +26,211 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.Locale;
-
 @Since("1.0")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PhoneNumber {
-    @Id
-    private ObjectId id;
-    @Reference
-    @NotNull
-    private User user;
-    @NotNull
-    private String number;
-    @NotNull
-    private String countryISOCode;
-    @NotNull
-    @Reference
-    private ServiceProvider provider;
-    @NotNull
-    private DateTime created;
-    private DateTime modified;
-    // Should expire every month
-    private DateTime expired;
-    private boolean voiceEnabled;
-    private boolean smsEnabled;
-    private boolean mmsEnabled;
-    private Status status;
-    // Inbound calls can only be directed to this app if set
-    @Reference
-    private App inbndApp;
-    // If set will be use to bill the incoming call, otherwise 'main' will be billed
-    @Reference
-    private Account inbndAcct;
-    // Use for outbound calls from the apps editor
-    private boolean preferred;
-    @NotNull
-    private String apiVersion;
+  @Id private ObjectId id;
+  @Reference @NotNull private User user;
+  @NotNull private String number;
+  @NotNull private String countryISOCode;
+  @NotNull @Reference private ServiceProvider provider;
+  @NotNull private DateTime created;
+  private DateTime modified;
+  // Should expire every month
+  private DateTime expired;
+  private boolean voiceEnabled;
+  private boolean smsEnabled;
+  private boolean mmsEnabled;
+  private Status status;
+  // Inbound calls can only be directed to this app if set
+  @Reference private App inbndApp;
+  // If set will be use to bill the incoming call, otherwise 'main' will be billed
+  @Reference private Account inbndAcct;
+  // Use for outbound calls from the apps editor
+  private boolean preferred;
+  @NotNull private String apiVersion;
 
-    public PhoneNumber() {
+  public PhoneNumber() {}
+
+  public PhoneNumber(User user, ServiceProvider provider, String number, String countryISOCode)
+      throws ApiException {
+    // Move this to a jb validator
+    boolean validCode = false;
+    for (String cc : Locale.getISOCountries()) {
+      if (countryISOCode.equals(cc)) {
+        validCode = true;
+        break;
+      }
     }
 
-    public PhoneNumber(User user,
-        ServiceProvider provider,
-        String number,
-        String countryISOCode) throws ApiException {
-        // Move this to a jb validator
-        boolean validCode = false;
-        for (String cc : Locale.getISOCountries()) {
-            if (countryISOCode.equals(cc)) {
-                validCode = true;
-                break;
-            }
-        }
+    if (!validCode) throw new ApiException("Invalid countryCode: " + countryISOCode);
 
-        if (!validCode) throw new ApiException("Invalid countryCode: " + countryISOCode);
+    Phonenumber.PhoneNumber pNumber;
 
-        Phonenumber.PhoneNumber pNumber;
-
-        try {
-            pNumber = PhoneNumberUtil.getInstance().parse(number, countryISOCode);
-        } catch (NumberParseException e) {
-            throw new InvalidPhoneNumberException("Unable to parse number: " + number);
-        }
-
-        if (!PhoneNumberUtil.getInstance().isValidNumber(pNumber)) throw new InvalidPhoneNumberException();
-
-        // Because we want to store the number using the ISO standard
-        this.number = PhoneNumberUtil.getInstance().format(pNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
-        this.countryISOCode = countryISOCode;
-        this.created = DateTime.now();
-        this.modified = DateTime.now();
-        this.setStatus(Status.ACTIVE);
-        this.user = user;
-        this.id = new ObjectId();
-        this.provider = provider;
-        this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+    try {
+      pNumber = PhoneNumberUtil.getInstance().parse(number, countryISOCode);
+    } catch (NumberParseException e) {
+      throw new InvalidPhoneNumberException("Unable to parse number: " + number);
     }
 
-    public ObjectId getId() {
-        return id;
-    }
+    if (!PhoneNumberUtil.getInstance().isValidNumber(pNumber))
+      throw new InvalidPhoneNumberException();
 
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
+    // Because we want to store the number using the ISO standard
+    this.number =
+        PhoneNumberUtil.getInstance().format(pNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
+    this.countryISOCode = countryISOCode;
+    this.created = DateTime.now();
+    this.modified = DateTime.now();
+    this.setStatus(Status.ACTIVE);
+    this.user = user;
+    this.id = new ObjectId();
+    this.provider = provider;
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+  }
 
-    public String getNumber() {
-        return number;
-    }
+  public ObjectId getId() {
+    return id;
+  }
 
-    public void setNumber(String number) {
-        this.number = number;
-    }
+  public void setId(ObjectId id) {
+    this.id = id;
+  }
 
-    public String getCountryISOCode() {
-        return countryISOCode;
-    }
+  public String getNumber() {
+    return number;
+  }
 
-    public void setCountryISOCode(String countryISOCode) {
-        this.countryISOCode = countryISOCode;
-    }
+  public void setNumber(String number) {
+    this.number = number;
+  }
 
-    @XmlTransient
-    public ServiceProvider getProvider() {
-        return provider;
-    }
+  public String getCountryISOCode() {
+    return countryISOCode;
+  }
 
-    public void setProvider(ServiceProvider provider) {
-        this.provider = provider;
-    }
+  public void setCountryISOCode(String countryISOCode) {
+    this.countryISOCode = countryISOCode;
+  }
 
-    public DateTime getCreated() {
-        return created;
-    }
+  @XmlTransient
+  public ServiceProvider getProvider() {
+    return provider;
+  }
 
-    public void setCreated(DateTime created) {
-        this.created = created;
-    }
+  public void setProvider(ServiceProvider provider) {
+    this.provider = provider;
+  }
 
-    public DateTime getModified() {
-        return modified;
-    }
+  public DateTime getCreated() {
+    return created;
+  }
 
-    public void setModified(DateTime modified) {
-        this.modified = modified;
-    }
+  public void setCreated(DateTime created) {
+    this.created = created;
+  }
 
-    public DateTime getExpired() {
-        return expired;
-    }
+  public DateTime getModified() {
+    return modified;
+  }
 
-    public void setExpired(DateTime expired) {
-        this.expired = expired;
-    }
+  public void setModified(DateTime modified) {
+    this.modified = modified;
+  }
 
-    public boolean isVoiceEnabled() {
-        return voiceEnabled;
-    }
+  public DateTime getExpired() {
+    return expired;
+  }
 
-    public void setVoiceEnabled(boolean voiceEnabled) {
-        this.voiceEnabled = voiceEnabled;
-    }
+  public void setExpired(DateTime expired) {
+    this.expired = expired;
+  }
 
-    public boolean isSmsEnabled() {
-        return smsEnabled;
-    }
+  public boolean isVoiceEnabled() {
+    return voiceEnabled;
+  }
 
-    public void setSmsEnabled(boolean smsEnabled) {
-        this.smsEnabled = smsEnabled;
-    }
+  public void setVoiceEnabled(boolean voiceEnabled) {
+    this.voiceEnabled = voiceEnabled;
+  }
 
-    public boolean isMmsEnabled() {
-        return mmsEnabled;
-    }
+  public boolean isSmsEnabled() {
+    return smsEnabled;
+  }
 
-    public void setMmsEnabled(boolean mmsEnabled) {
-        this.mmsEnabled = mmsEnabled;
-    }
+  public void setSmsEnabled(boolean smsEnabled) {
+    this.smsEnabled = smsEnabled;
+  }
 
-    public Status getStatus() {
-        return status;
-    }
+  public boolean isMmsEnabled() {
+    return mmsEnabled;
+  }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+  public void setMmsEnabled(boolean mmsEnabled) {
+    this.mmsEnabled = mmsEnabled;
+  }
 
-    public App getInbndApp() {
-        return inbndApp;
-    }
+  public Status getStatus() {
+    return status;
+  }
 
-    public void setInbndApp(App inbndApp) {
-        this.inbndApp = inbndApp;
-    }
+  public void setStatus(Status status) {
+    this.status = status;
+  }
 
-    @XmlTransient
-    public User getUser() {
-        return user;
-    }
+  public App getInbndApp() {
+    return inbndApp;
+  }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+  public void setInbndApp(App inbndApp) {
+    this.inbndApp = inbndApp;
+  }
 
-    public Account getInbndAcct() {
-        return inbndAcct;
-    }
+  @XmlTransient
+  public User getUser() {
+    return user;
+  }
 
-    public void setInbndAcct(Account inbndAcct) {
-        this.inbndAcct = inbndAcct;
-    }
+  public void setUser(User user) {
+    this.user = user;
+  }
 
-    public boolean isPreferred() {
-        return preferred;
-    }
+  public Account getInbndAcct() {
+    return inbndAcct;
+  }
 
-    public void setPreferred(boolean preferred) {
-        this.preferred = preferred;
-    }
+  public void setInbndAcct(Account inbndAcct) {
+    this.inbndAcct = inbndAcct;
+  }
 
-    public String getApiVersion() {
-        return apiVersion;
-    }
+  public boolean isPreferred() {
+    return preferred;
+  }
 
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
+  public void setPreferred(boolean preferred) {
+    this.preferred = preferred;
+  }
 
-    public enum Status {
-        ACTIVE,
-        AWAITING_REGISTRATION,
-        EXPIRING_SOON,
-        EXPIRED,
-        TERMINATED
-    }
+  public String getApiVersion() {
+    return apiVersion;
+  }
 
-    // Creates toString using reflection
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public void setApiVersion(String apiVersion) {
+    this.apiVersion = apiVersion;
+  }
+
+  // Creates toString using reflection
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
+
+  public enum Status {
+    ACTIVE,
+    AWAITING_REGISTRATION,
+    EXPIRING_SOON,
+    EXPIRED,
+    TERMINATED
+  }
 }
-

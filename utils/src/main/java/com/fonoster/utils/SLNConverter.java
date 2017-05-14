@@ -22,9 +22,9 @@ public class SLNConverter {
 
     public static boolean convert(String origin, String dest) {
         String originFormat = null;
-        if(origin.endsWith (".wav")) {
+        if (origin.endsWith(".wav")) {
             originFormat = "wav";
-        } else if(origin.endsWith (".mp3")) {
+        } else if (origin.endsWith(".mp3")) {
             originFormat = "mp3";
         }
 

@@ -1,128 +1,126 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import java.math.BigDecimal;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 @Since("1.0")
 @Entity
 @Embedded
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TrafficInfo {
-    private int completedCalls;
-    private int incompleteCalls;
-    private int answerByMachine;
-    private int answerByHuman;
-    private int answerByUnknown;
-    private int inbnd;
-    private int outbndApi;
-    private int outbndDial;
-    private BigDecimal cost;
-    @NotNull
-    private String apiVersion;
+  private int completedCalls;
+  private int incompleteCalls;
+  private int answerByMachine;
+  private int answerByHuman;
+  private int answerByUnknown;
+  private int inbnd;
+  private int outbndApi;
+  private int outbndDial;
+  private BigDecimal cost;
+  @NotNull private String apiVersion;
 
-    public TrafficInfo() {
-        cost = new BigDecimal("0.0");
-        this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
-    }
+  public TrafficInfo() {
+    cost = new BigDecimal("0.0");
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+  }
 
-    public int getCompletedCalls() {
-        return completedCalls;
-    }
+  public int getCompletedCalls() {
+    return completedCalls;
+  }
 
-    public void setCompletedCalls(int completedCalls) {
-        this.completedCalls = completedCalls;
-    }
+  public void setCompletedCalls(int completedCalls) {
+    this.completedCalls = completedCalls;
+  }
 
-    public int getIncompleteCalls() {
-        return incompleteCalls;
-    }
+  public int getIncompleteCalls() {
+    return incompleteCalls;
+  }
 
-    public void setIncompleteCalls(int incompleteCalls) {
-        this.incompleteCalls = incompleteCalls;
-    }
+  public void setIncompleteCalls(int incompleteCalls) {
+    this.incompleteCalls = incompleteCalls;
+  }
 
-    public int getAnswerByMachine() {
-        return answerByMachine;
-    }
+  public int getAnswerByMachine() {
+    return answerByMachine;
+  }
 
-    public void setAnswerByMachine(int answerByMachine) {
-        this.answerByMachine = answerByMachine;
-    }
+  public void setAnswerByMachine(int answerByMachine) {
+    this.answerByMachine = answerByMachine;
+  }
 
-    public int getAnswerByHuman() {
-        return answerByHuman;
-    }
+  public int getAnswerByHuman() {
+    return answerByHuman;
+  }
 
-    public void setAnswerByHuman(int answerByHuman) {
-        this.answerByHuman = answerByHuman;
-    }
+  public void setAnswerByHuman(int answerByHuman) {
+    this.answerByHuman = answerByHuman;
+  }
 
-    public int getAnswerByUnknown() {
-        return answerByUnknown;
-    }
+  public int getAnswerByUnknown() {
+    return answerByUnknown;
+  }
 
-    public void setAnswerByUnknown(int answerByUnknown) {
-        this.answerByUnknown = answerByUnknown;
-    }
+  public void setAnswerByUnknown(int answerByUnknown) {
+    this.answerByUnknown = answerByUnknown;
+  }
 
-    public int getInbnd() {
-        return inbnd;
-    }
+  public int getInbnd() {
+    return inbnd;
+  }
 
-    public void setInbnd(int inbnd) {
-        this.inbnd = inbnd;
-    }
+  public void setInbnd(int inbnd) {
+    this.inbnd = inbnd;
+  }
 
-    public int getOutbndApi() {
-        return outbndApi;
-    }
+  public int getOutbndApi() {
+    return outbndApi;
+  }
 
-    public void setOutbndApi(int outbndApi) {
-        this.outbndApi = outbndApi;
-    }
+  public void setOutbndApi(int outbndApi) {
+    this.outbndApi = outbndApi;
+  }
 
-    public int getOutbndDial() {
-        return outbndDial;
-    }
+  public int getOutbndDial() {
+    return outbndDial;
+  }
 
-    public void setOutbndDial(int outbndDial) {
-        this.outbndDial = outbndDial;
-    }
+  public void setOutbndDial(int outbndDial) {
+    this.outbndDial = outbndDial;
+  }
 
-    public BigDecimal getCost() {
-        return cost;
-    }
+  public BigDecimal getCost() {
+    return cost;
+  }
 
-    public void setCost(BigDecimal cost) {
-        this.cost = cost;
-    }
+  public void setCost(BigDecimal cost) {
+    this.cost = cost;
+  }
 
-    public String getApiVersion() {
-        return apiVersion;
-    }
+  public String getApiVersion() {
+    return apiVersion;
+  }
 
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
+  public void setApiVersion(String apiVersion) {
+    this.apiVersion = apiVersion;
+  }
 
-    // Creates toString using reflection
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  // Creates toString using reflection
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }

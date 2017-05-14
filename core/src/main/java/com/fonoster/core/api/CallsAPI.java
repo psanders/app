@@ -49,10 +49,8 @@ public class CallsAPI {
     }
 
     public CallDetailRecord getCDRById(ObjectId id) throws ApiException {
-        if (id == null)
-            throw new ResourceNotFoundException("Not found.");
-        return ds.createQuery(CallDetailRecord.class)
-                .field("_id").equal(id).get();
+        if (id == null) throw new ResourceNotFoundException("Not found.");
+        return ds.createQuery(CallDetailRecord.class).field("_id").equal(id).get();
     }
 
     public CallDetailRecord getCDRById(Account account, ObjectId id) throws ApiException {
@@ -72,15 +70,7 @@ public class CallsAPI {
         return q.get();
     }
 
-    public List<CallDetailRecord> getCDRs(Account account,
-        DateTime start,
-        DateTime end,
-        String from,
-        String to,
-        int maxResults,
-        int firstResult,
-        CallDetailRecord.Status status,
-        CallDetailRecord.AnswerBy answerBy) throws ApiException {
+    public List<CallDetailRecord> getCDRs(Account account, DateTime start, DateTime end, String from, String to, int maxResults, int firstResult, CallDetailRecord.Status status, CallDetailRecord.AnswerBy answerBy) throws ApiException {
 
         if (account == null) throw new ApiException("Invalid account.");
 
@@ -129,13 +119,7 @@ public class CallsAPI {
     }
 
     // Not the optimal solution
-    public int getCDRsTotal(Account account,
-        DateTime start,
-        DateTime end,
-        String from,
-        String to,
-        CallDetailRecord.Status status,
-        CallDetailRecord.AnswerBy answerBy) throws ApiException {
+    public int getCDRsTotal(Account account, DateTime start, DateTime end, String from, String to, CallDetailRecord.Status status, CallDetailRecord.AnswerBy answerBy) throws ApiException {
 
         if (account == null) throw new ApiException("Invalid account.");
 
@@ -178,13 +162,7 @@ public class CallsAPI {
     }
 
     // Not the optimal solution
-    public BigDecimal getCallsCost(Account account,
-        DateTime start,
-        DateTime end,
-        String from,
-        String to,
-        CallDetailRecord.Status status,
-        CallDetailRecord.AnswerBy answerBy) throws ApiException {
+    public BigDecimal getCallsCost(Account account, DateTime start, DateTime end, String from, String to, CallDetailRecord.Status status, CallDetailRecord.AnswerBy answerBy) throws ApiException {
 
         if (account == null) throw new ApiException("Invalid account.");
 
@@ -220,14 +198,14 @@ public class CallsAPI {
 
         // All crds until end date
         if (end != null) {
-        q.filter("created <=", end);
+            q.filter("created <=", end);
         }
 
         BigDecimal cost = new BigDecimal("0");
         List<CallDetailRecord> cdrs = q.asList();
 
         for (CallDetailRecord cdr : cdrs) {
-        cost = cost.add(cdr.getCost());
+            cost = cost.add(cdr.getCost());
         }
 
         return cost;
@@ -250,8 +228,7 @@ public class CallsAPI {
         try {
             AsteriskChannel ac = as.getChannelById(cdr.getChannelId());
             ac.hangup();
-            if (cdr.getStatus().equals(CallDetailRecord.Status.QUEUED) ||
-                    cdr.getStatus().equals(CallDetailRecord.Status.RINGING)) {
+            if (cdr.getStatus().equals(CallDetailRecord.Status.QUEUED) || cdr.getStatus().equals(CallDetailRecord.Status.RINGING)) {
                 cdr.setStatus(CallDetailRecord.Status.CANCELED);
             } else if (cdr.getStatus().equals(CallDetailRecord.Status.IN_PROGRESS)) {
                 cdr.setStatus(CallDetailRecord.Status.COMPLETED);
@@ -277,8 +254,8 @@ public class CallsAPI {
             AsteriskChannel ac = as.getChannelById(cdr.getChannelId());
             ac.hangup();
             // Too easy
-            if (cdr.getStatus().equals(CallDetailRecord.Status.QUEUED) ||
-                    cdr.getStatus().equals(CallDetailRecord.Status.RINGING)) cdr.setApp(new App());
+            if (cdr.getStatus().equals(CallDetailRecord.Status.QUEUED) || cdr.getStatus().equals(CallDetailRecord.Status.RINGING))
+                cdr.setApp(new App());
             else if (cdr.getStatus().equals(CallDetailRecord.Status.IN_PROGRESS)) {
                 //
             }
@@ -294,8 +271,7 @@ public class CallsAPI {
         LOG.debug("call.request => " + request);
 
         if (!BeanValidatorUtil.isValidBean(request)) {
-            throw new ApiException("Invalid parameter/s. "
-                    + BeanValidatorUtil.getValidationError(request));
+            throw new ApiException("Invalid parameter/s. " + BeanValidatorUtil.getValidationError(request));
         }
 
         PhoneNumber phoneNumber = NumbersAPI.getInstance().getPhoneNumber(request.getFrom());
@@ -305,7 +281,7 @@ public class CallsAPI {
         // Ensure user has enough balance
         long maxAllowedTime = BillingAPI.getInstance().maxAllowTime(account, phoneNumber, request.getTo());
 
-        if (request.isBillable() && maxAllowedTime <=0 ) throw new InsufficientFundsException();
+        if (request.isBillable() && maxAllowedTime <= 0) throw new InsufficientFundsException();
 
         // WARNING: Avoid this dom stuff by either creating more numbers all putting here a better note
         //if (phoneNumber == null || !phoneNumber.getUser().getEmail()
@@ -328,12 +304,7 @@ public class CallsAPI {
             throw new InvalidPhoneNumberException("Unable to format 'To' number. Try using a E.164 formatted number.");
         }
 
-        final CallDetailRecord callDetailRecord = new CallDetailRecord(account,
-            app,
-            phoneNumber.getNumber(),
-            reformattedTo,
-            null,
-            CallDetailRecord.Direction.OUTBOUND_API);
+        final CallDetailRecord callDetailRecord = new CallDetailRecord(account, app, phoneNumber.getNumber(), reformattedTo, null, CallDetailRecord.Direction.OUTBOUND_API);
 
         callDetailRecord.setStatus(CallDetailRecord.Status.QUEUED);
         callDetailRecord.setAnswerBy(CallDetailRecord.AnswerBy.NONE);
@@ -356,9 +327,7 @@ public class CallsAPI {
         final OriginateAction originateAction;
 
         // Setting up the channel info
-        String channel = "SIP/"
-            .concat(reformattedTo.replace("+", ""))
-            .concat("@" + phoneNumber.getProvider().getTrunk());
+        String channel = "SIP/".concat(reformattedTo.replace("+", "")).concat("@" + phoneNumber.getProvider().getTrunk());
 
         originateAction = new OriginateAction();
         originateAction.setChannel(channel);
@@ -375,70 +344,59 @@ public class CallsAPI {
         originateAction.setActionId(callDetailRecord.getId().toString());
         originateAction.setTimeout(request.getTimeout() * 1000);
 
-        ManagerProvider
-            .getInstance()
-            .getAsteriskServer()
-            .originateAsync(originateAction, new OriginateCallback() {
-                @Override
-                public void onDialing(AsteriskChannel channel) {
-                    LOG.info("call.id: ".concat(callDetailRecord.getId().toString()).concat(" ringing"));
-                    callDetailRecord.setStatus(CallDetailRecord.Status.RINGING);
-                    callDetailRecord.setChannelId(channel.getId());
-                    updateCDR(callDetailRecord);
-                }
+        ManagerProvider.getInstance().getAsteriskServer().originateAsync(originateAction, new OriginateCallback() {
+            @Override
+            public void onDialing(AsteriskChannel channel) {
+                LOG.info("call.id: ".concat(callDetailRecord.getId().toString()).concat(" ringing"));
+                callDetailRecord.setStatus(CallDetailRecord.Status.RINGING);
+                callDetailRecord.setChannelId(channel.getId());
+                updateCDR(callDetailRecord);
+            }
 
-                @Override
-                public void onSuccess(AsteriskChannel channel) {
-                    LOG.info("call.id: " + callDetailRecord.getId() + " in progress");
-                    if (request.isRecord()) {
-                        // By default save it as wav and mix in/out.
-                        // What happen if I don't call stopMonitoring?
-                        Recording recording = null;
-                        try {
-                            recording = RecordingsAPI.getInstance().createRecording(callDetailRecord);
-                        } catch (ApiException e) {
-                            LOG.error(e.getMessage());
-                        }
-
-                        // Ensures both sides of the conversation get mix.
-                        channel.startMonitoring(
-                            config.getRecordingsPath()
-                            .concat("/")
-                            .concat(recording.getId().toString())
-                            , "wav", true);
+            @Override
+            public void onSuccess(AsteriskChannel channel) {
+                LOG.info("call.id: " + callDetailRecord.getId() + " in progress");
+                if (request.isRecord()) {
+                    // By default save it as wav and mix in/out.
+                    // What happen if I don't call stopMonitoring?
+                    Recording recording = null;
+                    try {
+                        recording = RecordingsAPI.getInstance().createRecording(callDetailRecord);
+                    } catch (ApiException e) {
+                        LOG.error(e.getMessage());
                     }
-                    callDetailRecord.setStatus(CallDetailRecord.Status.IN_PROGRESS);
-                    updateCDR(callDetailRecord);
-                }
 
-                @Override
-                public void onNoAnswer(AsteriskChannel channel) {
-                    LOG.info("call.id: " + callDetailRecord.getId() + "  no answer");
-                    callDetailRecord.setStatus(CallDetailRecord.Status.NO_ANSWER);
-                    updateCDR(callDetailRecord);
-                    AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(),
-                            callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                    // Ensures both sides of the conversation get mix.
+                    channel.startMonitoring(config.getRecordingsPath().concat("/").concat(recording.getId().toString()), "wav", true);
                 }
+                callDetailRecord.setStatus(CallDetailRecord.Status.IN_PROGRESS);
+                updateCDR(callDetailRecord);
+            }
 
-                @Override
-                public void onBusy(AsteriskChannel channel) {
-                    LOG.info("call.id: " + callDetailRecord.getId() + " busy");
-                    callDetailRecord.setStatus(CallDetailRecord.Status.BUSY);
-                    updateCDR(callDetailRecord);
-                    AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(),
-                            callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
-                }
+            @Override
+            public void onNoAnswer(AsteriskChannel channel) {
+                LOG.info("call.id: " + callDetailRecord.getId() + "  no answer");
+                callDetailRecord.setStatus(CallDetailRecord.Status.NO_ANSWER);
+                updateCDR(callDetailRecord);
+                AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+            }
 
-                @Override
-                public void onFailure(LiveException cause) {
-                    LOG.info("call.id: " + callDetailRecord.getId()
-                            + " fail (cause->" + cause.getMessage() + ")");
-                    callDetailRecord.setStatus(CallDetailRecord.Status.FAILED);
-                    updateCDR(callDetailRecord);
-                    AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(),
-                            callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
-                }
-            });
+            @Override
+            public void onBusy(AsteriskChannel channel) {
+                LOG.info("call.id: " + callDetailRecord.getId() + " busy");
+                callDetailRecord.setStatus(CallDetailRecord.Status.BUSY);
+                updateCDR(callDetailRecord);
+                AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+            }
+
+            @Override
+            public void onFailure(LiveException cause) {
+                LOG.info("call.id: " + callDetailRecord.getId() + " fail (cause->" + cause.getMessage() + ")");
+                callDetailRecord.setStatus(CallDetailRecord.Status.FAILED);
+                updateCDR(callDetailRecord);
+                AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+            }
+        });
 
         return callDetailRecord;
     }

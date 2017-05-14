@@ -64,16 +64,14 @@ public class BillingAPI {
 
         // Warning: Fix this warning. But ensure a unit test is available
         Collections.sort(match, (o1, o2) -> {
-		    Rate r1 = (Rate) o1;
-		    Rate r2 = (Rate) o1;
+            Rate r1 = (Rate) o1;
+            Rate r2 = (Rate) o1;
 
-		    return (r1.getPrefix().length() < r2.getPrefix().length()) ? 1 : -1;
-		});
+            return (r1.getPrefix().length() < r2.getPrefix().length()) ? 1 : -1;
+        });
 
         if (match.size() == 0) {
-            LOG.error("Unable to find rate for this number. spId => "
-                    .concat(provider.getId().toString())
-                    .concat(" dest => " ).concat(dest));
+            LOG.error("Unable to find rate for this number. spId => ".concat(provider.getId().toString()).concat(" dest => ").concat(dest));
             throw new ApiException("Unable to find rate for this number");
         }
 

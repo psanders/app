@@ -1,18 +1,17 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 /*
-*Copyright (C) 2014 PhonyTive LLC
-*http://fonoster.com
-*
-*This file is part of Fonoster
-*/
+ *Copyright (C) 2014 PhonyTive LLC
+ *http://fonoster.com
+ *
+ *This file is part of Fonoster
+ */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -20,219 +19,212 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.model.services.Service;
+import java.util.ArrayList;
+import java.util.List;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
-import java.util.List;
-
 @Since("1.0")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
-    @Id
-    private String email;
-    private DateTime created;
-    private DateTime modified;
-    @NotNull
-    private String firstName;
-    @NotNull
-    private String lastName;
-    @NotNull
-    private String password;
-    @AssertFalse
-    private boolean disabled;
-    @NotNull
-    private String apiVersion;
-    @Reference
-    // Use this to avoid infinite recursion: http://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-    @JsonBackReference
-    private Account account;
-    private String phone;
-    private String company;
-    private String timezone;
-    private String countryCode;
-    @NotNull
-    private PaymentInfo pmntInfo;
-    private List<Service> services;
+  @Id private String email;
+  private DateTime created;
+  private DateTime modified;
+  @NotNull private String firstName;
+  @NotNull private String lastName;
+  @NotNull private String password;
+  @AssertFalse private boolean disabled;
+  @NotNull private String apiVersion;
 
-    // Use to verify if user has close a global alert.
-    private boolean checkedGlobalMessage;
+  @Reference
+  // Use this to avoid infinite recursion: http://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+  @JsonBackReference
+  private Account account;
 
-    public User() {
-    }
+  private String phone;
+  private String company;
+  private String timezone;
+  private String countryCode;
+  @NotNull private PaymentInfo pmntInfo;
+  private List<Service> services;
 
-    public User(String firstName, String lastName, String email, String phone, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phone = phone;
-        this.password = password;
-        this.created = DateTime.now();
-        this.modified = DateTime.now();
-        this.disabled = false;
-        this.apiVersion  = CommonsConfig.getInstance().getCurrentVersion();
-        this.timezone = "America/New_York";
-        this.countryCode = "US";
-        this.pmntInfo = new PaymentInfo();
-        this.services = new ArrayList<>();
-        // We don't know yet if there is any global msg
-        this.checkedGlobalMessage = false;
-    }
+  // Use to verify if user has close a global alert.
+  private boolean checkedGlobalMessage;
 
-    public User(String firstName, String lastName, String email, String password) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.created = DateTime.now();
-        this.modified = DateTime.now();
-        this.disabled = false;
-        this.apiVersion  = CommonsConfig.getInstance().getCurrentVersion();
-        this.timezone = "America/New_York";
-        this.countryCode = "US";
-        this.pmntInfo = new PaymentInfo();
-        this.checkedGlobalMessage = false;
-    }
+  public User() {}
 
-    public String getEmail() {
-        return email;
-    }
+  public User(String firstName, String lastName, String email, String phone, String password) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.password = password;
+    this.created = DateTime.now();
+    this.modified = DateTime.now();
+    this.disabled = false;
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+    this.timezone = "America/New_York";
+    this.countryCode = "US";
+    this.pmntInfo = new PaymentInfo();
+    this.services = new ArrayList<>();
+    // We don't know yet if there is any global msg
+    this.checkedGlobalMessage = false;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public User(String firstName, String lastName, String email, String password) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.password = password;
+    this.created = DateTime.now();
+    this.modified = DateTime.now();
+    this.disabled = false;
+    this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
+    this.timezone = "America/New_York";
+    this.countryCode = "US";
+    this.pmntInfo = new PaymentInfo();
+    this.checkedGlobalMessage = false;
+  }
 
-    public DateTime getCreated() {
-        return created;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setCreated(DateTime created) {
-        this.created = created;
-    }
+  public void setEmail(String email) {
+    this.email = email;
+  }
 
-    public DateTime getModified() {
-        return modified;
-    }
+  public DateTime getCreated() {
+    return created;
+  }
 
-    public void setModified(DateTime modified) {
-        this.modified = modified;
-    }
+  public void setCreated(DateTime created) {
+    this.created = created;
+  }
 
-    public String getFirstName() {
-        return firstName;
-    }
+  public DateTime getModified() {
+    return modified;
+  }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  public void setModified(DateTime modified) {
+    this.modified = modified;
+  }
 
-    public String getLastName() {
-        return lastName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public String getPassword() {
-        return password;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-    @XmlTransient
-    public boolean isDisabled() {
-        return disabled;
-    }
+  public String getPassword() {
+    return password;
+  }
 
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
-    }
+  public void setPassword(String password) {
+    this.password = password;
+  }
 
-    public String getApiVersion() {
-        return apiVersion;
-    }
+  @XmlTransient
+  public boolean isDisabled() {
+    return disabled;
+  }
 
-    public void setApiVersion(String apiVersion) {
-        this.apiVersion = apiVersion;
-    }
+  public void setDisabled(boolean disabled) {
+    this.disabled = disabled;
+  }
 
-    public String getPhone() {
-        return phone;
-    }
+  public String getApiVersion() {
+    return apiVersion;
+  }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+  public void setApiVersion(String apiVersion) {
+    this.apiVersion = apiVersion;
+  }
 
-    public Account getAccount() {
-        return account;
-    }
+  public String getPhone() {
+    return phone;
+  }
 
-    public void setAccount(Account account) {
-        this.account = account;
-    }
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
 
-    public String getCompany() {
-        return company;
-    }
+  public Account getAccount() {
+    return account;
+  }
 
-    public void setCompany(String company) {
-        this.company = company;
-    }
+  public void setAccount(Account account) {
+    this.account = account;
+  }
 
-    public String getTimezone() {
-        return timezone;
-    }
+  public String getCompany() {
+    return company;
+  }
 
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
-    }
+  public void setCompany(String company) {
+    this.company = company;
+  }
 
-    public String getCountryCode() {
-        return countryCode;
-    }
+  public String getTimezone() {
+    return timezone;
+  }
 
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
+  public void setTimezone(String timezone) {
+    this.timezone = timezone;
+  }
 
-    public PaymentInfo getPmntInfo() {
-        return pmntInfo;
-    }
+  public String getCountryCode() {
+    return countryCode;
+  }
 
-    public void setPmntInfo(PaymentInfo pmntInfo) {
-        this.pmntInfo = pmntInfo;
-    }
+  public void setCountryCode(String countryCode) {
+    this.countryCode = countryCode;
+  }
 
-    public List<Service> getServices() {
-        return services;
-    }
+  public PaymentInfo getPmntInfo() {
+    return pmntInfo;
+  }
 
-    public void setServices(List<Service> services) {
-        this.services = services;
-    }
+  public void setPmntInfo(PaymentInfo pmntInfo) {
+    this.pmntInfo = pmntInfo;
+  }
 
-    public boolean hasCheckedGlobalMessage() {
-        return checkedGlobalMessage;
-    }
+  public List<Service> getServices() {
+    return services;
+  }
 
-    public void setCheckedGlobalMessage(boolean checkedGlobalMessage) {
-        this.checkedGlobalMessage = checkedGlobalMessage;
-    }
+  public void setServices(List<Service> services) {
+    this.services = services;
+  }
 
-    // Creates toString using reflection
-    @Override
-    public String toString() {
-        return ReflectionToStringBuilder.toString(this);
-    }
+  public boolean hasCheckedGlobalMessage() {
+    return checkedGlobalMessage;
+  }
+
+  public void setCheckedGlobalMessage(boolean checkedGlobalMessage) {
+    this.checkedGlobalMessage = checkedGlobalMessage;
+  }
+
+  // Creates toString using reflection
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
+  }
 }
