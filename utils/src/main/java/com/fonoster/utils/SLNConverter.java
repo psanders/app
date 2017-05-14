@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.utils;
 
 import org.apache.commons.exec.CommandLine;
@@ -7,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+//@Since("1.0")
 public class SLNConverter {
     private static final Logger LOG = LoggerFactory.getLogger(SLNConverter.class);
 

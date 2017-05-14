@@ -1,7 +1,18 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.services;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 
+@Since("1.0")
 public class MailManager {
     private static final MailManager INSTANCE = new MailManager();
     private static final CommonsConfig config = CommonsConfig.getInstance();

@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 @XmlJavaTypeAdapters({
         @XmlJavaTypeAdapter(value = DateTimeAdapter.class, type = DateTime.class),
         @XmlJavaTypeAdapter(value = ObjectIdAdapter.class, type = ObjectId.class),

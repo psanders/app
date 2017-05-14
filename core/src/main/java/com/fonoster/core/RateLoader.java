@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.core;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DBManager;
 import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.model.Rate;
@@ -18,10 +28,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
- * TODO: This could be automate to check for updates at the end of the day (or everytime there is a change)
+ * TODO: This could be automate to check for updates at the end of the day (or every time there is a change)
  * A more advance approach to decide the "selling" price could be develop. Ideally the ability to update selling price
  * by service provider + region etc.
  */
+@Since("1.0")
 public class RateLoader {
     private static final Logger LOG = LoggerFactory.getLogger(RateLoader.class);
     //CSV file header

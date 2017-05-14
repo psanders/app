@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.voice.js;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.core.api.*;
 import com.fonoster.exception.ApiException;
@@ -21,6 +31,7 @@ import java.util.Iterator;
 
 import static java.util.logging.Level.WARNING;
 
+@Since("1.0")
 public class FonosterJS extends Astivlet {
     // Any JS-Script engine available (ie.: Nashorn or Rhino)
     // Eventually I will migrate this to any js engine supporting EMACS 6

@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.rest;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
@@ -17,6 +27,7 @@ import javax.ws.rs.core.Response;
 /**
  * This service is intended to be use from the webapp (or any future clients).
  */
+@Since("1.0")
 @Path("/users/credentials")
 public class CredentialsService {
 

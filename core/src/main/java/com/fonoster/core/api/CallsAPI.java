@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.core.config.CoreConfig;
 import com.fonoster.exception.*;
@@ -23,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Since("1.0")
 public class CallsAPI {
     private static final Logger LOG = LoggerFactory.getLogger(CallsAPI.class);
     private static final CallsAPI INSTANCE = new CallsAPI();

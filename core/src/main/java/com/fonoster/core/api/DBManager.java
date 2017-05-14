@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 /*
 *Copyright (C) 2014 PhonyTive LLC
 *http://fonoster.com
@@ -6,6 +15,7 @@
 */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.config.CoreConfig;
 import com.fonoster.model.Account;
 import com.fonoster.model.converters.BigDecimalConverter;
@@ -22,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+@Since("1.0")
 public final class DBManager {
     private static final Logger LOG = LoggerFactory.getLogger(DBManager.class);
     private static final CoreConfig config = CoreConfig.getInstance();

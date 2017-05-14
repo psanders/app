@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.voice.js;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.App;
 import com.fonoster.model.Script;
@@ -13,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
+@Since("1.0")
 public class Loader {
     private ScriptEngine engine;
     private Bindings scope;

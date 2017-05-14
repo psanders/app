@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 /*
 *Copyright (C) 2014 PhonyTive LLC
 *http://fonoster.com
@@ -6,6 +15,7 @@
 */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
@@ -30,6 +40,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+@Since("1.0")
 public class RecordingsAPI {
     private static final RecordingsAPI INSTANCE = new RecordingsAPI();
     private static final Datastore ds = DBManager.getInstance().getDS();

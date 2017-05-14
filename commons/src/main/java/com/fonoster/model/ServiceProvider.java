@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,9 +19,9 @@ import org.mongodb.morphia.annotations.Id;
 
 import javax.validation.constraints.NotNull;
 
-@Entity
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
 public class ServiceProvider {
     @Id
     private ObjectId id;

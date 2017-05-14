@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 /*
 *Copyright (C) 2014 PhonyTive LLC
 *http://fonoster.com
@@ -6,6 +15,7 @@
 */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.App;
 import com.fonoster.model.Script;
@@ -17,6 +27,7 @@ import org.mongodb.morphia.query.Query;
 
 import java.util.List;
 
+@Since("1.0")
 public class AppsAPI {
     private static final AppsAPI INSTANCE = new AppsAPI();
     final private Datastore ds = DBManager.getInstance().getDS();

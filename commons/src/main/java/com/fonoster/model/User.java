@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 /*
 *Copyright (C) 2014 PhonyTive LLC
 *http://fonoster.com
@@ -16,6 +25,7 @@ import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
+
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlTransient;

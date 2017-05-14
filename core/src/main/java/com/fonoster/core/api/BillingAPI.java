@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 /*
 *Copyright (C) 2014 PhonyTive LLC
 *http://fonoster.com
@@ -6,6 +15,7 @@
 */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
 import org.mongodb.morphia.Datastore;
@@ -18,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Since("1.0")
 public class BillingAPI {
     private static final Logger LOG = LoggerFactory.getLogger(BillingAPI.class);
     private static final BillingAPI INSTANCE = new BillingAPI();

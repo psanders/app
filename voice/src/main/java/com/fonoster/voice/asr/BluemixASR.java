@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.voice.asr;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.ibm.watson.developer_cloud.http.HttpMediaType;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.SpeechToText;
@@ -14,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.concurrent.CountDownLatch;
 
+@Since("1.0")
 public class BluemixASR implements ASR {
     private static final Logger LOG = LoggerFactory.getLogger(BluemixASR.class);
     CommonsConfig config = CommonsConfig.getInstance ();

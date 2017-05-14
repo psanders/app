@@ -1,9 +1,19 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.rest;
 
 import com.braintreegateway.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.core.config.CoreConfig;
 import com.fonoster.exception.ApiException;
@@ -23,6 +33,7 @@ import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+@Since("1.0")
 @Path("/billing")
 public class BillingService {
     private final CoreConfig config = CoreConfig.getInstance();

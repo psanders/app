@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.voice.js;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.exception.SequenceException;
 import org.apache.commons.httpclient.*;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -9,8 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Since("1.0")
 public class SimpleHttp {
-
     private static final HttpClient client = new HttpClient();
     private static HttpMethod method;   
     private static List<NameValuePair> qString;

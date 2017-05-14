@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.rest.filters;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.model.Account;
 import org.bson.types.ObjectId;
@@ -22,6 +32,7 @@ import java.util.*;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 
+@Since("1.0")
 @Provider
 public class AuthFilter implements ContainerRequestFilter {
 

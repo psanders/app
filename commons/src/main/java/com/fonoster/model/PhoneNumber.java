@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,8 +28,8 @@ import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.Locale;
 
-@Entity
 @Since("1.0")
+@Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PhoneNumber {
     @Id

@@ -1,3 +1,12 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.utils;
 
 import org.apache.commons.exec.CommandLine;
@@ -10,6 +19,7 @@ import java.io.IOException;
 /**
  * Wrapper class for "lame".
  */
+//@Since("1.0")
 public class WavToMp3Util {
     private static final Logger LOG = LoggerFactory.getLogger(WavToMp3Util.class);
 

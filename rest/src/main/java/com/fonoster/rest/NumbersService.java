@@ -1,5 +1,15 @@
+/**
+ * Copyright (C) 2017 <fonosterteam@fonoster.com>
+ * https://fonoster.com
+ *
+ * This file is part of Fonoster
+ *
+ * Fonoster can not be copied and/or distributed without the express
+ * permission of Fonoster's copyright owners.
+ */
 package com.fonoster.rest;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
@@ -8,7 +18,6 @@ import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.PhoneNumber;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -16,8 +25,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
+@Since("1.0")
 @Path("/accounts/{accountId}/numbers")
-@RolesAllowed({"USER"})
 public class NumbersService {
 
     @GET

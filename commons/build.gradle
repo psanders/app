@@ -1,3 +1,15 @@
+// Cannot be used in conjunction with subprojects {}, allprojects {} etc.
+// https://plugins.gradle.org/plugin/com.github.hierynomus.license
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+}
+
+license {
+    include "**/*.java"
+    header rootProject.file('commons/src/main/resources/license-template.txt')
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    strictCheck true
+}
 
 description = 'Fonoster :: Common Stuff'
 dependencies {
