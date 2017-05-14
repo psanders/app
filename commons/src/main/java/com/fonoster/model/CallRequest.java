@@ -12,9 +12,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 @Since("1.0")
+@XmlRootElement
 public class CallRequest {
   @NotNull private String appId;
   private String callId;
@@ -32,6 +34,7 @@ public class CallRequest {
   private boolean billable;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public CallRequest() {
     timeout = 60;
     record = false;

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
@@ -24,6 +24,7 @@ import org.mongodb.morphia.annotations.Reference;
 @Entity
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
 public class Activity {
   @Id private ObjectId id;
   private DateTime created;
@@ -32,6 +33,7 @@ public class Activity {
   @NotNull private Type type;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public Activity() {}
 
   public Activity(User user, String description, Type type) {
@@ -59,7 +61,7 @@ public class Activity {
     this.created = created;
   }
 
-  @XmlTransient
+  //@XmlTransient
   public User getUser() {
     return user;
   }

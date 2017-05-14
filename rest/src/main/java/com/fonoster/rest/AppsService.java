@@ -23,6 +23,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 
@@ -79,11 +80,8 @@ public class AppsService {
   @Path("/{appId}")
   public Response getApp(@PathParam("appId") String appId, @Context HttpServletRequest httpRequest)
       throws ApiException {
-
     Account account = AuthUtil.getAccount(httpRequest);
-
     App app = AppsAPI.getInstance().getAppById(account.getUser(), new ObjectId(appId), false);
-
     return Response.ok(app).build();
   }
 
@@ -91,9 +89,7 @@ public class AppsService {
   @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   public Response saveApp(App app, @Context HttpServletRequest httpRequest) throws ApiException {
-
     Account account = AuthUtil.getAccount(httpRequest);
-
     // If app is null create a 'Untitled' document
     App appFromDB;
 
@@ -130,11 +126,17 @@ public class AppsService {
     return Response.ok().build();
   }
 
-  public static class Apps {
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
+  static class Apps {
     private int page;
     private int total;
     private int pageSize;
     private List<App> apps;
+
+    // Must have no-argument constructor
+    public Apps() {}
 
     private Apps(int page, int pageSize, int total, List<App> apps) {
       this.page = page;

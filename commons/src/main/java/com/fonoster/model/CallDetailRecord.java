@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
@@ -51,6 +53,7 @@ import org.mongodb.morphia.annotations.Reference;
 })
 @Since("1.0")
 @Entity
+@XmlRootElement
 public class CallDetailRecord {
   @Id private ObjectId id;
   // Internal(telephone engine) identifier for this call
@@ -81,6 +84,7 @@ public class CallDetailRecord {
   @NotNull private String apiVersion;
   private boolean billable;
 
+  // Must have no-argument constructor
   public CallDetailRecord() {}
 
   public CallDetailRecord(
@@ -290,6 +294,7 @@ public class CallDetailRecord {
   }
 
   @JsonIgnore
+  @XmlTransient
   public String getChannelId() {
     return channelId;
   }

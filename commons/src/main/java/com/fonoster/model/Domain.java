@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
@@ -29,6 +30,7 @@ import org.mongodb.morphia.annotations.Reference;
 @Since("1.0")
 @Entity
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@XmlRootElement
 public class Domain {
   @XmlTransient @Id private URI id;
   @NotNull private DateTime created;
@@ -40,6 +42,7 @@ public class Domain {
   @NotNull private Map<String, String> metadata;
   @NotNull private Spec spec;
 
+  // Must have no-argument constructor
   public Domain() {}
 
   public Domain(User user, String name, Spec.Context context) {

@@ -14,6 +14,7 @@ import com.fonoster.config.CommonsConfig;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Embedded;
@@ -22,6 +23,7 @@ import org.mongodb.morphia.annotations.Entity;
 @Since("1.0")
 @Entity
 @Embedded
+@XmlRootElement
 public class PaymentInfo {
   private BigDecimal balance;
   private PaymentMethod method;
@@ -30,6 +32,7 @@ public class PaymentInfo {
   private float lastTrans;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public PaymentInfo() {
     balance = new BigDecimal("0.00");
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();

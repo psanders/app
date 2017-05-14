@@ -30,6 +30,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -51,8 +52,8 @@ public class BillingService {
   @Path("/braintree_token")
   public Response getClientToken(@Context HttpServletRequest httpRequest)
       throws UnauthorizedAccessException {
-    String clientToken = gateway.clientToken().generate();
 
+    String clientToken = gateway.clientToken().generate();
     // WARNING: Why are we doing this?
     JsonNodeFactory factory = JsonNodeFactory.instance;
     ObjectNode json = factory.objectNode();
@@ -71,7 +72,6 @@ public class BillingService {
 
     Account account = AuthUtil.getAccount(httpRequest);
     User user = account.getUser();
-
     TransactionRequest request =
         new TransactionRequest()
             .amount(new BigDecimal(amount))
@@ -116,11 +116,9 @@ public class BillingService {
       throws UnauthorizedAccessException {
 
     Account account = AuthUtil.getAccount(httpRequest);
-
     User u = account.getUser();
     u.getPmntInfo().setAutopay(autopay);
     UsersAPI.getInstance().updateUser(u);
-
     String status = "off";
 
     if (autopay) {
@@ -143,10 +141,8 @@ public class BillingService {
       throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
-
     User user = account.getUser();
     Customer customer = null;
-
     CustomerSearchRequest csq = new CustomerSearchRequest().email().contains(user.getEmail());
 
     try {
@@ -201,20 +197,18 @@ public class BillingService {
   @Path("/{email}/payment_method")
   public Response getPntInfo(@Context HttpServletRequest httpRequest)
       throws UnauthorizedAccessException {
-
     Account account = AuthUtil.getAccount(httpRequest);
     User user = account.getUser();
-
     return Response.ok(user.getPmntInfo()).build();
   }
 
-  // Yes this class must be static or it will cause a :
-  // java.lang.ArrayIndexOutOfBoundsException: 3
-  // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)
-  // Solution found here: http://stackoverflow.com/questions/7625783/jsonmappingexception-no-suitable-constructor-found-for-type-simple-type-class
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
   static class PaymentMethodRequest extends PaymentInfo.PaymentMethod {
     private String nonce;
 
+    // Must have no-argument constructor
     public PaymentMethodRequest() {}
 
     // Not marking this with JsonProperty was causing;

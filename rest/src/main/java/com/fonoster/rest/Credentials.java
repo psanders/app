@@ -10,10 +10,16 @@ package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 @Since("1.0")
+@XmlRootElement
 public class Credentials {
   private String username;
   private String secret;
+
+  // Must have no-argument constructor
+  public Credentials() {}
 
   public Credentials(String username, String secret) {
     this.username = username;

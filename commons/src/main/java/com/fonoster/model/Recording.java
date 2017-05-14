@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
@@ -23,6 +24,7 @@ import org.mongodb.morphia.annotations.Reference;
 
 @Since("1.0")
 @Entity
+@XmlRootElement
 public class Recording {
   @Id private ObjectId id;
   @NotNull @Reference private Account account;
@@ -33,6 +35,7 @@ public class Recording {
   private float duration;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public Recording() {}
 
   public Recording(CallDetailRecord callDetailRecord) throws ApiException {

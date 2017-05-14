@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -27,12 +28,14 @@ import org.mongodb.morphia.annotations.Id;
 @Since("1.0")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
 public class Broadcast {
   @Id private ObjectId id;
   private String message;
   private DateTime created;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public Broadcast() {
     created = new DateTime();
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();

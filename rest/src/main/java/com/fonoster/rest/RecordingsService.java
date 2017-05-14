@@ -25,6 +25,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.File;
 import java.util.List;
 
@@ -120,11 +121,17 @@ public class RecordingsService {
     return Response.ok(recording).build();
   }
 
-  class Recordings {
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
+  static class Recordings {
     private int page;
     private int total;
     private int pageSize;
     private List<Recording> recordings;
+
+    // Must have no-argument constructor
+    public Recordings() {}
 
     private Recordings(int page, int pageSize, int total, List<Recording> recordings) {
       this.page = page;

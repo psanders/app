@@ -12,7 +12,6 @@ import com.fonoster.annotations.Since;
 import com.fonoster.core.api.CallsAPI;
 import com.fonoster.core.api.RecordingsAPI;
 import com.fonoster.exception.ApiException;
-import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallDetailRecord;
 import com.fonoster.model.CallDetailRecord.AnswerBy;
@@ -27,8 +26,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.security.InvalidParameterException;
 import java.util.List;
 
@@ -52,10 +53,8 @@ public class CallsService {
       throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
-
     DateTime jStart = null;
     DateTime jEnd = null;
-
     DateTimeZone dtz = DateTimeZone.forID(account.getUser().getTimezone());
 
     if (start != null && !start.isEmpty()) jStart = new DateTime(start, dtz);
@@ -108,12 +107,8 @@ public class CallsService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   public Response getCDR(@PathParam("callId") String id, @Context HttpServletRequest httpRequest)
       throws ApiException {
-
     Account account = AuthUtil.getAccount(httpRequest);
-
     CallDetailRecord result = CallsAPI.getInstance().getCDRById(account, new ObjectId(id));
-    if (result == null) throw new ResourceNotFoundException();
-
     return Response.ok(result).build();
   }
 
@@ -124,10 +119,12 @@ public class CallsService {
       @PathParam("callId") String id, @Context HttpServletRequest httpRequest) throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
-
     CallDetailRecord cdr = CallsAPI.getInstance().getCDRById(account, new ObjectId(id));
-    List<Recording> result = RecordingsAPI.getInstance().getRecordings(account, cdr);
-    if (result == null) throw new ResourceNotFoundException();
+    List<Recording> recordings = RecordingsAPI.getInstance().getRecordings(account, cdr);
+
+    // See: http://stackoverflow.com/a/6081716/1320815
+    GenericEntity<List<Recording>> result =
+            new GenericEntity<List<Recording>>(recordings) {};
 
     return Response.ok(result).build();
   }
@@ -137,18 +134,23 @@ public class CallsService {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response call(CallRequest request, @Context HttpServletRequest httpRequest)
       throws ApiException {
-
     Account account = AuthUtil.getAccount(httpRequest);
     request.setAccountId(account.getId().toString());
     CallDetailRecord callDetailRecord = CallsAPI.getInstance().call(request);
     return Response.ok(callDetailRecord).build();
   }
 
-  class CDRs {
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
+  static class CDRs {
     private int page;
     private int total;
     private int pageSize;
     private List<CallDetailRecord> calls;
+
+    // Must have no-argument constructor
+    public CDRs() {}
 
     private CDRs(int page, int pageSize, int total, List<CallDetailRecord> calls) {
       this.page = page;

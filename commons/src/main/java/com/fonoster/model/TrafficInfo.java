@@ -13,6 +13,7 @@ import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import java.math.BigDecimal;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
@@ -21,6 +22,7 @@ import org.mongodb.morphia.annotations.Entity;
 @Entity
 @Embedded
 @JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
 public class TrafficInfo {
   private int completedCalls;
   private int incompleteCalls;
@@ -33,6 +35,7 @@ public class TrafficInfo {
   private BigDecimal cost;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public TrafficInfo() {
     cost = new BigDecimal("0.0");
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();

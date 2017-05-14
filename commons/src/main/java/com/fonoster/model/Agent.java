@@ -17,6 +17,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
@@ -27,6 +28,7 @@ import org.mongodb.morphia.annotations.Reference;
 
 @Since("1.0")
 @Entity
+@XmlRootElement
 public class Agent {
   @Id private ObjectId id;
   @NotNull private DateTime created;
@@ -38,6 +40,7 @@ public class Agent {
   @NotNull private Map<String, String> metadata;
   @NotNull private Spec spec;
 
+  // Must have no-argument constructor
   public Agent() {}
 
   public Agent(User user, String name, Spec.Credentials credentials) {

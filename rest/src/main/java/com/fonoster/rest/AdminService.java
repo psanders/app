@@ -15,7 +15,6 @@ import com.fonoster.core.api.DomainsAPI;
 import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
-import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.model.*;
 import org.bson.types.ObjectId;
 
@@ -23,8 +22,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URI;
 import java.util.List;
 
@@ -73,8 +74,13 @@ public class AdminService {
   public Response getDomains(
       @QueryParam("filter") String filter, @Context HttpServletRequest httpRequest)
       throws ApiException {
-    List<Domain> result = DomainsAPI.getInstance().getDomains(filter);
-    if (result == null || result.isEmpty()) throw new ResourceNotFoundException();
+
+      List<Domain> domains = DomainsAPI.getInstance().getDomains(filter);
+
+     // See: http://stackoverflow.com/a/6081716/1320815
+      GenericEntity<List<Domain>> result =
+          new GenericEntity<List<Domain>>(domains) {};
+
     return Response.ok(result).build();
   }
 
@@ -83,9 +89,8 @@ public class AdminService {
   @Path("/domains/{uri}")
   public Response getDomainsByUri(
       @PathParam("uri") URI uri, @Context HttpServletRequest httpRequest) throws ApiException {
-    Domain result = DomainsAPI.getInstance().getDomainByUri(uri);
-    if (result == null) throw new ResourceNotFoundException();
-    return Response.ok(result).build();
+    Domain domain = DomainsAPI.getInstance().getDomainByUri(uri);
+    return Response.ok(domain).build();
   }
 
   @GET
@@ -96,15 +101,18 @@ public class AdminService {
       @QueryParam("filter") String filter,
       @Context HttpServletRequest httpRequest)
       throws ApiException {
-    List<Agent> result = AgentsAPI.getInstance().getAgents(domainUri, filter);
-    if (result == null || result.isEmpty()) throw new ResourceNotFoundException();
+    List<Agent> agents = AgentsAPI.getInstance().getAgents(domainUri, filter);
+
+      // See: http://stackoverflow.com/a/6081716/1320815
+      GenericEntity<List<Agent>> result =
+              new GenericEntity<List<Agent>>(agents) {};
+
     return Response.ok(result).build();
   }
 
-  // Yes this class must be static or else it will cause a:
-  // java.lang.ArrayIndexOutOfBoundsException: 3
-  // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)
-  // Solution found here: http://stackoverflow.com/questions/7625783/jsonmappingexception-no-suitable-constructor-found-for-type-simple-type-class
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
   static class PhoneNumberRequest {
     // Service Provider ID
     private String spId;
@@ -114,8 +122,11 @@ public class AdminService {
     private boolean smsEnabled;
     private boolean mmsEnabled;
 
+    // Must have no-argument constructor
+    public PhoneNumberRequest() {}
+
     // Not marking this with JsonProperty was causing;
-    //  No suitable constructor found for type [simple type,
+    // No suitable constructor found for type [simple type,
     // class CredentialsService$CredentialsRequest]:
     // can not instantiate from JSON object (need to add/enable type information?)
     public PhoneNumberRequest(

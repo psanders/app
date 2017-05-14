@@ -14,6 +14,7 @@ import com.fonoster.config.CommonsConfig;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
@@ -26,6 +27,7 @@ import org.mongodb.morphia.annotations.Reference;
 @Entity
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
 public class App {
   @Id private ObjectId id;
   @NotNull private DateTime created;
@@ -37,6 +39,7 @@ public class App {
   @NotNull private String apiVersion;
   private List<Script> scripts;
 
+  // Must have no-argument constructor
   public App() {
     name = "";
     status = Status.NORMAL;

@@ -19,6 +19,7 @@ import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import java.math.BigDecimal;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -32,6 +33,7 @@ import org.mongodb.morphia.annotations.*;
       fields = {@Field("prefix"), @Field("provider")},
       options = @IndexOptions(unique = true, dropDups = true)
     ))
+@XmlRootElement
 public class Rate {
   @Id private ObjectId id;
   @Reference @NotNull private ServiceProvider provider;
@@ -43,6 +45,7 @@ public class Rate {
   @NotNull private DateTime modified;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public Rate() {}
 
   public Rate(ServiceProvider provider, String prefix, String description) {

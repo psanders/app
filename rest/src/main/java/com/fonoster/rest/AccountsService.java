@@ -20,6 +20,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -48,7 +49,12 @@ public class AccountsService {
   public Response getAccounts(@Context HttpServletRequest httpRequest) throws ApiException {
     Account main = AuthUtil.getAccount(httpRequest);
     List<Account> accounts = UsersAPI.getInstance().getAccountsFor(main.getUser());
-    return Response.ok(accounts).build();
+
+    // See: http://stackoverflow.com/a/6081716/1320815
+    GenericEntity<List<Account>> result =
+            new GenericEntity<List<Account>>(accounts) {};
+
+    return Response.ok(result).build();
   }
 
   @POST

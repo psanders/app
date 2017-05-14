@@ -12,6 +12,7 @@ package com.fonoster.core.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fonoster.exception.ApiException;
+import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.model.Agent;
 import com.fonoster.model.User;
 import com.jayway.jsonpath.Configuration;
@@ -25,7 +26,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,19 +45,6 @@ public class AgentsAPI {
 
     public static AgentsAPI getInstance() {
         return INSTANCE;
-    }
-
-    static public void main(String... args) throws ApiException {
-        User user = UsersAPI.getInstance().getUserByEmail("john@doe.com");
-        Agent agent = AgentsAPI.getInstance().createAgent(user, "Janie Doe", "janie", "1234");
-
-        ArrayList<String> domains = new ArrayList<String>();
-        domains.add("sip.ocean.com");
-
-        Agent.Spec spec = agent.getSpec();
-        spec.setDomains(domains);
-
-        AgentsAPI.getInstance().updateAgent(agent);
     }
 
     public Agent createAgent(User user, String name, String username, String secret) throws ApiException {
@@ -119,6 +106,8 @@ public class AgentsAPI {
         } catch (Exception e) {
             throw new ApiException(e.getMessage());
         }
+
+        if (result.isEmpty()) throw new ResourceNotFoundException();
 
         return result;
     }

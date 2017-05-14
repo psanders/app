@@ -9,14 +9,18 @@
 package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
-import javax.xml.bind.annotation.XmlElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 @Since("1.0")
+@XmlRootElement
 public class Response {
   private int status;
   private String message;
 
+  // Must have no-argument constructor
   public Response() {}
 
   public Response(int status, String message) {

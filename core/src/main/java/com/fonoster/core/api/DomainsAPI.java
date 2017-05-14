@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
+import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.model.Domain;
 import com.fonoster.model.User;
 import com.jayway.jsonpath.Configuration;
@@ -98,6 +99,8 @@ public class DomainsAPI {
             throw new ApiException(e.getMessage());
         }
 
+        if(result.isEmpty()) throw new ResourceNotFoundException();
+
         return result;
     }
 
@@ -106,11 +109,13 @@ public class DomainsAPI {
         return ds.createQuery(Domain.class).field("user").equal(user).field("deleted").equal(false).asList();
     }
 
-    public Domain getDomainByUri(URI uri) {
-        return ds.createQuery(Domain.class).field("id").equal(uri).field("deleted").equal(false).get();
+    public Domain getDomainByUri(URI uri) throws ResourceNotFoundException {
+        Domain result = ds.createQuery(Domain.class).field("id").equal(uri).field("deleted").equal(false).get();
+        if (result == null) throw new ResourceNotFoundException();
+        return result;
     }
 
-    public boolean domainExist(URI uri) {
+    public boolean domainExist(URI uri) throws ResourceNotFoundException {
         return getDomainByUri(uri) != null;
     }
 

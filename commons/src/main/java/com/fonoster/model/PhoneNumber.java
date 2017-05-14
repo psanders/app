@@ -18,6 +18,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import java.util.Locale;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
@@ -29,6 +30,7 @@ import org.mongodb.morphia.annotations.Reference;
 @Since("1.0")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
 public class PhoneNumber {
   @Id private ObjectId id;
   @Reference @NotNull private User user;
@@ -51,6 +53,7 @@ public class PhoneNumber {
   private boolean preferred;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public PhoneNumber() {}
 
   public PhoneNumber(User user, ServiceProvider provider, String number, String countryISOCode)

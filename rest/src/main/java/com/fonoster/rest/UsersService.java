@@ -31,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Since("1.0")
@@ -49,8 +50,9 @@ public class UsersService {
 
     if (uFromDB != null) {
       Account account = AuthUtil.getAccount(httpRequest);
+      Account accountFromDB = UsersAPI.getInstance().getMainAccount(uFromDB);
 
-      if (!uFromDB.getAccount().getId().equals(account.getId()))
+      if (!accountFromDB.getId().equals(account.getId()))
         throw new UnauthorizedAccessException();
 
       uFromDB.setFirstName(u.getFirstName());
@@ -60,7 +62,7 @@ public class UsersService {
       uFromDB.setTimezone(u.getTimezone());
       uFromDB.setCountryCode(u.getCountryCode());
       // This should never happens. Instead /users/{email} which uses the users credentials
-      //uFromDB.setPassword(password);
+      //uFromDB.setSecret(secret);
       uFromDB.setModified(new DateTime());
       UsersAPI.getInstance().updateUser(uFromDB);
       return Response.ok(uFromDB).build();
@@ -79,23 +81,20 @@ public class UsersService {
   @Path("/{email}")
   public Response getUser(@PathParam("email") String email, @Context HttpServletRequest httpRequest)
       throws UnauthorizedAccessException {
-
     Account account = AuthUtil.getAccount(httpRequest);
-
     if (!account.getUser().getEmail().equals(email.trim())) throw new UnauthorizedAccessException();
     User u = UsersAPI.getInstance().getUserByEmail(email);
-
     return Response.ok(u).build();
   }
 
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/{email}/password")
+  @Path("/{email}/secret")
   public Response changePassword(ChangePasswordRequest cpr, @Context HttpServletRequest httpRequest)
       throws ApiException {
 
-    LOG.debug("Changing password for: " + cpr.email + " new pass is " + cpr.password);
+    LOG.debug("Changing secret for: " + cpr.email + " new pass is " + cpr.secret);
 
     Account account = AuthUtil.getAccount(httpRequest);
     String secret;
@@ -107,15 +106,15 @@ public class UsersService {
       String id = new ObjectId().toHexString();
       secret = id.substring(id.length() - 5);
       if (uFromDB != null) {
-        //MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal password", "Your temporal password is: " + pass);
+        //MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal secret", "Your temporal secret is: " + pass);
       }
     } else {
       uFromDB = UsersAPI.getInstance().getUserByEmail(account.getUser().getEmail());
 
       if (uFromDB == null) throw new UnauthorizedAccessException();
-      if (cpr.getPassword().isEmpty()) throw new ApiException("Can't assign an empty password");
+      if (cpr.getSecret().isEmpty()) throw new ApiException("Can't assign an empty secret");
 
-      secret = cpr.getPassword();
+      secret = cpr.getSecret();
     }
 
     String encodedSecret = Base64.encodeAsString(secret);
@@ -134,11 +133,11 @@ public class UsersService {
       @QueryParam("maxResults") @DefaultValue("10") int maxResults,
       @Context HttpServletRequest httpRequest)
       throws ApiException {
-
     Account account = AuthUtil.getAccount(httpRequest);
     List<Activity> activities =
         UsersAPI.getInstance().getActivitiesFor(account.getUser(), maxResults);
-    GenericEntity<List<Activity>> entity = new GenericEntity<List<Activity>>(activities) {};
+    GenericEntity<List<Activity>> entity =
+            new GenericEntity<List<Activity>>(activities) {};
     return Response.ok(entity).build();
   }
 
@@ -157,7 +156,7 @@ public class UsersService {
       //     "User with email: " + email + " is requesting signup, but an account already exist");
 
       //MailManager.getInstance().sendMsg(config.getTeamMail(), email, "You already have an account",
-      //        "You already have an account in Fonoster. Perhaps, you should try to recover your password.");
+      //        "You already have an account in Fonoster. Perhaps, you should try to recover your secret.");
 
       throw new UserAlreadyExistException();
     }
@@ -177,30 +176,32 @@ public class UsersService {
     return Response.ok().build();
   }
 
-  // Yes this class must be static or it will cause a :
-  // java.lang.ArrayIndexOutOfBoundsException: 3
-  // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)
-  // Solution found here: http://stackoverflow.com/questions/7625783/jsonmappingexception-no-suitable-constructor-found-for-type-simple-type-class
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
   static class ChangePasswordRequest {
     private String email;
-    private String password;
+    private String secret;
+
+    // Must have no-argument constructor
+    public ChangePasswordRequest() {}
 
     // Not marking this with JsonProperty was causing;
     //  No suitable constructor found for type [simple type,
     // class CredentialsService$CredentialsRequest]:
     // can not instantiate from JSON object (need to add/enable type information?)
     public ChangePasswordRequest(
-        @JsonProperty("email") String email, @JsonProperty("password") String password) {
+        @JsonProperty("email") String email, @JsonProperty("secret") String secret) {
       this.setEmail(email);
-      this.setPassword(password);
+      this.setSecret(secret);
     }
 
-    public String getPassword() {
-      return password;
+    public String getSecret() {
+      return secret;
     }
 
-    public void setPassword(String password) {
-      this.password = password;
+    public void setSecret(String secret) {
+      this.secret = secret;
     }
 
     public String getEmail() {

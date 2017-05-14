@@ -49,14 +49,13 @@ public class CallsAPI {
     }
 
     public CallDetailRecord getCDRById(ObjectId id) throws ApiException {
-        if (id == null) throw new ResourceNotFoundException("Not found.");
+        if (id == null) throw new InvalidParameterException("id");
         return ds.createQuery(CallDetailRecord.class).field("_id").equal(id).get();
     }
 
     public CallDetailRecord getCDRById(Account account, ObjectId id) throws ApiException {
-        if (account == null) throw new ApiException("Invalid account.");
-
-        if (id == null) throw new ResourceNotFoundException("Not found.");
+        if (account == null) throw new InvalidParameterException("account");
+        if (id == null) throw new InvalidParameterException("id");
 
         Query<CallDetailRecord> q = ds.createQuery(CallDetailRecord.class);
         q.field("_id").equal(id);
@@ -67,7 +66,11 @@ public class CallsAPI {
             q.field("account").equal(account);
         }
 
-        return q.get();
+        CallDetailRecord cdr = q.get();
+
+        if (cdr == null) throw new ResourceNotFoundException();
+
+        return cdr;
     }
 
     public List<CallDetailRecord> getCDRs(Account account, DateTime start, DateTime end, String from, String to, int maxResults, int firstResult, CallDetailRecord.Status status, CallDetailRecord.AnswerBy answerBy) throws ApiException {
@@ -115,7 +118,11 @@ public class CallsAPI {
             q.field("created").lessThanOrEq(end);
         }
 
-        return q.limit(maxResults).offset(firstResult).asList();
+        List<CallDetailRecord> cdrs = q.limit(maxResults).offset(firstResult).asList();
+
+        if (cdrs.isEmpty()) throw new ResourceNotFoundException();
+
+        return cdrs;
     }
 
     // Not the optimal solution

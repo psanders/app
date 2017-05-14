@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
@@ -20,6 +21,7 @@ import org.mongodb.morphia.annotations.Id;
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
+@XmlRootElement
 public class ServiceProvider {
   @Id private ObjectId id;
   @NotNull private DateTime created;
@@ -31,6 +33,7 @@ public class ServiceProvider {
   @NotNull private String context;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public ServiceProvider() {}
 
   public ServiceProvider(String name, String address, String contactNumber) {

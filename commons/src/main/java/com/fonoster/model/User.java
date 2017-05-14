@@ -14,7 +14,6 @@
  */
 package com.fonoster.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
@@ -23,16 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Reference;
 
 @Since("1.0")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
+@XmlRootElement
 public class User {
   @Id private String email;
   private DateTime created;
@@ -42,12 +42,6 @@ public class User {
   @NotNull private String password;
   @AssertFalse private boolean disabled;
   @NotNull private String apiVersion;
-
-  @Reference
-  // Use this to avoid infinite recursion: http://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-  @JsonBackReference
-  private Account account;
-
   private String phone;
   private String company;
   private String timezone;
@@ -58,6 +52,7 @@ public class User {
   // Use to verify if user has close a global alert.
   private boolean checkedGlobalMessage;
 
+  // Must have no-argument constructor
   public User() {}
 
   public User(String firstName, String lastName, String email, String phone, String password) {
@@ -164,14 +159,6 @@ public class User {
 
   public void setPhone(String phone) {
     this.phone = phone;
-  }
-
-  public Account getAccount() {
-    return account;
-  }
-
-  public void setAccount(Account account) {
-    this.account = account;
   }
 
   public String getCompany() {

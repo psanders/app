@@ -37,7 +37,7 @@ public class CredentialsService {
   public Response login(@Context HttpServletRequest httpRequest)
       throws UnauthorizedAccessException {
     User user = AuthUtil.getUser(httpRequest);
-    Account main = user.getAccount();
+    Account main = UsersAPI.getInstance().getMainAccount(user);
     Credentials credentials = new Credentials(main.getId().toHexString(), main.getToken());
     return Response.ok(credentials).build();
   }
@@ -48,12 +48,11 @@ public class CredentialsService {
   // Re-generates the users main account
   // Warning: Should I allow regen of sub-accounts with this method?
   public Response regenToken(Credentials credentials) throws UnauthorizedAccessException {
-
     String encodedSecret = new String(Base64.encodeAsString(credentials.getSecret()));
     User user = UsersAPI.getInstance().getUserByEmail(credentials.getUsername());
 
     if (user != null && user.getPassword().equals(encodedSecret)) {
-      Account account = user.getAccount();
+      Account account = UsersAPI.getInstance().getMainAccount(user);
       account.regenerateToken();
       UsersAPI.getInstance().updateAccount(account);
       Credentials newCredentials =

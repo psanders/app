@@ -56,12 +56,10 @@ public class UsersAPI {
     public User createUser(String firstName, String lastName, String email, String phone, String password) throws ApiException {
         //if (!ValidatorUtil.isEmailValid(email)) throw new ApiException("Invalid email");
         if (getUserByEmail(email) != null) throw new ApiException("User already exist");
+
         User user = new User(firstName, lastName, email, phone, password);
-
-        user.setAccount(createAccount(user, "Main"));
-
+        createAccount(user, "Main");
         ds.save(user);
-
         // Add app
         AppsAPI.getInstance().createApp(user, "monkeys.js", "play('tt-monkeys');");
 
@@ -102,7 +100,7 @@ public class UsersAPI {
         }
     }
 
-    public Account createAccount(User user, String name) throws ApiException {
+    private Account createAccount(User user, String name) throws ApiException {
         Account account = new Account(user, name);
 
         // JavaBean validation
@@ -121,14 +119,20 @@ public class UsersAPI {
     }
 
     // Should put accounts in cache
+    public Account getMainAccount(User user) {
+        return ds.createQuery(Account.class).field("user").equal(user)
+                .field("name").equal("Main")
+                .field("deleted").equal(false).get();
+    }
+
+
+    // Should put accounts in cache
     public List<Account> getAccountsFor(User user) {
-        if (user == null) return new ArrayList<>();
         return ds.createQuery(Account.class).field("user").equal(user).field("deleted").equal(false).asList();
     }
 
     // Should put accounts in cache
     public Account getAccountById(ObjectId id) {
-        if (id == null) return null;
         return ds.createQuery(Account.class).field("_id").equal(id).field("deleted").equal(false).get();
     }
 
@@ -155,7 +159,6 @@ public class UsersAPI {
     }
 
     public List<Activity> getActivitiesFor(User user, int maxResults) throws ApiException {
-        if (user == null) throw new ApiException("Invalid user");
         return ds.find(Activity.class).order("-created").field("user").equal(user).limit(maxResults).asList();
     }
 
@@ -167,7 +170,6 @@ public class UsersAPI {
     }
 
     public List<Service> addService(User user, Service service) throws ApiException {
-
         if (user.getServices() == null || user.getServices().isEmpty()) {
             user.setServices(new ArrayList<>());
         }

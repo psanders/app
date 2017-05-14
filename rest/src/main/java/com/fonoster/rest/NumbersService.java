@@ -23,6 +23,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Since("1.0")
@@ -91,9 +92,7 @@ public class NumbersService {
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Path("/preferred")
   public Response getPreferred(@Context HttpServletRequest httpRequest) throws ApiException {
-
     Account account = AuthUtil.getAccount(httpRequest);
-
     PhoneNumber pn = NumbersAPI.getInstance().getDefault(account.getUser());
     return Response.ok(pn).build();
   }
@@ -142,11 +141,17 @@ public class NumbersService {
     }
   }
 
-  class Numbers {
+  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
+  // and a no-argument constructor.
+  @XmlRootElement
+  static class Numbers {
     private int page;
     private int total;
     private int pageSize;
     private List<PhoneNumber> phoneNumbers;
+
+    // Must have no-argument constructor
+    public Numbers() {}
 
     private Numbers(int page, int pageSize, int total, List<PhoneNumber> phoneNumbers) {
       this.page = page;

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -20,12 +21,14 @@ import org.mongodb.morphia.annotations.Id;
 @Embedded
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
+@XmlRootElement
 public class Script {
   @NotNull @Id private String name;
   @NotNull private String source;
   @NotNull private Type type;
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public Script() {}
 
   public Script(String name) {

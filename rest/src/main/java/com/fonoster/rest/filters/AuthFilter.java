@@ -89,11 +89,8 @@ public class AuthFilter implements ContainerRequestFilter {
         Set<String> rolesSet = new HashSet<>(Arrays.asList(rolesAnnotation.value()));
         Iterator i = rolesSet.iterator();
 
-        while (i.hasNext()) {
-          System.out.print("\nrole? " + i.next());
-        }
         //Is user valid?
-        if (!isAllowed(username, password, rolesSet)) {
+        if (!isAllowed(username.trim(), password.trim(), rolesSet)) {
           requestContext.abortWith(ACCESS_DENIED);
         }
       }

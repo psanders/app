@@ -14,6 +14,7 @@ import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -23,6 +24,7 @@ import org.mongodb.morphia.annotations.Reference;
 
 @Since("1.0")
 @Entity
+@XmlRootElement
 public class CallStats {
   @Id private ObjectId id;
   @Reference private Account account;
@@ -31,6 +33,7 @@ public class CallStats {
   private LinkedHashMap<String, TrafficInfo> stats = new LinkedHashMap<>(0, 0.75F, false);
   @NotNull private String apiVersion;
 
+  // Must have no-argument constructor
   public CallStats() {}
 
   public CallStats(Account account, Period period) {
