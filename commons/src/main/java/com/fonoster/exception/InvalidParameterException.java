@@ -8,7 +8,7 @@ public class InvalidParameterException extends ApiException {
         super("Invalid parameter.");
     }
 
-    public InvalidParameterException(String msg) {
-        super(msg);
+    public InvalidParameterException(String parameter) {
+        super("Invalid parameter '" + parameter + "'");
     }
 }

@@ -1,6 +1,5 @@
 package com.fonoster.rest;
 
-import com.fonoster.rest.filters.AuthUtil;
 import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
@@ -8,8 +7,8 @@ import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.PhoneNumber;
-import com.sun.xml.txw2.annotation.XmlElement;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -18,6 +17,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/accounts/{accountId}/numbers")
+@RolesAllowed({"USER"})
 public class NumbersService {
 
     @GET
@@ -26,33 +26,20 @@ public class NumbersService {
         @QueryParam("page") @DefaultValue("0") int page,
         @QueryParam("pageSize") @DefaultValue("1000") int pageSize,
         @QueryParam("status") PhoneNumber.Status status,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        Account account;
+        Account account = AuthUtil.getAccount(httpRequest);
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        List<PhoneNumber> numbersList = NumbersAPI.getInstance().getPhoneNumbersFor(account.getUser(),
+            status,
+            pageSize,
+            pageSize * page);
 
-        Numbers n;
-        List<PhoneNumber> numbersList;
+        int total = NumbersAPI.getInstance().getPhoneNumbersFor(account.getUser(), status).size();
 
-        try {
-            numbersList = NumbersAPI.getInstance().getPhoneNumbersFor(account.getUser(),
-                status,
-                pageSize,
-                pageSize * page);
+        Numbers numbers = new Numbers(page, pageSize, total, numbersList);
 
-            int total = NumbersAPI.getInstance().getPhoneNumbersFor(account.getUser(), status).size();
-
-            n = new Numbers(page, pageSize, total, numbersList);
-        } catch (ApiException e) {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, e.getMessage());
-        }
-
-        return Response.ok(n).build();
+        return Response.ok(numbers).build();
     }
 
     @POST
@@ -60,7 +47,7 @@ public class NumbersService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response addNumber(NumberRequest numberRequest,
         @Context HttpServletRequest httpRequest) {
-        return ResponseUtil.getResponse(ResponseUtil.NOT_IMPLEMENTED);
+        throw new UnsupportedOperationException();
     }
 
     @POST
@@ -68,15 +55,10 @@ public class NumbersService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/preferred")
     public Response setPreferred(PhoneNumber phone,
-            @Context HttpServletRequest httpRequest) {
+            @Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
 
-        Account account;
+        Account account = AuthUtil.getAccount(httpRequest);
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
 
         try {
             // This is just to  ensure that he owns the number
@@ -95,21 +77,12 @@ public class NumbersService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/preferred")
-    public Response getPreferred(@Context HttpServletRequest httpRequest) {
-        Account account;
+    public Response getPreferred(@Context HttpServletRequest httpRequest) throws ApiException {
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
 
-        try {
-            PhoneNumber pn = NumbersAPI.getInstance().getDefault(account.getUser());
-            return Response.ok(pn).build();
-        } catch (ApiException e) {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, e.getMessage());
-        }
+        PhoneNumber pn = NumbersAPI.getInstance().getDefault(account.getUser());
+        return Response.ok(pn).build();
     }
 
     @GET
@@ -117,10 +90,9 @@ public class NumbersService {
     @Path("/regions")
     // TODO: This should be in a different service
     public Response getRegions(@Context HttpServletRequest httpRequest) {
-       return ResponseUtil.getResponse(ResponseUtil.NOT_IMPLEMENTED);
+        throw new UnsupportedOperationException();
     }
 
-    @XmlElement
     class NumberRequest {
         private String countryISO;
         private String cityId;
@@ -157,7 +129,6 @@ public class NumbersService {
         }
     }
 
-    @XmlElement
     class Numbers {
         private int page;
         private int total;

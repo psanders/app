@@ -1,27 +1,23 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import com.fonoster.exception.ApiException;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Entity
 @Since("1.0")
-@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class App {
     @Id
@@ -146,21 +142,6 @@ public class App {
 
     public void setScripts(List<Script> scripts) {
         this.scripts = scripts;
-    }
-
-    public Script getEntryPoint() throws ApiException {
-        return getScriptByName("main.js");
-    }
-
-    public Script getScriptByName(String name) throws ApiException {
-        Iterator<Script> scripts = getScripts().iterator ();
-        while(scripts.hasNext ()) {
-            Script script = scripts.next ();
-            if(script.getName().equals(name)) {
-                return script;
-            }
-        }
-        throw new ApiException("App -> " + getId () + " does not have a script " + name);
     }
 
     @XmlType(name = "appStatus")

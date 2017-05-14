@@ -1,19 +1,18 @@
 package com.fonoster.rest;
 
 import com.braintreegateway.*;
-import com.fonoster.rest.filters.AuthUtil;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.core.config.CoreConfig;
 import com.fonoster.exception.ApiException;
+import com.fonoster.exception.InvalidPaymentMethodException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.PaymentInfo;
 import com.fonoster.model.User;
-import com.sun.xml.txw2.annotation.XmlElement;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.joda.time.DateTime;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,34 +27,23 @@ import java.util.ArrayList;
 public class BillingService {
     private final CoreConfig config = CoreConfig.getInstance();
     private BraintreeGateway gateway = new BraintreeGateway(
-            config.getBraintreeEnvironment(),
-            config.getBraintreeMerchantId(),
-            config.getBraintreePublicKey(),
-            config.getBraintreePrivateKey()
+        config.getBraintreeEnvironment(),
+        config.getBraintreeMerchantId(),
+        config.getBraintreePublicKey(),
+        config.getBraintreePrivateKey()
     );
 
     @GET
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_ATOM_XML, MediaType.APPLICATION_JSON})
     @Path("/braintree_token")
-    public Response getClientToken(@Context HttpServletRequest httpRequest)  {
-
-        try {
-            AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
+    public Response getClientToken(@Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
         String clientToken = gateway.clientToken().generate();
 
         // WARNING: Why are we doing this?
-        JSONObject json = new JSONObject();
-
-        try {
-            json.put("token", clientToken);
-        } catch (JSONException e) {
-            return ResponseUtil.getResponse(ResponseUtil.NOT_FOUND);
-        }
+        JsonNodeFactory factory = JsonNodeFactory.instance;
+        ObjectNode json = factory.objectNode();
+        json.put("token", clientToken);
 
         return Response.ok(json).build();
     }
@@ -67,14 +55,7 @@ public class BillingService {
     public Response addFunds(@PathParam("amount") Float amount,
         @Context HttpServletRequest httpRequest) throws ApiException {
 
-        Account account;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
+        Account account = AuthUtil.getAccount(httpRequest);
         User user = account.getUser();
 
         TransactionRequest request = new TransactionRequest()
@@ -115,15 +96,9 @@ public class BillingService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}/autopay/{autopay}")
     public Response autoCharge(@PathParam("autopay")Boolean autopay,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
 
-        Account account;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
 
         User u = account.getUser();
         u.getPmntInfo().setAutopay(autopay);
@@ -148,15 +123,9 @@ public class BillingService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}/payment_method/{nonce}")
     public Response addMethod(PaymentMethodRequest pr,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        Account account;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
 
         User user = account.getUser();
         Customer customer = null;
@@ -168,7 +137,7 @@ public class BillingService {
         try {
             customer = gateway.customer().search(csq).getFirst();
         } catch (IndexOutOfBoundsException e) {
-            // WARNING: Present proper message for this case.
+            throw new ApiException();
         }
 
         CustomerRequest request = new CustomerRequest()
@@ -202,7 +171,7 @@ public class BillingService {
 
             UsersAPI.getInstance().updateUser(user);
         } else {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, "Invalid payment method.");
+            throw new InvalidPaymentMethodException();
         }
 
         UsersAPI.getInstance().createActivity(account.getUser(), "Added new payment method",
@@ -214,22 +183,14 @@ public class BillingService {
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}/payment_method")
-    public Response getPntInfo(@Context HttpServletRequest httpRequest) {
+    public Response getPntInfo(@Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
 
-        Account account;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
+        Account account = AuthUtil.getAccount(httpRequest);
         User user = account.getUser();
 
         return Response.ok(user.getPmntInfo()).build();
     }
 
-    @XmlElement
     // Yes this class must be static or it will cause a :
     // java.lang.ArrayIndexOutOfBoundsException: 3
     // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)

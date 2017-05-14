@@ -1,15 +1,13 @@
 package com.fonoster.model.services;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
-import com.sun.xml.txw2.annotation.XmlElement;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import javax.validation.constraints.NotNull;
 
 @Since("1.0")
-@XmlElement
 @Entity
 @Embedded
 @JsonIgnoreProperties(ignoreUnknown = true)

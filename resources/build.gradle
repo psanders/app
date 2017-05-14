@@ -1,0 +1,10 @@
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+apply plugin: 'war'
+
+description = 'Fonoster :: Web Resources'
+
+gretty {
+    contextPath '/static'
+    // This works because this resources are not in the standard directory
+    extraResourceBase 'src/main/resources/META-INF/resources'
+}

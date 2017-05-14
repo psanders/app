@@ -22,6 +22,6 @@ public class PathSetupTest {
 
 		Set<Class<?>> r = reflections.getTypesAnnotatedWith(Path.class);
 		
-		assertEquals(10, r.size());
+		assertEquals(11, r.size());
 	}
 }

@@ -1,9 +1,8 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import com.sun.xml.txw2.annotation.XmlElement;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -11,7 +10,6 @@ import org.mongodb.morphia.annotations.Id;
 import javax.validation.constraints.NotNull;
 
 @Since("1.0")
-@XmlElement
 @Entity
 @Embedded
 @JsonIgnoreProperties(ignoreUnknown = true)

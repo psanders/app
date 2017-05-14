@@ -6,18 +6,18 @@
 */
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.model.services.Service;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-
+import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import java.util.List;
 @Since("1.0")
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-@XmlRootElement
 public class User {
     @Id
     private String email;
@@ -37,10 +36,13 @@ public class User {
     private String lastName;
     @NotNull
     private String password;
+    @AssertFalse
     private boolean disabled;
     @NotNull
     private String apiVersion;
     @Reference
+    // Use this to avoid infinite recursion: http://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    @JsonBackReference
     private Account account;
     private String phone;
     private String company;

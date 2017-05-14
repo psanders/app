@@ -10,14 +10,12 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
 @Since("1.0")
 @Entity
-@XmlRootElement
 public class CallStats {
     @Id
     private ObjectId id;

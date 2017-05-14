@@ -8,7 +8,7 @@ public class SequenceException extends Exception {
         super("Invalid sequence. Call get() or post() first.");
     }
 
-    public SequenceException(String msg) {
-        super(msg);
+    public SequenceException(String message) {
+        super(message);
     }
 }

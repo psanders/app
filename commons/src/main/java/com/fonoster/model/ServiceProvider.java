@@ -1,20 +1,17 @@
 package com.fonoster.model;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import com.sun.istack.NotNull;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Since("1.0")
-@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ServiceProvider {
     @Id

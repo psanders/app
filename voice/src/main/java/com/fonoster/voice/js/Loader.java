@@ -2,6 +2,7 @@ package com.fonoster.voice.js;
 
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.App;
+import com.fonoster.model.Script;
 import com.fonoster.voice.conversation.Conversation;
 
 import javax.script.Bindings;
@@ -10,6 +11,7 @@ import javax.script.ScriptException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 
 public class Loader {
     private ScriptEngine engine;
@@ -46,8 +48,19 @@ public class Loader {
         }
     }
 
-    public void load(App app, String script) throws IOException, ScriptException, ApiException {
-        scope.put("o", app.getScriptByName(script));
+    public void load(App app, String scriptName) throws IOException, ScriptException, ApiException {
+        scope.put("o", getScript(app, scriptName));
         engine.eval("load({name: o.name, script: o.source})", scope);
+    }
+
+    private Script getScript(App app, String scriptName) throws ApiException {
+        Iterator<Script> scripts = app.getScripts().iterator();
+        while(scripts.hasNext ()) {
+            Script script = scripts.next ();
+            if(script.getName().equals(scriptName)) {
+                return script;
+            }
+        }
+        throw new ApiException("App -> " + app.getId () + " does not have a script " + app.getName());
     }
 }

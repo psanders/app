@@ -1,13 +1,13 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -15,8 +15,6 @@ import org.mongodb.morphia.annotations.Reference;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -44,7 +42,6 @@ import java.util.logging.Level;
         "cost"})
 @Since("1.0")
 @Entity
-@XmlRootElement
 public class CallDetailRecord {
     @Id
     private ObjectId id;
@@ -296,7 +293,6 @@ public class CallDetailRecord {
         logs.add(log);
     }
 
-    @XmlTransient
     @JsonIgnore
     public String getChannelId() {
         return channelId;

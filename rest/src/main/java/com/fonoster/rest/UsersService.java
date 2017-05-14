@@ -1,19 +1,16 @@
 package com.fonoster.rest;
 
-import com.fonoster.core.api.UsersAPI;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.config.CommonsConfig;
+import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
+import com.fonoster.exception.UserAlreadyExistException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.User;
-import com.fonoster.rest.filters.AuthUtil;
-import com.fonoster.services.MailManager;
-import com.sun.xml.txw2.annotation.XmlElement;
-import org.apache.commons.codec.binary.Base64;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jettison.json.JSONException;
+import org.glassfish.jersey.internal.util.Base64;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,20 +31,14 @@ public class UsersService {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response createUser(User u, @Context HttpServletRequest httpRequest) {
+    public Response createUser(User u, @Context HttpServletRequest httpRequest) throws ApiException {
 
         User uFromDB = UsersAPI.getInstance().getUserByEmail(u.getEmail());
 
         if (uFromDB != null) {
-            Account account;
+            Account account = AuthUtil.getAccount(httpRequest);
 
-            try {
-                account = AuthUtil.getAccount(httpRequest);
-            } catch (UnauthorizedAccessException e) {
-                return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-            }
-
-            if (!uFromDB.getAccount().getId().equals(account.getId())) return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
+            if (!uFromDB.getAccount().getId().equals(account.getId())) throw new UnauthorizedAccessException();
 
             uFromDB.setFirstName(u.getFirstName());
             uFromDB.setLastName(u.getLastName());
@@ -61,15 +52,9 @@ public class UsersService {
             UsersAPI.getInstance().updateUser(uFromDB);
             return Response.ok(uFromDB).build();
         } else {
-            try {
-                byte[] encodedBytes = Base64.encodeBase64(u.getPassword().getBytes());
-                String password = new String(encodedBytes);
-                User user = UsersAPI.getInstance().createUser(u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), password);
-
-                return Response.ok(user).build();
-            } catch (ApiException e) {
-                return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-            }
+            String secret = Base64.encodeAsString(u.getPassword());
+            User user = UsersAPI.getInstance().createUser(u.getFirstName(), u.getLastName(), u.getEmail(), u.getPhone(), secret);
+            return Response.ok(user).build();
         }
     }
 
@@ -78,20 +63,11 @@ public class UsersService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}")
     public Response getUser(@PathParam("email") String email,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
 
-        Account account;
+        Account account = AuthUtil.getAccount(httpRequest);
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
-        if (!account.getUser().getEmail().equals(email.trim())) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
+        if (!account.getUser().getEmail().equals(email.trim())) throw new UnauthorizedAccessException();
         User u = UsersAPI.getInstance().getUserByEmail(email);
 
         return Response.ok(u).build();
@@ -102,45 +78,37 @@ public class UsersService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}/password")
     public Response changePassword(ChangePasswordRequest cpr,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
         LOG.debug("Changing password for: " + cpr.email + " new pass is " + cpr.password);
 
-        Account account = null;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            //return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
-        String pass;
+        Account account = AuthUtil.getAccount(httpRequest);
+        String secret;
         User uFromDB;
 
         // Resetting from webapp
         if (account == null) {
             uFromDB = UsersAPI.getInstance().getUserByEmail(cpr.email);
             String id = new ObjectId().toHexString();
-            pass = id.substring(id.length() - 5);
+            secret = id.substring(id.length() - 5);
             if (uFromDB != null) {
-                MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal password", "Your temporal password is: " + pass);
+                //MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal password", "Your temporal password is: " + pass);
             }
         } else {
             uFromDB = UsersAPI.getInstance().getUserByEmail(account.getUser().getEmail());
-            if (!cpr.getPassword().isEmpty()) {
-                pass = cpr.getPassword();
-            } else {
-                return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, "Can't assign an empty password");
-            }
+
+            if (uFromDB == null)  throw new UnauthorizedAccessException();
+            if (cpr.getPassword().isEmpty())  throw new ApiException("Can't assign an empty password");
+
+            secret = cpr.getPassword();
         }
 
-        byte[] encodedBytes = Base64.encodeBase64(pass.getBytes());
-        assert uFromDB != null;
-        uFromDB.setPassword(new String(encodedBytes));
+        String encodedSecret = Base64.encodeAsString(secret);
+        uFromDB.setPassword(encodedSecret);
         UsersAPI.getInstance().updateUser(uFromDB);
 
         UsersAPI.getInstance().createActivity(account.getUser(), "Password changed",
-                Activity.Type.SYS);
+            Activity.Type.SYS);
 
         return Response.ok().build();
     }
@@ -149,20 +117,11 @@ public class UsersService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}/activities")
     public Response getActivities(@QueryParam("maxResults") @DefaultValue("10") int maxResults,
-        @Context HttpServletRequest httpRequest) throws JSONException, ApiException {
-        Account account;
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
+        Account account = AuthUtil.getAccount(httpRequest);
         List<Activity> activities = UsersAPI.getInstance().getActivitiesFor(account.getUser(), maxResults);
-
-        GenericEntity<List<Activity>> entity = new GenericEntity<List<Activity>>(activities) {
-        };
-
+        GenericEntity<List<Activity>> entity = new GenericEntity<List<Activity>>(activities) {};
         return Response.ok(entity).build();
     }
 
@@ -170,35 +129,34 @@ public class UsersService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{email}/signup")
-    public Response signup(@PathParam("email") String email) {
+    public Response signup(@PathParam("email") String email) throws UserAlreadyExistException {
 
         User user = UsersAPI.getInstance().getUserByEmail(email);
 
         if (user != null) {
             LOG.debug("User with email: " + email + " is requesting an signup, but an account already exist");
-            MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "Alert: User attempt to re-signup",
-                "User with email: " + email + " is requesting signup, but an account already exist");
+           // MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "Alert: User attempt to re-signup",
+           //     "User with email: " + email + " is requesting signup, but an account already exist");
 
-            MailManager.getInstance().sendMsg(config.getTeamMail(), email, "You already have an account",
-                    "You already have an account in Fonoster. Perhaps, you should try to recover your password.");
+            //MailManager.getInstance().sendMsg(config.getTeamMail(), email, "You already have an account",
+            //        "You already have an account in Fonoster. Perhaps, you should try to recover your password.");
 
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            throw new UserAlreadyExistException();
         }
 
-        MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "New signup", "Person with email " + email + " is signing-up for an account");
+        //MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "New signup", "Person with email " + email + " is signing-up for an account");
 
         String approvedMsg = "Hi! Welcome Fonoster.\n";
         approvedMsg = approvedMsg.concat("\nPlease click the link bellow to completed your profile.");
-        approvedMsg = approvedMsg.concat("\n\n\thttps://console.fonoster.com/#/login?code=" + Base64.encodeBase64String(email.getBytes()));
+        approvedMsg = approvedMsg.concat("\n\n\thttps://console.fonoster.com/#/login?code=" + Base64.encodeAsString(email));
         approvedMsg = approvedMsg.concat("\n\nFonoster Team.");
 
-        MailManager.getInstance().sendMsg(config.getTeamMail(), email, "Your new account",
-            approvedMsg);
+        //MailManager.getInstance().sendMsg(config.getTeamMail(), email, "Your new account",
+        //    approvedMsg);
 
         return Response.ok().build();
     }
 
-    @XmlElement
     // Yes this class must be static or it will cause a :
     // java.lang.ArrayIndexOutOfBoundsException: 3
     // at org.codehaus.jackson.map.introspect.AnnotatedWithParams.getParameter(AnnotatedWithParams.java:138)

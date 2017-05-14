@@ -220,8 +220,7 @@ public class CallsAPI {
         }
 
         return cost;
-        }
-
+    }
 
     public CallDetailRecord updateCDR(CallDetailRecord callDetailRecord) {
         callDetailRecord.setModified(DateTime.now());

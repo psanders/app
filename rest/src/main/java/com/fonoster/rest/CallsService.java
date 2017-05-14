@@ -4,15 +4,12 @@ import com.fonoster.core.api.CallsAPI;
 import com.fonoster.core.api.RecordingsAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.ResourceNotFoundException;
-import com.fonoster.exception.UnauthorizedAccessException;
-import com.fonoster.model.Recording;
-import com.fonoster.rest.filters.AuthUtil;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallDetailRecord;
 import com.fonoster.model.CallDetailRecord.AnswerBy;
 import com.fonoster.model.CallDetailRecord.Status;
 import com.fonoster.model.CallRequest;
-import com.sun.xml.txw2.annotation.XmlElement;
+import com.fonoster.model.Recording;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -22,6 +19,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.InvalidParameterException;
 import java.util.List;
 
 @Path("/accounts/{accountId}/calls")
@@ -37,15 +35,9 @@ public class CallsService {
         @QueryParam("pageSize") @DefaultValue("1000") int pageSize,
         @QueryParam("status") String status,
         @QueryParam("answerBy") String answerBy,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        Account account;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
 
         DateTime jStart = null;
         DateTime jEnd = null;
@@ -61,63 +53,48 @@ public class CallsService {
             .withZone(dtz);
 
         if (status != null && Status.getByValue(status) == null)
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, "Invalid 'status' parameter");
+            throw new InvalidParameterException("status");
+
         if (answerBy != null && AnswerBy.getByValue(answerBy) == null)
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, "Invalid 'answerBy' parameter");
+            throw new InvalidParameterException("answerBy");
 
-        try {
-            List<CallDetailRecord> calls = CallsAPI.getInstance().getCDRs(account,
-                jStart,
-                jEnd,
-                from,
-                to,
-                pageSize,
-                pageSize * page,
-                Status.getByValue(status),
-                AnswerBy.getByValue(answerBy)
-            );
 
-            int total = CallsAPI.getInstance().getCDRsTotal(account,
-                jStart,
-                jEnd,
-                from,
-                to,
-                Status.getByValue(status),
-                AnswerBy.getByValue(answerBy)
-            );
+        List<CallDetailRecord> calls = CallsAPI.getInstance().getCDRs(account,
+            jStart,
+            jEnd,
+            from,
+            to,
+            pageSize,
+            pageSize * page,
+            Status.getByValue(status),
+            AnswerBy.getByValue(answerBy)
+        );
 
-            CDRs cdrs = new CDRs(page, pageSize, total, calls);
+        int total = CallsAPI.getInstance().getCDRsTotal(account,
+            jStart,
+            jEnd,
+            from,
+            to,
+            Status.getByValue(status),
+            AnswerBy.getByValue(answerBy)
+        );
 
-            return Response.ok(cdrs).build();
+        CDRs cdrs = new CDRs(page, pageSize, total, calls);
 
-        } catch (ApiException e) {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, e.getMessage());
-        }
+        return Response.ok(cdrs).build();
     }
 
     @GET
     @Path("/{callId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCDR(@PathParam("callId") String id,
-        @Context HttpServletRequest httpRequest) {
-        Account account;
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
 
-        CallDetailRecord result;
+        CallDetailRecord result = CallsAPI.getInstance().getCDRById(account, new ObjectId(id));
+        if (result == null) throw new ResourceNotFoundException();
 
-        try {
-            result = CallsAPI.getInstance().getCDRById(account, new ObjectId(id));
-            if (result == null) throw new ResourceNotFoundException();
-        } catch (ResourceNotFoundException e) {
-            return ResponseUtil.getResponse(ResponseUtil.NOT_FOUND);
-        } catch (ApiException e) {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, e.getMessage());
-        }
         return Response.ok(result).build();
     }
 
@@ -125,26 +102,14 @@ public class CallsService {
     @Path("/{callId}/recordings")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response getCallRecordings(@PathParam("callId") String id,
-        @Context HttpServletRequest httpRequest) {
-        Account account;
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
 
-        List<Recording> result;
+        CallDetailRecord cdr =CallsAPI.getInstance().getCDRById(account, new ObjectId(id));
+        List<Recording> result = RecordingsAPI.getInstance ().getRecordings (account, cdr);
+        if (result == null) throw new ResourceNotFoundException();
 
-        try {
-            CallDetailRecord cdr =CallsAPI.getInstance().getCDRById(account, new ObjectId(id));
-            result = RecordingsAPI.getInstance ().getRecordings (account, cdr);
-            if (result == null) throw new ResourceNotFoundException();
-        } catch (ResourceNotFoundException e) {
-            return ResponseUtil.getResponse(ResponseUtil.NOT_FOUND);
-        } catch (ApiException e) {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, e.getMessage());
-        }
         return Response.ok(result).build();
     }
 
@@ -152,32 +117,14 @@ public class CallsService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response call(CallRequest request,
-        @Context HttpServletRequest httpRequest) {
+        @Context HttpServletRequest httpRequest) throws ApiException {
 
-        Account account;
-
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
-        try {
-            if (!ObjectId.isValid(request.getAppId())) {
-                return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, "Invalid appId: ".concat(request.getAppId()));
-            }
-
-            request.setAccountId(account.getId().toString());
-
-            // WARNING: How do you now if is the same account
-            CallDetailRecord callDetailRecord = CallsAPI.getInstance().call(request);
-            return Response.ok(callDetailRecord).build();
-        } catch (ApiException e) {
-            return ResponseUtil.getResponse(ResponseUtil.BAD_REQUEST, e.getMessage());
-        }
+        Account account = AuthUtil.getAccount(httpRequest);
+        request.setAccountId(account.getId().toString());
+        CallDetailRecord callDetailRecord = CallsAPI.getInstance().call(request);
+        return Response.ok(callDetailRecord).build();
     }
 
-    @XmlElement
     class CDRs {
         private int page;
         private int total;

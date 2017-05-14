@@ -1,5 +1,6 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
@@ -9,21 +10,17 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.util.Locale;
 
 @Entity
 @Since("1.0")
-@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PhoneNumber {
     @Id
@@ -32,10 +29,8 @@ public class PhoneNumber {
     @NotNull
     private User user;
     @NotNull
-    @NotEmpty
     private String number;
     @NotNull
-    @NotEmpty
     private String countryISOCode;
     @NotNull
     @Reference
@@ -64,9 +59,9 @@ public class PhoneNumber {
     }
 
     public PhoneNumber(User user,
-                       ServiceProvider provider,
-                       String number,
-                       String countryISOCode) throws ApiException {
+        ServiceProvider provider,
+        String number,
+        String countryISOCode) throws ApiException {
         // Move this to a jb validator
         boolean validCode = false;
         for (String cc : Locale.getISOCountries()) {

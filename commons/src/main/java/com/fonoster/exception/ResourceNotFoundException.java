@@ -8,7 +8,7 @@ public class ResourceNotFoundException extends ApiException {
         super("Resource not found.");
     }
 
-    public ResourceNotFoundException(String msg) {
-        super(msg);
+    public ResourceNotFoundException(String message) {
+        super(message);
     }
 }

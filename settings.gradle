@@ -1,0 +1,16 @@
+rootProject.name = 'fonoster'
+include ':commons'
+include ':core'
+include ':voice'
+include ':resources'
+include ':rest'
+include ':webui'
+include ':utils'
+
+project(':commons').projectDir = "$rootDir/commons" as File
+project(':core').projectDir = "$rootDir/core" as File
+project(':voice').projectDir = "$rootDir/voice" as File
+project(':resources').projectDir = "$rootDir/resources" as File
+project(':rest').projectDir = "$rootDir/rest" as File
+project(':webui').projectDir = "$rootDir/webui" as File
+project(':utils').projectDir = "$rootDir/utils" as File

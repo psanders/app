@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.script.*;
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 import static java.util.logging.Level.WARNING;
 
@@ -146,7 +147,7 @@ public class FonosterJS extends Astivlet {
             engine.eval("LOADER_56579084eaa1f291d1c99900.load('fn:loader.js')", engineScope);
             engine.eval("LOADER_56579084eaa1f291d1c99900.load('fn:core.js')", engineScope);
 
-            engine.eval(app.getEntryPoint().getSource(), engineScope);
+            engine.eval(getEntryPointSource(app), engineScope);
 
         } catch (AgiException e) {
             LOG.debug("Channel error/disconnected, cause by: ", e);
@@ -206,4 +207,14 @@ public class FonosterJS extends Astivlet {
 
     }
 
+    private String getEntryPointSource(App app) throws ApiException {
+        Iterator<Script> scripts = app.getScripts().iterator();
+        while(scripts.hasNext ()) {
+            Script script = scripts.next ();
+            if(script.getName().equals("main.js")) {
+                return script.getSource();
+            }
+        }
+        throw new ApiException("App -> " + app.getId () + " does not have a script " + app.getName());
+    }
 }

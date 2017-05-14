@@ -1,22 +1,21 @@
 package com.fonoster.rest.filters;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
 
 @Provider
 public class ContentTypeFilter implements ContainerResponseFilter {
 
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        if (request.getQueryParameters().getFirst("result") != null &&
-                request.getQueryParameters().getFirst("result").equals("xml")) {
-            response.getHttpHeaders().putSingle("content-type", "application/xml");
+    @Override
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+        if (request.getUriInfo().getQueryParameters().getFirst("result") != null &&
+                request.getUriInfo().getQueryParameters().getFirst("result").equals("xml")) {
+            response.getHeaders().putSingle("content-type", "application/xml");
         } else {
-            response.getHttpHeaders().putSingle("content-type", "application/json");
+            response.getHeaders().putSingle("content-type", "application/json");
         }
-
-        return response;
     }
 }

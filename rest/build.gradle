@@ -1,0 +1,13 @@
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+apply plugin: 'war'
+
+description = 'Fonoster :: Restful API'
+dependencies {
+    // Peer modules
+    compile project(':commons')
+    compile project(':core')
+}
+
+gretty {
+    contextPath '/v1'
+}

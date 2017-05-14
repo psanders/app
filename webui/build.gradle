@@ -1,0 +1,18 @@
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+apply plugin: 'war'
+
+description = 'Fonoster :: Web UI'
+dependencies {
+    compile project(':rest')
+    compile project(':resources')
+}
+
+gretty {
+    contextPath '/'
+}
+
+farm {
+    webapp ':rest'
+    webapp ':resources'
+    webapp ':webui'
+}

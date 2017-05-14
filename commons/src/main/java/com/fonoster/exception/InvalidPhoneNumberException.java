@@ -8,7 +8,7 @@ public class InvalidPhoneNumberException extends ApiException {
         super("Invalid phone number.");
     }
 
-    public InvalidPhoneNumberException(String msg) {
-        super(msg);
+    public InvalidPhoneNumberException(String message) {
+        super(message);
     }
 }

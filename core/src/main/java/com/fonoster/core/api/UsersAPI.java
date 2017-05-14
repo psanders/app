@@ -7,11 +7,9 @@
 package com.fonoster.core.api;
 
 import com.fonoster.config.CommonsConfig;
-import com.fonoster.core.config.CoreConfig;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
 import com.fonoster.model.services.Service;
-import com.fonoster.services.MailManager;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
@@ -28,12 +26,10 @@ import java.util.Set;
 
 public class UsersAPI {
     private static final CommonsConfig commonsConfig = CommonsConfig.getInstance();
-    private final static CoreConfig coreConfig = CoreConfig.getInstance();
     private static final UsersAPI INSTANCE = new UsersAPI();
     private static final Datastore ds = DBManager.getInstance().getDS();
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
-
 
     private UsersAPI() {
     }
@@ -74,8 +70,8 @@ public class UsersAPI {
         user.setPmntInfo(pi);
         UsersAPI.getInstance().updateUser(user);
 
-        MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), user.getEmail(), "Welcome to Fonoster", "Thanks for trying out Fonoster. We are excited to have you with us. Happy coding!");
-        MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), commonsConfig.getAdminMail(), "New Fonoster account", user.getFirstName() + "<" + user.getEmail() + "> just sign-up for an account.");
+        //MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), user.getEmail(), "Welcome to Fonoster", "Thanks for trying out Fonoster. We are excited to have you with us. Happy coding!");
+        //MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), commonsConfig.getAdminMail(), "New Fonoster account", user.getFirstName() + "<" + user.getEmail() + "> just sign-up for an account.");
 
         createActivity(user, "Welcome to Fonoster", Activity.Type.INFO);
 

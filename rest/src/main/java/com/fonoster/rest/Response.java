@@ -1,38 +1,29 @@
-/*
-*Copyright (C) 2014 PhonyTive LLC
-*http://fonoster.com
-*
-*This file is part of Fonoster
-*/
-package com.fonoster.model;
+package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Since("1.0")
-@XmlRootElement
 public class Response {
-    private int code;
+    private int status;
     private String message;
 
     public Response() {
     }
 
-    public Response(int code, String message) {
-        this.code = code;
+    public Response(int status, String message) {
+        this.status = status;
         this.message = message;
     }
 
     @XmlElement
-    public int getCode() {
-        return code;
+    public int getStatus() {
+        return status;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     @XmlElement

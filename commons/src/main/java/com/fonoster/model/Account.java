@@ -1,15 +1,15 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -22,6 +22,8 @@ public class Account {
     private DateTime modified;
     @NotNull
     @Reference
+    // Use this to avoid infinite recursion: http://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    @JsonManagedReference
     private User user;
     @NotNull
     private String name;

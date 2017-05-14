@@ -1,9 +1,3 @@
-/*
-*Copyright (C) 2014 PhonyTive LLC
-*http://fonoster.com
-*
-*This file is part of Fonoster
-*/
 package com.fonoster.exception;
 
 public class ApiException extends Exception {
@@ -13,7 +7,7 @@ public class ApiException extends Exception {
 	public ApiException() {
     }
 
-    public ApiException(String msg) {
-        super(msg);
+    public ApiException(String message) {
+        super(message);
     }
 }

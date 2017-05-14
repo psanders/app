@@ -8,7 +8,7 @@ public class InsufficientFundsException extends ApiException {
         super("Insufficient funds.");
     }
 
-    public InsufficientFundsException(String msg) {
-        super(msg);
+    public InsufficientFundsException(String message) {
+        super(message);
     }
 }

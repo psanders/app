@@ -82,4 +82,12 @@ public class CommonsConfig extends AbstractConfig {
     public String getTTSStorePath() {
         return config.getString("ttsStorePath");
     }
+
+    public String getAdminUsername() {
+        return config.getString("admin.username");
+    }
+
+    public String getAdminSecret() {
+        return config.getString("admin.secret");
+    }
 }

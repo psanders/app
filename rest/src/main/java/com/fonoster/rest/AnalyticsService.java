@@ -2,11 +2,9 @@ package com.fonoster.rest;
 
 import com.fonoster.core.api.AnalyticsAPI;
 import com.fonoster.exception.UnauthorizedAccessException;
-import com.fonoster.rest.filters.AuthUtil;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallStats;
 import org.joda.time.DateTime;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -21,15 +19,9 @@ public class AnalyticsService {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/calls/{period}")
     public Response getTrafficAnalysis(@PathParam("period") CallStats.Period period,
-        @Context HttpServletRequest httpRequest) {
-        Account account;
+        @Context HttpServletRequest httpRequest) throws UnauthorizedAccessException {
 
-        try {
-            account = AuthUtil.getAccount(httpRequest);
-        } catch (UnauthorizedAccessException e) {
-            return ResponseUtil.getResponse(ResponseUtil.UNAUTHORIZED);
-        }
-
+        Account account = AuthUtil.getAccount(httpRequest);
         CallStats cs = AnalyticsAPI.getInstance().getStats(account, period, DateTime.now());
 
         return Response.ok(cs).build();

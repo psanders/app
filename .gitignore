@@ -4,10 +4,16 @@ nodes/
 clients/
 astivetoolkit/
 fops
+
 # eclipse
 .classpath
 .project
 .settings
+
+# Gradle
+gradle
+.gradle
+build
 
 # maven
 target/

@@ -1,20 +1,17 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import com.sun.xml.txw2.annotation.XmlElement;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.Range;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Since("1.0")
-@XmlElement
 @Entity
 @Embedded
 public class PaymentInfo {
@@ -83,8 +80,7 @@ public class PaymentInfo {
         PAYPAL,
         CREDIT_CARD
     }
-
-    @XmlElement
+    
     @JsonIgnoreProperties(ignoreUnknown = true)
     static public class PaymentMethod {
         @NotNull
@@ -161,7 +157,6 @@ public class PaymentInfo {
         }
     }
 
-    @XmlElement
     // May need to un-embed in the future
     static public class Transaction {
         private String id;

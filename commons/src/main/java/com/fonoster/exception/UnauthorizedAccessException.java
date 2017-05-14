@@ -14,7 +14,7 @@ public class UnauthorizedAccessException extends ApiException {
         super("Unauthorized access.");
     }
 
-    public UnauthorizedAccessException(String msg) {
-        super(msg);
+    public UnauthorizedAccessException(String message) {
+        super(message);
     }
 }

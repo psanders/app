@@ -1,20 +1,17 @@
 package com.fonoster.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.math.BigDecimal;
 
 @Since("1.0")
 @Entity
 @Embedded
-@XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TrafficInfo {
     private int completedCalls;
