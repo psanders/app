@@ -1,9 +1,9 @@
 <md-card id="recordings-widget" ng-controller="RecordingsCtrl as ctrl">
-    <md-toolbar class="md-table-toolbar md-default" ng-show="!filter" aria-hidden="false">
+    <md-toolbar class="md-table-toolbar md-default" ng-show="!ctrl.filter" aria-hidden="false">
         <div class="md-toolbar-tools">
             <span>Recordings</span>
             <span flex></span>
-            <md-button class="md-icon-button" aria-label="Search" ng-click="filter=true">
+            <md-button class="md-icon-button" aria-label="Search" ng-click="ctrl.filter=true">
                 <md-icon md-font-library="material-icons">search</md-icon>
                 <md-tooltip md-direction="left">
                     Search recordings
