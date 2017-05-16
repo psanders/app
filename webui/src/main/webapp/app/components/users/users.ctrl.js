@@ -2,7 +2,6 @@
     'use strict';
 
     var app = angular.module('fnUsers');
-   
     app.config(['$stateProvider', config]);
     app.controller('AccountCtrl', AccountCtrl);
     app.controller('ProfileCtrl', ProfileCtrl);
@@ -10,19 +9,21 @@
 
     AccountCtrl.$inject =  ['$mdToast', '$mdDialog', '$document', 'CredentialsService', 'LoginService'];
     ProfileCtrl.$inject =  ['$mdToast', '$document', 'Users'];
-    PasswordCtrl.$inject = ['$mdToast', '$document', 'Users'];
+    PasswordCtrl.$inject = ['$mdToast', '$document', '$scope', 'Users'];
 
     function AccountCtrl($mdToast, $mdDialog, $document, CredentialsService, LoginService) {
         var self = this;
         self.account = CredentialsService.getCredentials();
 
         self.login = function(evt) {
+            console.log('DBG0001 ~> ' + $mdDialog);
+
             $mdDialog.show({
                 controller: DialogController,
                 templateUrl: 'app/components/users/password_dialog.tpl.html',
                 parent: angular.element(document.body),
                 targetEvent: evt,
-                clickOutsideToClose:true
+                clickOutsideToClose: true
             })
             .then(function(request) {
                 regenerate(request);
@@ -89,7 +90,7 @@
         }
     }
 
-    function PasswordCtrl($mdToast, $document, Users) {
+    function PasswordCtrl($mdToast, $document, $scope, Users) {
         var self = this;
 
         self.request = angular.copy({password: "", confirmPassword: ""});
@@ -103,7 +104,7 @@
                 toastMe("Unable to change password. Code #0005");
             });
 
-            self.passwordForm.$setPristine();
+            $scope.passwordForm.$setPristine();
             self.request = angular.copy({password: "", confirmPassword: ""});
         }
 
@@ -121,14 +122,17 @@
         }
     }
 
-    function DialogController(self, $mdDialog) {
-        self.hide = function() {
+    function DialogController($scope, $mdDialog) {
+        $scope.hide = function() {
+            console.log('Hide what? :O ')
             $mdDialog.hide();
         };
-        self.cancel = function() {
+        $scope.cancel = function() {
+            console.log('Cancel what? :O ')
             $mdDialog.cancel();
         };
-        self.regenerate = function(r) {
+        $scope.regenerate = function(r) {
+            console.log('Regenerate what? :O ')
             $mdDialog.hide(r);
         };
     }

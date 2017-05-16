@@ -38,8 +38,8 @@ public class CredentialsService {
       throws UnauthorizedAccessException {
     User user = AuthUtil.getUser(httpRequest);
     Account main = UsersAPI.getInstance().getMainAccount(user);
-    Credentials credentials = new Credentials(main.getId().toHexString(), main.getToken());
-    return Response.ok(credentials).build();
+    AccountCredentials accountCredentials = new AccountCredentials(main.getId().toHexString(), main.getToken());
+    return Response.ok(accountCredentials).build();
   }
 
   @POST
@@ -47,22 +47,22 @@ public class CredentialsService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   // Re-generates the users main account
   // Warning: Should I allow regen of sub-accounts with this method?
-  public Response regenToken(Credentials credentials) throws UnauthorizedAccessException {
-    String encodedSecret = new String(Base64.encodeAsString(credentials.getSecret()));
-    User user = UsersAPI.getInstance().getUserByEmail(credentials.getUsername());
+  public Response regenToken(UserCredentials credentials) throws UnauthorizedAccessException {
+    User user = UsersAPI.getInstance().getUserByEmail(credentials.getEmail());
+    String encodedSecret = new String(Base64.encodeAsString(credentials.getPassword()));
 
     if (user != null && user.getPassword().equals(encodedSecret)) {
       Account account = UsersAPI.getInstance().getMainAccount(user);
       account.regenerateToken();
       UsersAPI.getInstance().updateAccount(account);
-      Credentials newCredentials =
-          new Credentials(account.getId().toHexString(), account.getToken());
+      AccountCredentials newAccountCredentials =
+          new AccountCredentials(account.getId().toHexString(), account.getToken());
 
       UsersAPI.getInstance()
           .createActivity(
               account.getUser(), "Account token has been regenerated", Activity.Type.SYS);
 
-      return Response.ok(newCredentials).build();
+      return Response.ok(newAccountCredentials).build();
     }
 
     throw new UnauthorizedAccessException();

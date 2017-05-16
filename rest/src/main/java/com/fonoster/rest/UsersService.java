@@ -90,11 +90,11 @@ public class UsersService {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/{email}/secret")
+  @Path("/{email}/password")
   public Response changePassword(ChangePasswordRequest cpr, @Context HttpServletRequest httpRequest)
       throws ApiException {
 
-    LOG.debug("Changing secret for: " + cpr.email + " new pass is " + cpr.secret);
+    LOG.debug("Changing secret for: " + cpr.email + " new pass is " + cpr.getPassword());
 
     Account account = AuthUtil.getAccount(httpRequest);
     String secret;
@@ -106,15 +106,15 @@ public class UsersService {
       String id = new ObjectId().toHexString();
       secret = id.substring(id.length() - 5);
       if (uFromDB != null) {
-        //MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal secret", "Your temporal secret is: " + pass);
+        //MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal password", "Your temporal secret is: " + pass);
       }
     } else {
       uFromDB = UsersAPI.getInstance().getUserByEmail(account.getUser().getEmail());
 
       if (uFromDB == null) throw new UnauthorizedAccessException();
-      if (cpr.getSecret().isEmpty()) throw new ApiException("Can't assign an empty secret");
+      if (cpr.getPassword().isEmpty()) throw new ApiException("Can't assign an empty password");
 
-      secret = cpr.getSecret();
+      secret = cpr.getPassword();
     }
 
     String encodedSecret = Base64.encodeAsString(secret);
@@ -181,7 +181,7 @@ public class UsersService {
   @XmlRootElement
   static class ChangePasswordRequest {
     private String email;
-    private String secret;
+    private String password;
 
     // Must have no-argument constructor
     public ChangePasswordRequest() {}
@@ -191,17 +191,17 @@ public class UsersService {
     // class CredentialsService$CredentialsRequest]:
     // can not instantiate from JSON object (need to add/enable type information?)
     public ChangePasswordRequest(
-        @JsonProperty("email") String email, @JsonProperty("secret") String secret) {
+        @JsonProperty("email") String email, @JsonProperty("password") String password) {
       this.setEmail(email);
-      this.setSecret(secret);
+      this.setPassword(password);
     }
 
-    public String getSecret() {
-      return secret;
+    public String getPassword() {
+      return password;
     }
 
-    public void setSecret(String secret) {
-      this.secret = secret;
+    public void setPassword(String password) {
+      this.password = password;
     }
 
     public String getEmail() {

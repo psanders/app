@@ -30,10 +30,11 @@ public class AuthUtil {
   public static Account getAccount(HttpServletRequest httpRequest)
       throws UnauthorizedAccessException {
     final Credentials credentials = getCredentialsFromRequest(httpRequest);
+    final AccountCredentials accountCredentials = new AccountCredentials(credentials.getUsername(), credentials.getSecret());
     final Account account =
-        UsersAPI.getInstance().getAccountById(new ObjectId(credentials.getUsername()));
+        UsersAPI.getInstance().getAccountById(new ObjectId(accountCredentials.getAccountId()));
 
-    if (account == null || !account.getToken().equals(credentials.getSecret())) {
+    if (account == null || !account.getToken().equals(accountCredentials.getToken())) {
       throw new UnauthorizedAccessException();
     }
 
@@ -43,7 +44,8 @@ public class AuthUtil {
   // Obtain user from http request
   public static User getUser(HttpServletRequest httpRequest) throws UnauthorizedAccessException {
     final Credentials credentials = getCredentialsFromRequest(httpRequest);
-    final User user = UsersAPI.getInstance().getUserByEmail(credentials.getUsername());
+    final UserCredentials userCredentials = new UserCredentials(credentials.getUsername(), credentials.getSecret());
+    final User user = UsersAPI.getInstance().getUserByEmail(userCredentials.getEmail());
 
     if (user == null || !user.getPassword().equals(Base64.encodeAsString(credentials.getSecret())))
       throw new UnauthorizedAccessException();
@@ -73,8 +75,8 @@ public class AuthUtil {
     //Split username and password tokens
     final StringTokenizer tokenizer = new StringTokenizer(usernameAndSecret, ":");
     final String username = tokenizer.nextToken();
-    final String password = tokenizer.nextToken();
+    final String secret = tokenizer.nextToken();
 
-    return new Credentials(username, password);
+    return new Credentials(username, secret);
   }
 }

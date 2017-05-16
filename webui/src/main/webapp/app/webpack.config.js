@@ -21,10 +21,6 @@ module.exports = function(env) {
                 'angular-audio',
                 'angular-nvd3',
                 'jquery-creditcardvalidator'
-                /* 'angular-aria',
-                'angular-animate',
-                'showdown',
-                'smoothscroll',*/
             ],
             init: './init.js'
         },
@@ -51,28 +47,19 @@ module.exports = function(env) {
                 name: ["vendor", "manifest"], // vendor libs + extracted manifest
                 minChunks: Infinity,
             }),
-           new webpack.HashedModuleIdsPlugin(),
-             /*new WebpackChunkHash(),
-            new ChunkManifestPlugin({
-              filename: "chunk-manifest.json",
-              manifestVariable: "webpackManifest"
-            }),
-            /*new webpack.LoaderOptionsPlugin({
-                minimize: false,
-                debug: false
-            }),*/
+            new webpack.HashedModuleIdsPlugin(),
             new webpack.optimize.UglifyJsPlugin({
                 compress: {
-                warnings: false,
-                screw_ie8: true,
-                conditionals: true,
-                unused: true,
-                comparisons: true,
-                sequences: true,
-                dead_code: true,
-                evaluate: true,
-                if_return: true,
-                join_vars: true,
+                    warnings: false,
+                    screw_ie8: true,
+                    conditionals: true,
+                    unused: true,
+                    comparisons: true,
+                    sequences: true,
+                    dead_code: true,
+                    evaluate: true,
+                    if_return: true,
+                    join_vars: true,
                 },
                 output: {
                   comments: false,
