@@ -61,7 +61,7 @@ public class FonosterJS extends Astivlet {
 
                 // Then use the main account
                 if (account == null) {
-                    account = destNumber.getUser().getAccount();
+                    account = UsersAPI.getInstance().getMainAccount(destNumber.getUser());
                 }
 
                 direction = CallDetailRecord.Direction.INBOUND;
