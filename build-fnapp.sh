@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root or sudo" ; exit 1 ; fi
+#if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root or sudo" ; exit 1 ; fi
 
 BASE_DOCKER_IMAGE=gcr.io/fonoster-app/fnapp_base:latest
 PACK=''
@@ -25,13 +25,13 @@ confirm() {
     esac
 }
 
-confirm && SKIP_TEST=false && PACK='-p'
+confirm && PACK='-p' && echo 'This might take a while. Go grab some coffee  :)'
 
-$(cd webui/src/main/webapp/app && npm i --verbose && webpack --verbose $PACK)
+$(cd webui/src/main/webapp/app && npm update && webpack $PACK)
 
-gradle
-gradle goJf
-gradle build
+gradle clean
+gradle goJF
+gradle jar war
 
 docker build -t gcr.io/fonoster-app/fnapp:latest .
 docker tag gcr.io/fonoster-app/fnapp:latest gcr.io/fonoster-app/fnapp:1.0.$(timestamp)
