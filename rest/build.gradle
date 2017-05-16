@@ -19,7 +19,11 @@ description = 'Fonoster :: Restful API'
 dependencies {
     // Peer modules
     compile project(':commons')
-    compile project(':core')
+    compile (project(':core')) { transitive = true; } // Verify if we really need this...
+}
+
+war {
+    archiveName = "rest.war"
 }
 
 gretty {

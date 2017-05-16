@@ -7,6 +7,10 @@ dependencies {
     compile project(':resources')
 }
 
+war {
+    archiveName = "webui.war"
+}
+
 gretty {
     contextPath '/'
 }
