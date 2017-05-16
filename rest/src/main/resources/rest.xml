@@ -6,5 +6,5 @@
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
     <Set name="war"><SystemProperty name="jetty.base" default="."/>/webapps/rest.war
     </Set>
-    <Set name="contextPath">/</Set>
+    <Set name="contextPath">/v1</Set>
 </Configure>
