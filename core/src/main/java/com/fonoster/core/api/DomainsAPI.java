@@ -13,13 +13,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
+import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.ResourceNotFoundException;
+import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Domain;
+import com.fonoster.model.PhoneNumber;
 import com.fonoster.model.User;
+import com.google.common.base.Strings;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +56,24 @@ public class DomainsAPI {
         return INSTANCE;
     }
 
-    public Domain createDomain(User user, URI uri, String desc) throws ApiException {
-        if (getDomainByUri(uri) != null) throw new ApiException("This domain already exist.");
+    public Domain createDomain(User user, URI domainUri, String name, String egressRule, String egressDidRef) throws ApiException {
+        if (domainExist(domainUri)) throw new ApiException("This domain already exist.");
 
-        Domain.Spec.Context context = new Domain.Spec.Context(uri);
-        Domain domain = new Domain(user, desc, context);
+        Domain.Spec.Context context = new Domain.Spec.Context(domainUri);
+        Domain domain = new Domain(user, name, context);
+
+        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDidRef)) {
+            throw new InvalidParameterException("EgressRule and EgressDidRef parameters must both be present to enable the EgressPolicy");
+        }
+
+        if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDidRef)) {
+
+            PhoneNumber pn = NumbersAPI.getInstance().getPhoneNumber(egressDidRef);
+            if (pn == null || pn.getUser().getEmail() != user.getEmail()) throw new UnauthorizedAccessException("This DID is not assigned to you");
+
+            Domain.Spec.Context.EgressPolicy ep = new Domain.Spec.Context.EgressPolicy(egressRule, egressDidRef);
+            domain.getSpec().getContext().setEgressPolicy(ep);
+        }
 
         // JavaBean validation
         if (!validator.validate(domain).isEmpty()) {
@@ -74,6 +93,16 @@ public class DomainsAPI {
     public Domain updateDomain(Domain domain) {
         ds.save(domain);
         return domain;
+    }
+
+    public Domain getDomain(User user, String uri) throws ResourceNotFoundException {
+        Domain result = ds.createQuery(Domain.class)
+            .field("id")
+                .equal(uri).field("deleted").equal(false)
+                    .field("user").equal(user).get();
+
+        if (result == null) throw new ResourceNotFoundException();
+        return result;
     }
 
     // Only for admin account (Including Sip I/O integration)
@@ -104,19 +133,51 @@ public class DomainsAPI {
         return result;
     }
 
+    public List<Domain> getDomains(User user, DateTime start, DateTime end, int maxResults, int firstResult, boolean starred, Domain.Status status) throws ApiException {
+
+        if (user == null) throw new InvalidParameterException("Invalid user.");
+
+        if (maxResults < 0) maxResults = 0;
+        if (maxResults > 1000) maxResults = 1000;
+
+        if (firstResult < 0) firstResult = 0;
+        if (firstResult > 1000) firstResult = 1000;
+
+        Query<Domain> q = ds.createQuery(Domain.class).field("user").equal(user);
+
+        // All recordings from start date
+        if (start != null) {
+            q.filter("created >=", start);
+        }
+
+        // All recordings until end date
+        if (end != null) {
+            q.filter("created <=", end);
+        }
+
+        if (starred) {
+            q.field("starred").equal(true);
+            q.field("status").equal(Domain.Status.NORMAL);
+        } else {
+            q.field("status").equal(status);
+        }
+
+        return q.limit(maxResults).offset(firstResult).asList();
+    }
+
     public List<Domain> getDomainsFor(User user) {
         if (user == null) return new ArrayList<>();
         return ds.createQuery(Domain.class).field("user").equal(user).field("deleted").equal(false).asList();
     }
 
-    public Domain getDomainByUri(URI uri) throws ResourceNotFoundException {
-        Domain result = ds.createQuery(Domain.class).field("id").equal(uri).field("deleted").equal(false).get();
+    public Domain getDomainByUri(URI domainUri) throws ResourceNotFoundException {
+        Domain result = ds.createQuery(Domain.class).field("id").equal(domainUri).field("deleted").equal(false).get();
         if (result == null) throw new ResourceNotFoundException();
         return result;
     }
 
-    public boolean domainExist(URI uri) throws ResourceNotFoundException {
-        return getDomainByUri(uri) != null;
+    public boolean domainExist(URI domainUri) throws ResourceNotFoundException {
+        return getDomainByUri(domainUri) != null;
     }
 
     public boolean domainHasUser(URI uri, String username) {
