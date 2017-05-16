@@ -54,7 +54,6 @@ public class BillingService {
       throws UnauthorizedAccessException {
 
     String clientToken = gateway.clientToken().generate();
-    // WARNING: Why are we doing this?
     JsonNodeFactory factory = JsonNodeFactory.instance;
     ObjectNode json = factory.objectNode();
     json.put("token", clientToken);

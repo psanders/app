@@ -103,7 +103,6 @@ public class AppsService {
       appFromDB.setStarred(app.isStarred());
       appFromDB.setStatus(app.getStatus());
       appFromDB.setModified(DateTime.now());
-      appFromDB.setStarred(app.isStarred());
 
       DBManager.getInstance().getDS().save(appFromDB);
     }

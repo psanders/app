@@ -1,11 +1,12 @@
 package com.fonoster.rest.test;
 
-import static junit.framework.TestCase.assertEquals;
-
-import java.util.Set;
-import javax.ws.rs.Path;
 import org.junit.Test;
 import org.reflections.Reflections;
+
+import javax.ws.rs.Path;
+import java.util.Set;
+
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * @author ecabrerar

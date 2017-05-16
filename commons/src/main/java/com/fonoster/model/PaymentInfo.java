@@ -107,6 +107,7 @@ public class PaymentInfo {
     // If applies
     private String token;
 
+    // Must have no-argument constructor
     public PaymentMethod() {}
 
     public PaymentType getType() {
