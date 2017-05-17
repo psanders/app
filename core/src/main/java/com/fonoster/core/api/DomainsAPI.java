@@ -9,8 +9,6 @@
  */
 package com.fonoster.core.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
@@ -20,36 +18,25 @@ import com.fonoster.model.Domain;
 import com.fonoster.model.PhoneNumber;
 import com.fonoster.model.User;
 import com.google.common.base.Strings;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Since("1.0")
 public class DomainsAPI {
-    private static final Logger LOG = LoggerFactory.getLogger(DomainsAPI.class);
     private static final DomainsAPI INSTANCE = new DomainsAPI();
     private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private AgentsAPI aAPI = AgentsAPI.getInstance();
-    private ObjectMapper mapper = new ObjectMapper();
-    private Configuration conf;
 
     private DomainsAPI() {
-        conf = Configuration.defaultConfiguration();
-        conf.addOptions(Option.ALWAYS_RETURN_LIST);
     }
 
     public static DomainsAPI getInstance() {
@@ -69,7 +56,7 @@ public class DomainsAPI {
         if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDidRef)) {
 
             PhoneNumber pn = NumbersAPI.getInstance().getPhoneNumber(egressDidRef);
-            if (pn == null || pn.getUser().getEmail() != user.getEmail()) throw new UnauthorizedAccessException("This DID is not assigned to you");
+            if (pn == null || !Objects.equals(pn.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException("This DID is not assigned to you");
 
             Domain.Spec.Context.EgressPolicy ep = new Domain.Spec.Context.EgressPolicy(egressRule, egressDidRef);
             domain.getSpec().getContext().setEgressPolicy(ep);
@@ -95,45 +82,20 @@ public class DomainsAPI {
         return domain;
     }
 
-    public Domain getDomain(User user, String uri) throws ResourceNotFoundException {
+    public Domain getDomain(User user, URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
+
+        if (domainUri == null || user == null) throw  new InvalidParameterException();
+
         Domain result = ds.createQuery(Domain.class)
             .field("id")
-                .equal(uri).field("deleted").equal(false)
+                .equal(domainUri).field("deleted").equal(false)
                     .field("user").equal(user).get();
 
         if (result == null) throw new ResourceNotFoundException();
         return result;
     }
 
-    // Only for admin account (Including Sip I/O integration)
-    public List<Domain> getDomains(String f) throws ApiException {
-        String filter;
-        String jsonInString;
-
-        if (f == null || f.isEmpty()) {
-            filter = "*";
-        } else {
-            filter = "*.[?(@." + f + ")]";
-        }
-
-        List<Domain> domains = ds.createQuery(Domain.class).field("deleted").equal(false).asList();
-        List<Domain> result;
-
-        try {
-            jsonInString = mapper.writeValueAsString(domains);
-            result = JsonPath.parse(jsonInString).read(filter);
-        } catch (JsonProcessingException e) {
-            throw new ApiException(e.getMessage());
-        } catch (Exception e) {
-            throw new ApiException(e.getMessage());
-        }
-
-        if(result.isEmpty()) throw new ResourceNotFoundException();
-
-        return result;
-    }
-
-    public List<Domain> getDomains(User user, DateTime start, DateTime end, int maxResults, int firstResult, boolean starred, Domain.Status status) throws ApiException {
+    public List<Domain> getDomains(User user, DateTime start, DateTime end, int maxResults, int firstResult) throws ApiException {
 
         if (user == null) throw new InvalidParameterException("Invalid user.");
 
@@ -155,32 +117,28 @@ public class DomainsAPI {
             q.filter("created <=", end);
         }
 
-        if (starred) {
-            q.field("starred").equal(true);
-            q.field("status").equal(Domain.Status.NORMAL);
-        } else {
-            q.field("status").equal(status);
-        }
-
         return q.limit(maxResults).offset(firstResult).asList();
     }
 
-    public List<Domain> getDomainsFor(User user) {
-        if (user == null) return new ArrayList<>();
-        return ds.createQuery(Domain.class).field("user").equal(user).field("deleted").equal(false).asList();
-    }
-
-    public Domain getDomainByUri(URI domainUri) throws ResourceNotFoundException {
+    public Domain getDomainByUri(URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
+        if (domainUri == null) throw  new InvalidParameterException("domainUri");
         Domain result = ds.createQuery(Domain.class).field("id").equal(domainUri).field("deleted").equal(false).get();
         if (result == null) throw new ResourceNotFoundException();
         return result;
     }
 
-    public boolean domainExist(URI domainUri) throws ResourceNotFoundException {
+    public boolean domainExist(URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
+        if (domainUri == null) throw  new InvalidParameterException();
         return getDomainByUri(domainUri) != null;
     }
 
-    public boolean domainHasUser(URI uri, String username) {
-        return aAPI.getAgent(uri, username) != null;
+    public boolean ownsDomain(User user, URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
+        if (domainUri == null || user == null) throw  new InvalidParameterException();
+
+        Domain result = ds.createQuery(Domain.class)
+                .field("id")
+                .equal(domainUri).field("deleted").equal(false)
+                .field("user").equal(user).get();
+        return result != null;
     }
 }

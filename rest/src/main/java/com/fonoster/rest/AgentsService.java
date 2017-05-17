@@ -11,17 +11,15 @@ package com.fonoster.rest;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fonoster.annotations.Since;
+import com.fonoster.core.api.AgentsAPI;
 import com.fonoster.core.api.DBManager;
 import com.fonoster.core.api.DomainsAPI;
-import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.exception.ApiException;
-import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.UnauthorizedAccessException;
-import com.fonoster.model.Account;
+import com.fonoster.model.Agent;
 import com.fonoster.model.Domain;
-import com.fonoster.model.PhoneNumber;
 import com.fonoster.model.User;
-import com.google.common.base.Strings;
+import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 
 import javax.annotation.security.RolesAllowed;
@@ -37,12 +35,12 @@ import java.util.Objects;
 
 @Since("1.0")
 @RolesAllowed({"USER"})
-@Path("/accounts/{accountId}/domains")
-public class DomainsService {
+@Path("/accounts/{accountId}/agents")
+public class AgentsService {
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public javax.ws.rs.core.Response getDomains(
+    public javax.ws.rs.core.Response getAgents(
             @QueryParam("start") String start,
             @QueryParam("end") String end,
             @QueryParam("page") @DefaultValue("0") int page,
@@ -58,13 +56,13 @@ public class DomainsService {
         if (start != null && !start.isEmpty()) jStart = new DateTime(start);
         if (end != null && !end.isEmpty()) jEnd = new DateTime(end);
 
-        List<Domain> domains =
-            DomainsAPI.getInstance()
-                .getDomains(user, jStart, jEnd, pageSize, pageSize * page);
+        List<Agent> agents =
+            AgentsAPI.getInstance()
+                .getAgents(user, jStart, jEnd, pageSize, pageSize * page);
 
         int total =
-                DomainsAPI.getInstance()
-                .getDomains(
+                AgentsAPI.getInstance()
+                .getAgents(
                     user,
                     jStart,
                     jEnd,
@@ -73,15 +71,15 @@ public class DomainsService {
                     // To ensure that there is a least 1000 elements
                     0).size();
 
-        Domains domainPages = new Domains(page, pageSize, total, domains);
+        Agents agentsPages = new Agents(page, pageSize, total, agents);
 
-        return javax.ws.rs.core.Response.ok(domainPages).build();
+        return javax.ws.rs.core.Response.ok(agentsPages).build();
     }
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("/{domainUri}")
-    public javax.ws.rs.core.Response getDomain(@PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
+    public javax.ws.rs.core.Response getAgent(@PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
             throws ApiException {
         User user = AuthUtil.getUser(httpRequest);
         Domain domain = DomainsAPI.getInstance().getDomainByUri(domainUri);
@@ -105,85 +103,59 @@ public class DomainsService {
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public javax.ws.rs.core.Response saveDomain(Domain domain, @Context HttpServletRequest httpRequest) throws ApiException {
+    public javax.ws.rs.core.Response saveAgent(Agent agent, @Context HttpServletRequest httpRequest) throws ApiException {
         User user = AuthUtil.getUser(httpRequest);
 
-        Domain domainFromDB;
-        URI domainUri = domain.getSpec().getContext().getDomainUri();
-        String name = domain.getMetadata().get("name");
-        String egressRule = null;
-        String egressDidRef = null;
+        Agent agentFromDB;
+        String name = agent.getMetadata().get("name");
+        Agent.Spec.Credentials credentials =  agent.getSpec().getCredentials();
+        URI domainUri = agent.getSpec().getDomains().get(0);
+        String username = credentials.getUsername();
+        String secret = credentials.getSecret();
 
-        if (Strings.isNullOrEmpty(name)) { throw new InvalidParameterException("name"); }
-
-        try {
-            egressRule = domain.getSpec().getContext().getEgressPolicy().getRule();
-            egressDidRef = domain.getSpec().getContext().getEgressPolicy().getDidRef();
-        } catch (Exception ignored) {}
-
-        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDidRef)) {
-            throw new InvalidParameterException("egressRule, egressDidRef");
-        }
-
-        if (domain.getId() == null) {
-            domainFromDB = DomainsAPI.getInstance().createDomain(user, domainUri, name, egressRule, egressDidRef);
-            DBManager.getInstance().getDS().save(domainFromDB);
+        if (agent.getId() == null) {
+            agentFromDB = AgentsAPI.getInstance().createAgent(user, domainUri, name, username, secret);
+            DBManager.getInstance().getDS().save(agentFromDB);
         } else {
-            // Update object
-            domainFromDB = DomainsAPI.getInstance().getDomainByUri(domainUri);
-
-            // User does not own domain
-            if (!Objects.equals(domainFromDB.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException();
-
-            // Both parameters must be present for it to work.
-            if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDidRef)) {
-                PhoneNumber pn = NumbersAPI.getInstance().getPhoneNumber(egressDidRef);
-                // Verify didOwner
-                if (pn == null || !Objects.equals(pn.getUser().getEmail(), user.getEmail())) {
-                    throw new UnauthorizedAccessException("This DID is not assigned to you");
-                }
-
-                domainFromDB.getSpec().getContext().setEgressPolicy(new Domain.Spec.Context.EgressPolicy(egressRule, egressDidRef));
-            }
-            domainFromDB.getMetadata().put("name", name);
-
-            domainFromDB.setModified(DateTime.now());
-            DBManager.getInstance().getDS().save(domainFromDB);
+            agentFromDB = AgentsAPI.getInstance().getAgent(user, agent.getId());
+            agentFromDB.getMetadata().put("name", agent.getMetadata().get("name"));
+            agentFromDB.getSpec().getCredentials().setSecret(secret);
+            DBManager.getInstance().getDS().save(agentFromDB);
         }
 
-        return javax.ws.rs.core.Response.ok(domainFromDB).build();
+        return javax.ws.rs.core.Response.ok(agentFromDB).build();
     }
 
     @DELETE
-    @Path("/{domainUri}")
+    @Path("/{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public javax.ws.rs.core.Response deleteApp(
-            @PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
+    public javax.ws.rs.core.Response deleteAgent(
+            @PathParam("id") ObjectId agentId, @Context HttpServletRequest httpRequest)
             throws ApiException {
-        Account account = AuthUtil.getAccount(httpRequest);
-        Domain domain = DomainsAPI.getInstance().getDomain(account.getUser(), domainUri);
-        domain.setDeleted(true);
-        DomainsAPI.getInstance().updateDomain(domain);
+        User user = AuthUtil.getUser(httpRequest);
+        Agent agent = AgentsAPI.getInstance().getAgent(user, agentId);
+        agent.setDeleted(true);
+        DBManager.getInstance().getDS().save(agent);
         return javax.ws.rs.core.Response.ok().build();
     }
 
     // For media type "xml", this inner class must be static have the @XmlRootElement annotation
     // and a no-argument constructor.
     @XmlRootElement
-    static class Domains {
+    static class Agents {
         private int page;
         private int total;
         private int pageSize;
-        private List<Domain> domains;
+        private List<Agent> agents;
 
         // Must have no-argument constructor
-        public Domains() {}
+        public Agents() {}
 
-        private Domains(int page, int pageSize, int total, List<Domain> domains) {
+        private Agents(int page, int pageSize, int total, List<Agent> agents) {
             this.page = page;
             this.pageSize = pageSize;
             this.total = total;
-            this.domains = domains;
+            this.agents = agents;
         }
 
         public int getPage() {
@@ -210,12 +182,12 @@ public class DomainsService {
             this.pageSize = pageSize;
         }
 
-        public List<Domain> getApps() {
-            return domains;
+        public List<Agent> getAgents() {
+            return agents;
         }
 
-        public void setApps(List<Domain> domains) {
-            this.domains = domains;
+        public void setAgents(List<Agent> agents) {
+            this.agents = agents;
         }
     }
 }

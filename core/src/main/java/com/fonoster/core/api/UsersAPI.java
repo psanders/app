@@ -20,6 +20,7 @@ import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
 import com.fonoster.model.services.Service;
+import com.fonoster.services.MailManager;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
@@ -79,8 +80,8 @@ public class UsersAPI {
         user.setPmntInfo(pi);
         UsersAPI.getInstance().updateUser(user);
 
-        //MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), user.getEmail(), "Welcome to Fonoster", "Thanks for trying out Fonoster. We are excited to have you with us. Happy coding!");
-        //MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), commonsConfig.getAdminMail(), "New Fonoster account", user.getFirstName() + "<" + user.getEmail() + "> just sign-up for an account.");
+        MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), user.getEmail(), "Welcome to Fonoster", "Thanks for trying out Fonoster. We are excited to have you with us. Happy coding!");
+        MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), commonsConfig.getAdminMail(), "New Fonoster account", user.getFirstName() + "<" + user.getEmail() + "> just sign-up for an account.");
 
         createActivity(user, "Welcome to Fonoster", Activity.Type.INFO);
 

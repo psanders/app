@@ -10,6 +10,16 @@ package com.fonoster.services;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Since("1.0")
 public class MailManager {
@@ -20,16 +30,19 @@ public class MailManager {
     return INSTANCE;
   }
 
-  /* public ClientResponse sendMsg(String from, String to, String subject, String msg) {
-      Client client = Client.create();
-      client.addFilter(new HTTPBasicAuthFilter("api", config.getMailgunApiKey()));
-      WebResource webResource = client.resource(config.getMailgunResource());
-      MultivaluedMapImpl formData = new MultivaluedMapImpl();
-      formData.add("from", from);
-      formData.add("to", to);
-      formData.add("subject", subject);
-      formData.add("text", msg);
-      return webResource.type(MediaType.APPLICATION_FORM_URLENCODED).
-              post(ClientResponse.class, formData);
-  }*/
+  public Response sendMsg(String from, String to, String subject, String message) {
+      ClientConfig clientConfigMail = new ClientConfig();
+      Client clientMail = ClientBuilder.newClient(clientConfigMail);
+      clientMail.register(HttpAuthenticationFeature.basic("api", config.getMailgunApiKey()));
+      WebTarget targetMail = clientMail.target(config.getMailgunResource());
+      Form formData = new Form();
+      formData.param("from", from);
+      formData.param("to", to);
+      formData.param("subject", subject);
+      formData.param("text", message);
+      Response response = targetMail.request().post(Entity.entity(formData,MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+      //If everything goes correct you should be able to see status 200 in response
+      System.out.println("Mail sent : " + response);
+      return response;
+  }
 }

@@ -11,6 +11,7 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +148,7 @@ public class Agent {
 
   public static class Spec {
     @NotNull private Credentials credentials;
-    private List<String> domains;
+    private List<URI> domains;
 
     public Credentials getCredentials() {
       return credentials;
@@ -157,11 +158,11 @@ public class Agent {
       this.credentials = credentials;
     }
 
-    public List<String> getDomains() {
+    public List<URI> getDomains() {
       return domains;
     }
 
-    public void setDomains(List<String> domains) {
+    public void setDomains(List<URI> domains) {
       this.domains = domains;
     }
 

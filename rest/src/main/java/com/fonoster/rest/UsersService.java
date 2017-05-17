@@ -18,6 +18,7 @@ import com.fonoster.exception.UserAlreadyExistException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.User;
+import com.fonoster.services.MailManager;
 import org.bson.types.ObjectId;
 import org.glassfish.jersey.internal.util.Base64;
 import org.joda.time.DateTime;
@@ -106,7 +107,7 @@ public class UsersService {
       String id = new ObjectId().toHexString();
       secret = id.substring(id.length() - 5);
       if (uFromDB != null) {
-        //MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal password", "Your temporal secret is: " + pass);
+        MailManager.getInstance().sendMsg(config.getTeamMail(), cpr.getEmail(), "Your temporal password", "Your temporal secret is: " + secret);
       }
     } else {
       uFromDB = UsersAPI.getInstance().getUserByEmail(account.getUser().getEmail());
@@ -152,16 +153,16 @@ public class UsersService {
     if (user != null) {
       LOG.debug(
           "User with email: " + email + " is requesting an signup, but an account already exist");
-      // MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "Alert: User attempt to re-signup",
-      //     "User with email: " + email + " is requesting signup, but an account already exist");
+      MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "Alert: User attempt to re-signup",
+           "User with email: " + email + " is requesting signup, but an account already exist");
 
-      //MailManager.getInstance().sendMsg(config.getTeamMail(), email, "You already have an account",
-      //        "You already have an account in Fonoster. Perhaps, you should try to recover your secret.");
+      MailManager.getInstance().sendMsg(config.getTeamMail(), email, "You already have an account",
+              "You already have an account in Fonoster. Perhaps, you should try to recover your secret.");
 
       throw new UserAlreadyExistException();
     }
 
-    //MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "New signup", "Person with email " + email + " is signing-up for an account");
+    MailManager.getInstance().sendMsg(config.getTeamMail(), config.getAdminMail(), "New signup", "Person with email " + email + " is signing-up for an account");
 
     String approvedMsg = "Hi! Welcome Fonoster.\n";
     approvedMsg = approvedMsg.concat("\nPlease click the link bellow to completed your profile.");
@@ -170,8 +171,8 @@ public class UsersService {
             "\n\n\thttps://console.fonoster.com/#/login?code=" + Base64.encodeAsString(email));
     approvedMsg = approvedMsg.concat("\n\nFonoster Team.");
 
-    //MailManager.getInstance().sendMsg(config.getTeamMail(), email, "Your new account",
-    //    approvedMsg);
+    MailManager.getInstance().sendMsg(config.getTeamMail(), email, "Your new account",
+        approvedMsg);
 
     return Response.ok().build();
   }

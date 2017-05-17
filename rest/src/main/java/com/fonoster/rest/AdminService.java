@@ -10,10 +10,7 @@ package com.fonoster.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.annotations.Since;
-import com.fonoster.core.api.AgentsAPI;
-import com.fonoster.core.api.DomainsAPI;
-import com.fonoster.core.api.NumbersAPI;
-import com.fonoster.core.api.UsersAPI;
+import com.fonoster.core.api.*;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
 import org.bson.types.ObjectId;
@@ -75,7 +72,7 @@ public class AdminService {
       @QueryParam("filter") String filter, @Context HttpServletRequest httpRequest)
       throws ApiException {
 
-      List<Domain> domains = DomainsAPI.getInstance().getDomains(filter);
+      List<Domain> domains = SipIOResourcesAPI.getInstance().getDomains(filter);
 
      // See: http://stackoverflow.com/a/6081716/1320815
       GenericEntity<List<Domain>> result =
@@ -89,7 +86,7 @@ public class AdminService {
   @Path("/domains/{uri}")
   public Response getDomainsByUri(
       @PathParam("uri") URI uri, @Context HttpServletRequest httpRequest) throws ApiException {
-    Domain domain = DomainsAPI.getInstance().getDomainByUri(uri);
+    Domain domain = SipIOResourcesAPI.getInstance().getDomainByUri(uri);
     return Response.ok(domain).build();
   }
 
@@ -101,11 +98,11 @@ public class AdminService {
       @QueryParam("filter") String filter,
       @Context HttpServletRequest httpRequest)
       throws ApiException {
-    List<Agent> agents = AgentsAPI.getInstance().getAgents(domainUri, filter);
+      List<Agent> agents = SipIOResourcesAPI.getInstance().getAgents(domainUri, filter);
 
       // See: http://stackoverflow.com/a/6081716/1320815
       GenericEntity<List<Agent>> result =
-              new GenericEntity<List<Agent>>(agents) {};
+        new GenericEntity<List<Agent>>(agents) {};
 
     return Response.ok(result).build();
   }

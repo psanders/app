@@ -21,7 +21,6 @@ import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
@@ -42,7 +41,6 @@ public class Domain {
   @NotNull private String kind = getClass().getSimpleName();
   @NotNull private Map<String, String> metadata;
   @NotNull private Spec spec;
-  @NotNull private Status status;
 
   // Must have no-argument constructor
   public Domain() {}
@@ -147,14 +145,6 @@ public class Domain {
   @Override
   public String toString() {
     return ReflectionToStringBuilder.toString(this);
-  }
-
-  public Status getStatus() {
-    return status;
-  }
-
-  public void setStatus(Status status) {
-    this.status = status;
   }
 
   public static class Spec {
@@ -268,30 +258,6 @@ public class Domain {
           this.deny = deny;
         }
       }
-    }
-  }
-
-  @XmlType(name = "domainStatus")
-  public static enum Status {
-    NORMAL,
-    ARCHIVED,
-    DELETED,
-    TRASH;
-
-    public static Status getByValue(String value) {
-      if (value == null) return null;
-      value = value.toUpperCase();
-      switch (value) {
-        case "NORMAL":
-          return NORMAL;
-        case "ARCHIVED":
-          return ARCHIVED;
-        case "DELETED":
-          return DELETED;
-        case "TRASH":
-          return TRASH;
-      }
-      return null;
     }
   }
 }
