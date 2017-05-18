@@ -58,7 +58,9 @@ import * as moment from 'moment-timezone';
                 self.recordings = result;
             })
             .catch(function(error) {
-                console.log(JSON.stringify(error));
+                // Ignore 404 errors
+                if (error.status != 404)
+                    console.warn(JSON.stringify(error));
             });
             self.filter = false;
         }

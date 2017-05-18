@@ -39,7 +39,9 @@ import * as moment from 'moment-timezone';
                 self.calls = result;
             })
             .catch(function(error) {
-                console.error(JSON.stringify(error));
+                // Ignore 404 errors
+                if (error.status != 404)
+                    console.warn(JSON.stringify(error));
             });
 
             self.filter = false;

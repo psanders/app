@@ -16,8 +16,6 @@
         self.account = CredentialsService.getCredentials();
 
         self.login = function(evt) {
-            console.log('DBG0001 ~> ' + $mdDialog);
-
             $mdDialog.show({
                 controller: DialogController,
                 templateUrl: 'app/components/users/password_dialog.tpl.html',
@@ -50,7 +48,7 @@
                 console.log(JSON.stringify(data));
                 self.account = data
                 CredentialsService.setCredentials(data);
-                toastMe("Regenerated!. Remember to update all your apps with the new token.", 8000);
+                toastMe("Regenerated! Remember to update all your apps with the new token.", 8000);
             }).catch(function(error) {
                 console.error(JSON.stringify(error));
                 toastMe(error.data.message);
