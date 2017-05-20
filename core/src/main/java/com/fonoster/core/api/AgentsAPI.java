@@ -15,8 +15,6 @@ import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Agent;
 import com.fonoster.model.User;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.Option;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
@@ -33,11 +31,8 @@ public class AgentsAPI {
     private static final AgentsAPI INSTANCE = new AgentsAPI();
     private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-    private Configuration conf;
 
     private AgentsAPI() {
-        conf = Configuration.defaultConfiguration();
-        conf.addOptions(Option.ALWAYS_RETURN_LIST);
     }
 
     public static AgentsAPI getInstance() {
