@@ -59,6 +59,8 @@ public final class DBManager {
             }
         });
 
+        morphia.map(com.fonoster.model.Domain.class);
+        morphia.map(com.fonoster.model.Agent.class);
         morphia.map(com.fonoster.model.Account.class);
         morphia.map(com.fonoster.model.Activity.class);
         morphia.map(com.fonoster.model.App.class);
