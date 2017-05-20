@@ -20,8 +20,8 @@ subprojects {
 
     dependencies {
         // Mongo and Morphia
-        compile 'org.mongodb:mongo-java-driver:3.2.2'
-        compile 'org.mongodb.morphia:morphia:1.1.1'
+        compile 'org.mongodb:mongo-java-driver:3.4.2'
+        compile 'org.mongodb.morphia:morphia:1.3.2'
         // Java Bean, Rest, XML, JSON etc.
         compile 'javax.xml.bind:jaxb-api:2.2.2'
         compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.8'
