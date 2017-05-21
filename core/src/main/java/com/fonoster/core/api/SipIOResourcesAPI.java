@@ -15,6 +15,7 @@ import com.fonoster.exception.ApiException;
 import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.model.Agent;
 import com.fonoster.model.Domain;
+import com.google.common.base.Strings;
 import com.jayway.jsonpath.JsonPath;
 import org.mongodb.morphia.Datastore;
 
@@ -69,12 +70,10 @@ public class SipIOResourcesAPI {
 
     // Only for admin account (Including Sip I/O integration)
     public List<Agent> getAgents(URI domainUri, String f) throws ApiException {
-        String filter;
+        String filter = "*";
         String jsonInString;
 
-        if (f == null || f.isEmpty()) {
-            filter = "*";
-        } else {
+        if (!Strings.isNullOrEmpty(f) && !f.equals("*")) {
             filter = "*.[?(" + f + ")]";
         }
 
