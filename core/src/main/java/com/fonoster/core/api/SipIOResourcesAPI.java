@@ -75,13 +75,13 @@ public class SipIOResourcesAPI {
         if (f == null || f.isEmpty()) {
             filter = "*";
         } else {
-            filter = "*.[?(@." + f + ")]";
+            filter = "*.[?(" + f + ")]";
         }
 
         List<Agent> agents = ds.createQuery(Agent.class).field("deleted").equal(false).asList();
 
         if (domainUri != null) {
-            agents = agents.stream().filter(agent -> hasDomain(agent.getSpec().getDomains(), domainUri.toString())).collect(Collectors.toList());
+            agents = agents.stream().filter(agent -> hasDomain(agent.getSpec().getDomains(), domainUri)).collect(Collectors.toList());
         }
 
         List<Agent> result;
@@ -98,9 +98,11 @@ public class SipIOResourcesAPI {
         return result;
     }
 
-    private boolean hasDomain(List<URI> domains, String domainUri) {
+    private boolean hasDomain(List<URI> domains, URI domainUri) {
         for (URI dUri : domains) {
-            if (domainUri.equals(dUri)) return true;
+            if (domainUri.equals(dUri)) {
+                return true;
+            }
         }
         return false;
     }
