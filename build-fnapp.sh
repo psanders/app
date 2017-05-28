@@ -29,7 +29,7 @@ confirm && PACK='-p' && echo 'This might take a while. Go grab some coffee  :)'
 
 $(cd webui/src/main/webapp/app && npm update && webpack $PACK)
 
-gradle clean goJF jar war
+gradle clean goJF jar war shadowJar
 
 docker build -t gcr.io/fonoster-app/fnapp:latest .
 docker tag gcr.io/fonoster-app/fnapp:latest gcr.io/fonoster-app/fnapp:1.0.$(timestamp)
