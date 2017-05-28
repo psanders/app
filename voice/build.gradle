@@ -3,6 +3,7 @@
 plugins {
     id "com.github.hierynomus.license" version "0.14.0"
     id 'com.github.sherter.google-java-format' version '0.6'
+    id 'com.github.johnrengelman.shadow' version '2.0.0'
 }
 
 license {
@@ -35,4 +36,10 @@ dependencies {
 
 jar {
     archiveName = "voice.jar"
+}
+
+shadowJar {
+    baseName = 'voice-fat'
+    classifier = null
+    version = null
 }
