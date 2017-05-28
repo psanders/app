@@ -13,7 +13,6 @@ Once the system is up, you can run Jetty using the following command inside the 
 > Astive Toolkit and JsonPath must be installed manually in maven local :(
 
 ```
-
 cd fonoster/app/webui
 gradle farmRun 
 ```
