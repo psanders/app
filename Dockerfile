@@ -7,4 +7,4 @@ ADD webui/src/main/resources/web.xml                 /opt/app-base/webapps
 ADD webui/src/main/resources/webui.xml               /opt/app-base/webapps
 ADD rest/build/libs/rest.war                         /opt/app-base/webapps
 ADD webui/build/libs/webui.war                       /opt/app-base/webapps
-ADD voice/build/libs/voice.jar                       /opt/astive/apps
+ADD voice/build/libs/voice-fat.jar                   /opt/astive/apps
