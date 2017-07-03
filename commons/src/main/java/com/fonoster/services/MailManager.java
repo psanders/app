@@ -31,18 +31,19 @@ public class MailManager {
   }
 
   public Response sendMsg(String from, String to, String subject, String message) {
-      ClientConfig clientConfigMail = new ClientConfig();
-      Client clientMail = ClientBuilder.newClient(clientConfigMail);
-      clientMail.register(HttpAuthenticationFeature.basic("api", config.getMailgunApiKey()));
-      WebTarget targetMail = clientMail.target(config.getMailgunResource());
-      Form formData = new Form();
-      formData.param("from", from);
-      formData.param("to", to);
-      formData.param("subject", subject);
-      formData.param("text", message);
-      Response response = targetMail.request().post(Entity.entity(formData,MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-      //If everything goes correct you should be able to see status 200 in response
-      System.out.println("Mail sent : " + response);
-      return response;
+    ClientConfig clientConfigMail = new ClientConfig();
+    Client clientMail = ClientBuilder.newClient(clientConfigMail);
+    clientMail.register(HttpAuthenticationFeature.basic("api", config.getMailgunApiKey()));
+    WebTarget targetMail = clientMail.target(config.getMailgunResource());
+    Form formData = new Form();
+    formData.param("from", from);
+    formData.param("to", to);
+    formData.param("subject", subject);
+    formData.param("text", message);
+    Response response =
+        targetMail
+            .request()
+            .post(Entity.entity(formData, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+    return response;
   }
 }
