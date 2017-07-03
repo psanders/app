@@ -12,20 +12,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.validation.Valid;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
+
+import javax.validation.Valid;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Since("1.0")
 @Entity
@@ -98,7 +99,6 @@ public class Domain {
     this.user = user;
   }
 
-  // Can only be deleted if is a sub-account
   @JsonIgnore
   @XmlTransient
   public boolean isDeleted() {
@@ -139,12 +139,6 @@ public class Domain {
 
   public void setSpec(Spec spec) {
     this.spec = spec;
-  }
-
-  // Creates toString using reflection
-  @Override
-  public String toString() {
-    return ReflectionToStringBuilder.toString(this);
   }
 
   public static class Spec {
@@ -259,5 +253,11 @@ public class Domain {
         }
       }
     }
+  }
+
+  // Creates toString using reflection
+  @Override
+  public String toString() {
+    return ReflectionToStringBuilder.toString(this);
   }
 }
