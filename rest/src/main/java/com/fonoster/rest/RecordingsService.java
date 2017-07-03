@@ -108,12 +108,11 @@ public class RecordingsService {
       }
 
       Response.ResponseBuilder response = Response.ok(file);
-      StringBuilder sb = new StringBuilder("attachment; filename=\"");
-      sb.append(recordingId);
-      sb.append(".");
-      sb.append(ext);
-      sb.append("\"");
-      response.header("Content-Disposition", sb.toString());
+      String sb = "attachment; filename=\"" + recordingId +
+              "." +
+              ext +
+              "\"";
+      response.header("Content-Disposition", sb);
       return response.build();
     }
 
