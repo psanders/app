@@ -15,6 +15,7 @@
 */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallDetailRecord;
 import com.fonoster.model.CallStats;
@@ -23,6 +24,7 @@ import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+@Since("1.0")
 public class AnalyticsAPI {
     private static final AnalyticsAPI INSTANCE = new AnalyticsAPI();
     final private Datastore ds;
