@@ -9,6 +9,7 @@
  */
 package com.fonoster.core.api;
 
+import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.ResourceNotFoundException;
@@ -27,6 +28,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
+@Since("1.0")
 public class AgentsAPI {
     private static final AgentsAPI INSTANCE = new AgentsAPI();
     private static final Datastore ds = DBManager.getInstance().getDS();
@@ -66,7 +68,7 @@ public class AgentsAPI {
 
     public Agent createAgent(User user, URI domainUri, String name, String username, String secret) throws ApiException {
 
-        if (!DomainsAPI.getInstance().ownsDomain(user, domainUri)) throw  new UnauthorizedAccessException();
+        if (!DomainsAPI.getInstance().isDomainOwner(user, domainUri)) throw  new UnauthorizedAccessException();
 
         Agent.Spec.Credentials credentials = new Agent.Spec.Credentials(username, secret);
         Agent agent = new Agent(user, name, credentials);
