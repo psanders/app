@@ -11,12 +11,13 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,8 +30,6 @@ public class ServiceProvider {
   @NotNull private String name;
   @NotNull private String address;
   @NotNull private String contactNumber;
-  @NotNull private String trunk;
-  @NotNull private String context;
   @NotNull private String apiVersion;
 
   // Must have no-argument constructor
@@ -77,14 +76,6 @@ public class ServiceProvider {
     this.contactNumber = contactNumber;
   }
 
-  public String getTrunk() {
-    return trunk;
-  }
-
-  public void setTrunk(String trunk) {
-    this.trunk = trunk;
-  }
-
   public DateTime getCreated() {
     return created;
   }
@@ -99,14 +90,6 @@ public class ServiceProvider {
 
   public void setModified(DateTime modified) {
     this.modified = modified;
-  }
-
-  public String getContext() {
-    return context;
-  }
-
-  public void setContext(String context) {
-    this.context = context;
   }
 
   public String getApiVersion() {
