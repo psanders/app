@@ -35,7 +35,11 @@ public class DIDNumber {
   @NotNull private DateTime created;
   @NotNull private DateTime modified;
   @Reference private App ingressApp; // Entry point for ingress calls
-  @Reference private Account ingressAcct; // If set will be use to bill ingress calls, otherwise 'main' will be billed
+
+  @Reference
+  private Account
+      ingressAcct; // If set will be use to bill ingress calls, otherwise 'main' will be billed
+
   @NotNull @Reference private Gateway gateway;
   @NotNull private String kind;
   @NotNull private Map<String, Object> metadata;
@@ -49,8 +53,11 @@ public class DIDNumber {
   // Must have no-argument constructor
   public DIDNumber() {}
 
-  public DIDNumber(Gateway gateway, Spec.Location location, Map<String, String> geoInfo,
-     Map<String, Boolean> tech) {
+  public DIDNumber(
+      Gateway gateway,
+      Spec.Location location,
+      Map<String, String> geoInfo,
+      Map<String, Boolean> tech) {
     this.id = new ObjectId();
     this.spec = new Spec();
     this.gateway = gateway;
