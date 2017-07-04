@@ -13,7 +13,7 @@ import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.UnauthorizedAccessException;
-import com.fonoster.model.DID;
+import com.fonoster.model.DIDNumber;
 import com.fonoster.model.Gateway;
 import com.fonoster.model.ServiceProvider;
 import com.fonoster.model.User;
@@ -32,32 +32,32 @@ import java.util.Map;
 import java.util.Set;
 
 @Since("1.0")
-public class DIDsAPI {
-    private static final Logger LOG = LoggerFactory.getLogger(DIDsAPI.class);
-    private static final DIDsAPI INSTANCE = new DIDsAPI();
+public class DIDNumbersAPI {
+    private static final Logger LOG = LoggerFactory.getLogger(DIDNumbersAPI.class);
+    private static final DIDNumbersAPI INSTANCE = new DIDNumbersAPI();
     private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    private DIDsAPI() {
+    private DIDNumbersAPI() {
     }
 
-    public static DIDsAPI getInstance() {
+    public static DIDNumbersAPI getInstance() {
         return INSTANCE;
     }
 
-    public DID createDID(User renter, Gateway gateway, String number, Map<String, Map > geoInfo) throws ApiException {
+    public DIDNumber createDIDNumber(Gateway gateway, String number, Map<String, String> geoInfo,
+                                     Map<String, Boolean> tech) throws ApiException {
 
-        if (getDID(renter, number) != null) throw new ApiException("This number has been assigned.");
+        if (existDIDNumber(number)) throw new ApiException("This number already exist.");
 
-        // TODO: Get aorLink from config
-        DID.Spec.Location location = new DID.Spec.Location("tel:" + number, "");
+        DIDNumber.Spec.Location location = new DIDNumber.Spec.Location("tel:" + number, "ast@fnast");
 
-        DID did = new DID(renter, gateway, location, geoInfo);
+        DIDNumber didNumber = new DIDNumber(gateway, location, geoInfo, tech);
 
         // JavaBean validation
-        if (!validator.validate(did).isEmpty()) {
+        if (!validator.validate(didNumber).isEmpty()) {
             StringBuilder sb = new StringBuilder(75);
-            Set<ConstraintViolation<DID>> validate = validator.validate(did);
+            Set<ConstraintViolation<DIDNumber>> validate = validator.validate(didNumber);
             for (ConstraintViolation<?> cv : validate) {
                 sb.append(cv.getMessage());
                 sb.append("\n");
@@ -65,33 +65,67 @@ public class DIDsAPI {
             throw new ApiException("Invalid parameter. [" + sb.toString() + "]");
         }
 
-        ds.save(did);
-        return did;
+        ds.save(didNumber);
+        return didNumber;
     }
 
-    public DID getDID(String telUrl) throws ApiException {
-        LOG.debug("Getting obj DID for: " + telUrl);
-        DID did = ds.createQuery(DID.class).field("number").equal(telUrl).field("status").equal(DID.Status.ACTIVE).get();
+    public void rentDIDNumber(DIDNumber didNumber, User user) throws ApiException {
 
-        if (did == null) throw new ApiException("Unable to find DID for tel url '" + telUrl + "'");
+        // TODO: Verify balance...
 
-        return did;
+        didNumber.setUser(user);
+
+        if (!validator.validate(didNumber).isEmpty()) {
+            StringBuilder sb = new StringBuilder(75);
+            Set<ConstraintViolation<DIDNumber>> validate = validator.validate(didNumber);
+            for (ConstraintViolation<?> cv : validate) {
+                sb.append(cv.getMessage());
+                sb.append("\n");
+            }
+            throw new ApiException("Invalid parameter. [" + sb.toString() + "]");
+        }
+        ds.save(didNumber);
     }
 
-    public DID getDID(User user, String number) throws ApiException {
-        DID pn = ds.createQuery(DID.class).field("user").equal(user)
-                .field("number").equal(number).field("status").equal(DID.Status.ACTIVE).get();
+    public DIDNumber getDIDNumber(String number) throws ApiException {
+        LOG.debug("Getting obj DIDNumber for: " + number);
+        DIDNumber didNumber = ds.createQuery(DIDNumber.class)
+                .field("spec.location.telUrl").equal("tel:" + number)
+                .field("status").equal(DIDNumber.Status.ACTIVE).get();
 
-        if (pn == null) throw new ApiException("Unable to find number " + number);
+        if (didNumber == null) throw new ApiException("Unable to find DIDNumber for number '" + number + "'");
 
-        return pn;
+        return didNumber;
     }
 
-    public List<DID> getDIDsFor(User user, DID.Status status) throws ApiException {
+    public DIDNumber getDIDNumber(User user, String number) throws ApiException {
+        LOG.debug("Getting obj DIDNumber for: " + number + " and user => " + user.getEmail());
+
+        DIDNumber didNumber = ds.createQuery(DIDNumber.class).field("user").equal(user)
+                .field("spec.location.telUrl").equal("tel:" + number)
+                .field("status").equal(DIDNumber.Status.ACTIVE).get();
+
+        if (didNumber == null) throw new ApiException("Unable to find number " + number);
+
+        return didNumber;
+    }
+
+    private boolean existDIDNumber(String number) throws ApiException {
+        LOG.debug("Getting obj DIDNumber for: " + number);
+        DIDNumber didNumber = ds.createQuery(DIDNumber.class)
+                .field("spec.location.telUrl").equal("tel:" + number)
+                .field("deleted").equal(false).get();
+
+        if (didNumber == null) return false;
+
+        return true;
+    }
+
+    public List<DIDNumber> getDIDNumbersFor(User user, DIDNumber.Status status) throws ApiException {
 
         if (user == null) throw new ApiException("Invalid user.");
 
-        Query<DID> q = ds.createQuery(DID.class).field("user").equal(user);
+        Query<DIDNumber> q = ds.createQuery(DIDNumber.class).field("user").equal(user);
 
         if (status != null) {
             q.field("status").equal(status);
@@ -100,7 +134,7 @@ public class DIDsAPI {
         return q.limit(1000).asList();
     }
 
-    public List<DID> getDIDsFor(User user, DID.Status status, int maxResults, int firstResult) throws ApiException {
+    public List<DIDNumber> getDIDNumbersFor(User user, DIDNumber.Status status, int maxResults, int firstResult) throws ApiException {
         if (user == null) throw new ApiException("Invalid user.");
 
         if (maxResults < 0) maxResults = 0;
@@ -109,7 +143,7 @@ public class DIDsAPI {
         if (firstResult < 0) firstResult = 0;
         if (firstResult > 1000) firstResult = 1000;
 
-        Query<DID> q = ds.createQuery(DID.class).field("user").equal(user);
+        Query<DIDNumber> q = ds.createQuery(DIDNumber.class).field("user").equal(user);
 
         if (status != null) {
             q.field("status").equal(status);
@@ -118,9 +152,9 @@ public class DIDsAPI {
         return q.limit(maxResults).offset(firstResult).asList();
     }
 
-    public void setDefault(User user, DID did) throws ApiException {
+    public void setDefault(User user, DIDNumber did) throws ApiException {
 
-        for (DID d : getDIDsFor(user, DID.Status.ACTIVE)) {
+        for (DIDNumber d : getDIDNumbersFor(user, DIDNumber.Status.ACTIVE)) {
             if (did.getId().equals(d.getId())) {
                 d.setPreferred(true);
             } else {
@@ -131,14 +165,14 @@ public class DIDsAPI {
         }
     }
 
-    public DID getDefault(User user) throws ApiException {
+    public DIDNumber getDefault(User user) throws ApiException {
 
-        for (DID did : getDIDsFor(user, DID.Status.ACTIVE)) {
-            if (did.isPreferred()) return did;
+        for (DIDNumber didNumber : getDIDNumbersFor(user, DIDNumber.Status.ACTIVE)) {
+            if (didNumber.isPreferred()) return didNumber;
         }
 
-        if (getDIDsFor(user, DID.Status.ACTIVE).size() > 0) {
-            return getDIDsFor(user, DID.Status.ACTIVE).get(0);
+        if (getDIDNumbersFor(user, DIDNumber.Status.ACTIVE).size() > 0) {
+            return getDIDNumbersFor(user, DIDNumber.Status.ACTIVE).get(0);
         }
 
         throw new ApiException("Not numbers were found for this user.");
@@ -163,22 +197,21 @@ public class DIDsAPI {
         return ds.createQuery(ServiceProvider.class).field("_id").equal(id).get();
     }
 
-    public void updateDID(User user, DID phoneNumber) throws ApiException {
+    public void updateDIDNumber(User user, DIDNumber didNumber) throws ApiException {
 
-        if (!user.getEmail().equals(phoneNumber.getUser().getEmail())) {
+        if (!user.getEmail().equals(didNumber.getUser().getEmail())) {
             throw new UnauthorizedAccessException();
         }
 
-        // TODO: Do this everywhere !!!
-        if (!validator.validate(phoneNumber).isEmpty()) {
+        if (!validator.validate(didNumber).isEmpty()) {
             StringBuilder sb = new StringBuilder(75);
-            Set<ConstraintViolation<DID>> validate = validator.validate(phoneNumber);
+            Set<ConstraintViolation<DIDNumber>> validate = validator.validate(didNumber);
             for (ConstraintViolation<?> cv : validate) {
                 sb.append(cv.getMessage());
                 sb.append("\n");
             }
             throw new ApiException("Invalid parameter. [" + sb.toString() + "]");
         }
-        ds.save(phoneNumber);
+        ds.save(didNumber);
     }
 }
