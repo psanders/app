@@ -1,11 +1,11 @@
-<md-card id="numbers-widget" ng-controller="NumbersCtrl as ctrl" ng-show="ctrl.numbers.total > 0">
+<md-card id="numbers-widget" ng-controller="NumbersCtrl as ctrl">
     <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
         <div class="md-toolbar-tools">
-            <span>Numbers</span>
+            <span>DID Numbers</span>
             <span flex></span>
             <md-button ng-click="numberRequest($event)" class="md-icon-button" aria-label="Add">
                 <md-tooltip md-direction="left">
-                    Add new number
+                    Rent new DID
                 </md-tooltip>
                 <md-icon md-font-library="material-icons">add</md-icon>
             </md-button>
@@ -26,7 +26,8 @@
             </thead>
             <tbody md-body>
                 <!-- WARNING: Inline css here! -->
-                <tr md-row ng-repeat="number in ctrl.numbers.phoneNumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
+                <tr md-row
+                    ng-repeat="number in ctrl.didNumbers.didnumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
                     <td md-cell style="padding: 0" layout-align="center end" layout="row">
                         <md-button style="margin: 0"  ng-show="number.preferred" class="md-icon-button" ng-click="ctrl.setPreferred(number)">
                             <md-icon md-font-library="material-icons">radio_button_checked</md-icon>
@@ -42,13 +43,13 @@
                         </md-button>
                     </td>
                     <td md-cell style="padding: 0">
-                        {{ctrl.formatLocal(ctrl.user.countryCode, number.number)}}
+                        {{ctrl.formatLocal(ctrl.user.countryCode, number.spec.location.telUrl.replace('tel:', ''))}}
                     </td>
-                    <td md-cell>{{number.countryISOCode}}</td>
+                    <td md-cell>{{number.metadata.geoInfo.countryISOCode}}</td>
                     <td md-cell>
-                        <span ng-show="number.voiceEnabled">Voice</span>
-                        <span ng-show="number.smsEnabled">, SMS</span>
-                        <span ng-show="number.mmsEnabled">, MMS</span>
+                        <span ng-show="number.metadata.tech.voice == true">Voice</span>
+                        <span ng-show="number.metadata.tech.sms == true">, SMS</span>
+                        <span ng-show="number.metadata.tech.mms == true">, MMS</span>
                     </td>
                     <td md-cell>{{number.modified | asCalendar}}</td>
                 </tr>
@@ -56,9 +57,7 @@
         </table>
     </md-table-container>
 
-    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page" md-total="{{ctrl.numbers.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
+    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
+                         md-total="{{ctrl.dids.total}}" md-on-paginate="ctrl.onPageChange"
+                         md-page-select></md-table-pagination>
 </md-card>
-
-<div ng-show="ctrl.numbers.total == 0" layout="column" layout-align="center center" layout-padding class="not-found-card" >
-    <h2 class="md-headline">Not items found!</h2>
-</div>

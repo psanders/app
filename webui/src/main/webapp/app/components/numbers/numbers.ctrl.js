@@ -56,10 +56,11 @@ import * as moment from 'moment-timezone';
         self.setPreferred = function(number) {
             Numbers.getPreferredResource().save(number).$promise
             .then(function(result) {
-                toastMe('Your test number changed to ' + self.formatLocal(self.user.countryCode, number.number), 4000);
+                toastMe('Your test number changed to ' +
+                    self.formatLocal(self.user.countryCode, number.spec.location.telUrl.replace('tel:', '')), 4000);
                 init();
             })
-            .catch(function(error){
+            .catch(function(error) {
                 toastMe(error.data.message);
             });
         }
@@ -87,10 +88,10 @@ import * as moment from 'moment-timezone';
         function init() {
             Numbers.getResource().get().$promise
             .then(function(result){
-                self.numbers = result;
+                self.didNumbers = result;
             })
             .catch(function(error) {
-                console.log(JSON.stringify(error));
+                console.error(JSON.stringify(error));
             });
         }
 
