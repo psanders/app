@@ -65,7 +65,7 @@ public class BillingAPI {
         return match.get(0);
     }
 
-    public BigDecimal getPrice(DID origin, String dest, long time) throws ApiException {
+    public BigDecimal getPrice(DIDNumber origin, String dest, long time) throws ApiException {
         // WARNING: Perhaps we may want to add a "connection" rate
         if (time == 0) return new BigDecimal("0");
 
@@ -76,7 +76,7 @@ public class BillingAPI {
     }
 
     // Maximum time allowed(approximate)
-    public long maxAllowTime(Account account, DID origin, String dest) throws ApiException {
+    public long maxAllowTime(Account account, DIDNumber origin, String dest) throws ApiException {
         Rate rate = getRate(origin.getGateway().getProvider(), dest);
         BigDecimal balance = account.getUser().getPmntInfo().getBalance();
 
