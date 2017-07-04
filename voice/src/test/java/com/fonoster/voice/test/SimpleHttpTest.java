@@ -21,240 +21,205 @@ import static org.mockserver.model.HttpResponse.response;
 
 public class SimpleHttpTest {
 
-    private ClientAndProxy proxy;
-    private ClientAndServer mockServer;
+  private ClientAndProxy proxy;
+  private ClientAndServer mockServer;
 
-    @Before
-    public void startProxy() {
-        mockServer = startClientAndServer(1080);
-        proxy = startClientAndProxy(1090);
-    }
+  @Before
+  public void startProxy() {
+    mockServer = startClientAndServer(1080);
+    proxy = startClientAndProxy(1090);
+  }
 
-    @After
-    public void stopProxy() {
-        proxy.stop();
-        mockServer.stop();
-    }
+  @After
+  public void stopProxy() {
+    proxy.stop();
+    mockServer.stop();
+  }
 
-    @Test
-    public void testGet() throws Exception {
-        final int[] code = new int[1];
-        final String[] body = new String[1];
+  @Test
+  public void testGet() throws Exception {
+    final int[] code = new int[1];
+    final String[] body = new String[1];
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                        .withMethod("GET")
-                        .withPath("/get")
-                )
-                .respond(
-                        response()
-                        .withStatusCode(200)
-                        .withBody("{v:'ok'}")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(request().withMethod("GET").withPath("/get"))
+        .respond(response().withStatusCode(200).withBody("{v:'ok'}"));
 
-        new SimpleHttp().get("http://localhost:1080/get").then(r -> {
-            code[0] = r.getCode();
-            body[0] = r.getBody();
-        });
+    new SimpleHttp()
+        .get("http://localhost:1080/get")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertEquals(code[0], 200);
-        assertEquals(body[0], "{v:'ok'}");
-    }
+    assertEquals(code[0], 200);
+    assertEquals(body[0], "{v:'ok'}");
+  }
 
-    @Test
-    public void testPost() throws Exception {
-        final int[] code = new int[1];
-        final String[] body = new String[1];
+  @Test
+  public void testPost() throws Exception {
+    final int[] code = new int[1];
+    final String[] body = new String[1];
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                        .withMethod("POST")
-                        .withPath("/post")
-                )
-                .respond(
-                        response()
-                        .withStatusCode(200)
-                        .withBody("{v:'ok'}")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(request().withMethod("POST").withPath("/post"))
+        .respond(response().withStatusCode(200).withBody("{v:'ok'}"));
 
-        new SimpleHttp().post("http://localhost:1080/post").then(r -> {
-            code[0] = r.getCode();
-            body[0] = r.getBody();
-        });
+    new SimpleHttp()
+        .post("http://localhost:1080/post")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertEquals(code[0], 200);
-        assertEquals(body[0], "{v:'ok'}");
-    }
+    assertEquals(code[0], 200);
+    assertEquals(body[0], "{v:'ok'}");
+  }
 
-    @Test
-    public void testHeader() throws Exception {
-        final int[] code = new int[1];
-        final String[] body = new String[1];
+  @Test
+  public void testHeader() throws Exception {
+    final int[] code = new int[1];
+    final String[] body = new String[1];
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                        .withMethod("POST")
-                        .withPath("/withHeader")
-                        .withHeader("content", "application/xml")
-                )
-                .respond(
-                        response()
-                        .withStatusCode(200)
-                        .withBody("<message>OK</message>")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(
+            request()
+                .withMethod("POST")
+                .withPath("/withHeader")
+                .withHeader("content", "application/xml"))
+        .respond(response().withStatusCode(200).withBody("<message>OK</message>"));
 
-        new SimpleHttp().post("http://localhost:1080/withHeader")
-                .then(r -> {
-                    code[0] = r.getCode();
-                    body[0] = r.getBody();
-                });
+    new SimpleHttp()
+        .post("http://localhost:1080/withHeader")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertNotSame(code[0], 200);
-        assertNotSame(body[0], "<message>OK</message>");
+    assertNotSame(code[0], 200);
+    assertNotSame(body[0], "<message>OK</message>");
 
-        new SimpleHttp().post("http://localhost:1080/withHeader")
-                .header("content", "application/xml")
-                .then(r -> {
-                    code[0] = r.getCode();
-                    body[0] = r.getBody();
-                });
+    new SimpleHttp()
+        .post("http://localhost:1080/withHeader")
+        .header("content", "application/xml")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertEquals(code[0], 200);
-        assertEquals(body[0], "<message>OK</message>");
-    }
+    assertEquals(code[0], 200);
+    assertEquals(body[0], "<message>OK</message>");
+  }
 
-    @Test(expected = org.apache.commons.httpclient.ConnectTimeoutException.class)
-    public void testTimeout() throws Exception {
+  @Test(expected = org.apache.commons.httpclient.ConnectTimeoutException.class)
+  public void testTimeout() throws Exception {
 
-        new SimpleHttp().post("http://www.google.com:81")
-                .timeout(5000)
-                .then(r -> {
-                });
-    }
+    new SimpleHttp().post("http://www.google.com:81").timeout(5000).then(r -> {});
+  }
 
-    @Test
-    public void testField() throws Exception {
-        final int[] code = new int[1];
-        final String[] body = new String[1];
+  @Test
+  public void testField() throws Exception {
+    final int[] code = new int[1];
+    final String[] body = new String[1];
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                        .withMethod("POST")
-                        .withPath("/withField")
-                        .withBody("name=quijote")
-                )
-                .respond(
-                        response()
-                        .withStatusCode(200)
-                        .withBody("{v:'ok'}")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(request().withMethod("POST").withPath("/withField").withBody("name=quijote"))
+        .respond(response().withStatusCode(200).withBody("{v:'ok'}"));
 
-        new SimpleHttp().post("http://localhost:1080/withField")
-                .field("name", "quijote")
-                .then(r -> {
-                    code[0] = r.getCode();
-                    body[0] = r.getBody();
-                });
+    new SimpleHttp()
+        .post("http://localhost:1080/withField")
+        .field("name", "quijote")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertEquals(code[0], 200);
-        assertEquals(body[0], "{v:'ok'}");
-    }
+    assertEquals(code[0], 200);
+    assertEquals(body[0], "{v:'ok'}");
+  }
 
-    @Test
-    public void testQueryString() throws Exception {
-        final int[] code = new int[1];
-        final String[] body = new String[1];
+  @Test
+  public void testQueryString() throws Exception {
+    final int[] code = new int[1];
+    final String[] body = new String[1];
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                        .withMethod("GET")
-                        .withPath("/getQueryString")
-                        .withQueryStringParameter("name")
-                )
-                .respond(
-                        response()
-                        .withStatusCode(200)
-                        .withBody("{v:'ok'}")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(
+            request()
+                .withMethod("GET")
+                .withPath("/getQueryString")
+                .withQueryStringParameter("name"))
+        .respond(response().withStatusCode(200).withBody("{v:'ok'}"));
 
-        new SimpleHttp().get("http://localhost:1080/getQueryString")
-                .queryString("name", "quijote")
-                .then(r -> {
-                    code[0] = r.getCode();
-                    body[0] = r.getBody();
-                });
+    new SimpleHttp()
+        .get("http://localhost:1080/getQueryString")
+        .queryString("name", "quijote")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertEquals(code[0], 200);
-        assertEquals(body[0], "{v:'ok'}");
-    }
+    assertEquals(code[0], 200);
+    assertEquals(body[0], "{v:'ok'}");
+  }
 
-    @Test(expected = SequenceException.class)
-    public void testSecuenceException() throws SequenceException, IOException {
+  @Test(expected = SequenceException.class)
+  public void testSecuenceException() throws SequenceException, IOException {
 
-        new SimpleHttp().timeout(5000).post("http://random.page")
-                .then(r -> {
-                });
-    }
+    new SimpleHttp().timeout(5000).post("http://random.page").then(r -> {});
+  }
 
-    @Test
-    public void testBasicAuth() throws SequenceException, IOException {
-        final int[] code = new int[1];
-        final String[] body = new String[1];
+  @Test
+  public void testBasicAuth() throws SequenceException, IOException {
+    final int[] code = new int[1];
+    final String[] body = new String[1];
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                        .withMethod("POST")
-                        .withPath("/login")
-                        .withHeader("Authorization", "Basic dXNlcjpwYXNzd29yZA==")
-                )
-                .respond(
-                        response()
-                        .withStatusCode(200)
-                        .withBody("{name: logged}")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(
+            request()
+                .withMethod("POST")
+                .withPath("/login")
+                .withHeader("Authorization", "Basic dXNlcjpwYXNzd29yZA=="))
+        .respond(response().withStatusCode(200).withBody("{name: logged}"));
 
-        new SimpleHttp().post("http://localhost:1080/login")
-                .basicAuth("user", "password")
-                .then(r -> {
-                    code[0] = r.getCode();
-                    body[0] = r.getBody();
-                });
+    new SimpleHttp()
+        .post("http://localhost:1080/login")
+        .basicAuth("user", "password")
+        .then(
+            r -> {
+              code[0] = r.getCode();
+              body[0] = r.getBody();
+            });
 
-        assertEquals(code[0], 200);
-        assertEquals(body[0], "{name: logged}");
-    }
+    assertEquals(code[0], 200);
+    assertEquals(body[0], "{name: logged}");
+  }
 
-    @Test
-    public void testWithJS() throws ScriptException {
+  @Test
+  public void testWithJS() throws ScriptException {
 
-        new MockServerClient("localhost", 1080)
-                .when(
-                        request()
-                                .withMethod("GET")
-                                .withPath("/hello.txt")
-                )
-                .respond(
-                        response()
-                                .withStatusCode(200)
-                                .withBody("hi!")
-                );
+    new MockServerClient("localhost", 1080)
+        .when(request().withMethod("GET").withPath("/hello.txt"))
+        .respond(response().withStatusCode(200).withBody("hi!"));
 
-        // Init Js Engine
-        ScriptEngine engine = new ScriptEngineManager().getEngineByExtension("js");
-        ScriptContext newContext = new SimpleScriptContext();
-        newContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
-        Bindings engineScope = newContext.getBindings(ScriptContext.ENGINE_SCOPE);
+    // Init Js Engine
+    ScriptEngine engine = new ScriptEngineManager().getEngineByExtension("js");
+    ScriptContext newContext = new SimpleScriptContext();
+    newContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
+    Bindings engineScope = newContext.getBindings(ScriptContext.ENGINE_SCOPE);
 
-        engineScope.put("http", new SimpleHttp());
+    engineScope.put("http", new SimpleHttp());
 
-        engine.eval("var hi; http.get('http://localhost:1080/hello.txt').then(function(r) {hi = r.body;});", engineScope);
-        String hi = engineScope.get("hi").toString();
-        assertEquals("hi!", hi);
-    }
+    engine.eval(
+        "var hi; http.get('http://localhost:1080/hello.txt').then(function(r) {hi = r.body;});",
+        engineScope);
+    String hi = engineScope.get("hi").toString();
+    assertEquals("hi!", hi);
+  }
 }

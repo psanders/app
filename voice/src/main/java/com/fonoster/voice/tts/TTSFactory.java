@@ -1,11 +1,10 @@
 /**
- * Copyright (C) 2017 <fonosterteam@fonoster.com>
- * https://fonoster.com
+ * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
  *
- * This file is part of Fonoster
+ * <p>This file is part of Fonoster
  *
- * Fonoster can not be copied and/or distributed without the express
- * permission of Fonoster's copyright owners.
+ * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
+ * copyright owners.
  */
 package com.fonoster.voice.tts;
 
@@ -18,33 +17,33 @@ import com.fonoster.model.services.IvonaTTSService;
 import com.fonoster.model.services.Service;
 
 public class TTSFactory {
-    CoreConfig config = CoreConfig.getInstance ();
-    private User user;
+  CoreConfig config = CoreConfig.getInstance();
+  private User user;
 
-    public TTSFactory(User user) {
-        this.user = user;
+  public TTSFactory(User user) {
+    this.user = user;
+  }
+
+  public TTS getTTSEngine(String engine) throws ApiException {
+
+    if (engine.equals("default")) return getDefaultTTS();
+
+    Service service = UsersAPI.getInstance().getService(user, engine);
+
+    if (service instanceof BluemixTTSService) {
+      BluemixTTSService bservice = (BluemixTTSService) service;
+      return new BluemixTTS(bservice.getUsername(), bservice.getPassword());
     }
 
-    public TTS getTTSEngine(String engine) throws ApiException {
-
-        if (engine.equals("default")) return getDefaultTTS ();
-
-        Service service = UsersAPI.getInstance().getService(user, engine);
-
-        if (service instanceof BluemixTTSService) {
-            BluemixTTSService bservice = (BluemixTTSService)service;
-            return new BluemixTTS (bservice.getUsername(), bservice.getPassword());
-        }
-
-        if (service instanceof IvonaTTSService) {
-            IvonaTTSService iservice = (IvonaTTSService)service;
-            return new IvonaTTS (iservice.getAccessKey (), iservice.getSecretKey ());
-        }
-
-        throw new ApiException ("Unable to find " + engine + " in your catalog.");
+    if (service instanceof IvonaTTSService) {
+      IvonaTTSService iservice = (IvonaTTSService) service;
+      return new IvonaTTS(iservice.getAccessKey(), iservice.getSecretKey());
     }
 
-    public BluemixTTS getDefaultTTS() throws ApiException {
-        return new BluemixTTS(config.getBluemixUsername(), config.getBluemixPassword());
-    }
+    throw new ApiException("Unable to find " + engine + " in your catalog.");
+  }
+
+  public BluemixTTS getDefaultTTS() throws ApiException {
+    return new BluemixTTS(config.getBluemixUsername(), config.getBluemixPassword());
+  }
 }

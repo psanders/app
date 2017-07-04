@@ -16,5 +16,5 @@ description = 'Fonoster :: Core'
 dependencies {
     compile project(':commons')
     compile project(':utils')
-    compile group: 'org.asteriskjava', name: 'asterisk-java', version: '1.0.0-final'
+    compile "org.asteriskjava:asterisk-java:1.1.0-beta"
 }
