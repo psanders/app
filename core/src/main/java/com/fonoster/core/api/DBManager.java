@@ -18,6 +18,7 @@ package com.fonoster.core.api;
 import com.fonoster.annotations.Since;
 import com.fonoster.core.config.CoreConfig;
 import com.fonoster.model.Account;
+import com.fonoster.model.DIDNumber;
 import com.fonoster.model.converters.BigDecimalConverter;
 import com.fonoster.model.converters.DateTimeConverter;
 import com.mongodb.MongoClient;
@@ -68,7 +69,7 @@ public final class DBManager {
         morphia.map(com.fonoster.model.CallDetailRecord.class);
         morphia.map(com.fonoster.model.CallStats.class);
         morphia.map(com.fonoster.model.PaymentInfo.class);
-        morphia.map(com.fonoster.model.DID.class);
+        morphia.map(DIDNumber.class);
         morphia.map(com.fonoster.model.Rate.class);
         morphia.map(com.fonoster.model.Recording.class);
         morphia.map(com.fonoster.model.ServiceProvider.class);
