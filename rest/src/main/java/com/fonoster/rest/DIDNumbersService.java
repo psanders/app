@@ -9,13 +9,13 @@
 package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
-import com.fonoster.core.api.NumbersAPI;
+import com.fonoster.core.api.DIDNumbersAPI;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
-import com.fonoster.model.PhoneNumber;
+import com.fonoster.model.DIDNumber;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -28,57 +28,50 @@ import java.util.List;
 
 @Since("1.0")
 @RolesAllowed({"USER"})
-@Path("/accounts/{accountId}/numbers")
-public class NumbersService {
+@Path("/accounts/{accountId}/dids")
+public class DIDsService {
 
   @GET
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  public Response getNumbers(
+  public Response getDIDs(
       @QueryParam("page") @DefaultValue("0") int page,
       @QueryParam("pageSize") @DefaultValue("1000") int pageSize,
-      @QueryParam("status") PhoneNumber.Status status,
+      @QueryParam("status") DIDNumber.Status status,
       @Context HttpServletRequest httpRequest)
       throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
 
-    List<PhoneNumber> numbersList =
-        NumbersAPI.getInstance()
-            .getPhoneNumbersFor(account.getUser(), status, pageSize, pageSize * page);
+    List<DIDNumber> didsList =
+        DIDNumbersAPI.getInstance()
+            .getDIDNumbersFor(account.getUser(), status, pageSize, pageSize * page);
 
-    int total = NumbersAPI.getInstance().getPhoneNumbersFor(account.getUser(), status).size();
+    int total = DIDNumbersAPI.getInstance().getDIDNumbersFor(account.getUser(), status).size();
 
-    Numbers numbers = new Numbers(page, pageSize, total, numbersList);
+    DIDs dids = new DIDs(page, pageSize, total, didsList);
 
-    return Response.ok(numbers).build();
-  }
-
-  @POST
-  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  public Response addNumber(NumberRequest numberRequest, @Context HttpServletRequest httpRequest) {
-    throw new UnsupportedOperationException();
+    return Response.ok(dids).build();
   }
 
   @POST
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Path("/preferred")
-  public Response setPreferred(PhoneNumber phone, @Context HttpServletRequest httpRequest)
+  public Response setPreferred(DIDNumber phone, @Context HttpServletRequest httpRequest)
       throws UnauthorizedAccessException {
 
     Account account = AuthUtil.getAccount(httpRequest);
 
     try {
       // This is just to  ensure that he owns the number
-      PhoneNumber pn =
-          NumbersAPI.getInstance().getPhoneNumber(account.getUser(), phone.getNumber());
-      NumbersAPI.getInstance().setDefault(account.getUser(), pn);
+      DIDNumber did =
+          DIDNumbersAPI.getInstance().getDIDNumber(account.getUser(), phone.getSpec().getLocation().getTelUrl().replace("tel:",""));
+      DIDNumbersAPI.getInstance().setDefault(account.getUser(), did);
 
       UsersAPI.getInstance()
           .createActivity(
               account.getUser(),
-              "Your test number changed to ".concat(pn.getNumber()),
+              "Your test number changed to ".concat(did.getSpec().getLocation().getTelUrl().replace("tel:", "")),
               Activity.Type.SETTING);
 
       return Response.ok().build();
@@ -93,8 +86,8 @@ public class NumbersService {
   @Path("/preferred")
   public Response getPreferred(@Context HttpServletRequest httpRequest) throws ApiException {
     Account account = AuthUtil.getAccount(httpRequest);
-    PhoneNumber pn = NumbersAPI.getInstance().getDefault(account.getUser());
-    return Response.ok(pn).build();
+    DIDNumber did = DIDNumbersAPI.getInstance().getDefault(account.getUser());
+    return Response.ok(did).build();
   }
 
   @GET
@@ -105,59 +98,23 @@ public class NumbersService {
     throw new UnsupportedOperationException();
   }
 
-  class NumberRequest {
-    private String countryISO;
-    private String cityId;
-    private boolean autoRenew;
-
-    public NumberRequest(String countryISO, String cityId, boolean autoRenew) {
-      this.countryISO = countryISO;
-      this.cityId = cityId;
-      this.autoRenew = autoRenew;
-    }
-
-    public String getCountryISO() {
-      return countryISO;
-    }
-
-    public void setCountryISO(String countryISO) {
-      this.countryISO = countryISO;
-    }
-
-    public String getCityId() {
-      return cityId;
-    }
-
-    public void setCityId(String cityId) {
-      this.cityId = cityId;
-    }
-
-    public boolean isAutoRenew() {
-      return autoRenew;
-    }
-
-    public void setAutoRenew(boolean autoRenew) {
-      this.autoRenew = autoRenew;
-    }
-  }
-
   // For media type "xml", this inner class must be static have the @XmlRootElement annotation
   // and a no-argument constructor.
   @XmlRootElement
-  static class Numbers {
+  static class DIDs {
     private int page;
     private int total;
     private int pageSize;
-    private List<PhoneNumber> phoneNumbers;
+    private List<DIDNumber> dids;
 
     // Must have no-argument constructor
-    public Numbers() {}
+    public DIDs() {}
 
-    private Numbers(int page, int pageSize, int total, List<PhoneNumber> phoneNumbers) {
+    private DIDs(int page, int pageSize, int total, List<DIDNumber> dids) {
       this.page = page;
       this.pageSize = pageSize;
       this.total = total;
-      this.phoneNumbers = phoneNumbers;
+      this.dids = dids;
     }
 
     public int getPage() {
@@ -184,12 +141,12 @@ public class NumbersService {
       this.pageSize = pageSize;
     }
 
-    public List<PhoneNumber> getPhoneNumbers() {
-      return phoneNumbers;
+    public List<DIDNumber> getDIDs() {
+      return dids;
     }
 
-    public void setPhoneNumbers(List<PhoneNumber> phoneNumbers) {
-      this.phoneNumbers = phoneNumbers;
+    public void setDIDs(List<DIDNumber> dids) {
+      this.dids = dids;
     }
   }
 }
