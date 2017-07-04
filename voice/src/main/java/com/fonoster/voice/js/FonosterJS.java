@@ -55,13 +55,13 @@ public class FonosterJS extends Astivlet {
         callDetailRecord =
             CallsAPI.getInstance().getCDRById(new ObjectId(request.getQueryParameter("callId")));
       } else {
-        DID destNumber = DIDsAPI.getInstance().getDID(request.getContext());
+        DIDNumber destNumber = DIDNumbersAPI.getInstance().getDIDNumber(request.getContext());
         app = destNumber.getIngressApp();
         Account account = destNumber.getIngressAcct();
 
         // Then use the main account
         if (account == null) {
-          account = UsersAPI.getInstance().getMainAccount(destNumber.getRenter());
+          account = UsersAPI.getInstance().getMainAccount(destNumber.getUser());
         }
 
         direction = CallDetailRecord.Direction.INBOUND;
@@ -130,7 +130,7 @@ public class FonosterJS extends Astivlet {
       CallsAPI.getInstance().updateCDR(callDetailRecord);
 
       // Hangup the call if the user does not have enough balance
-      DID origin = DIDsAPI.getInstance().getDID(callDetailRecord.getFrom());
+      DIDNumber origin = DIDNumbersAPI.getInstance().getDIDNumber(callDetailRecord.getFrom());
       long maxAllowedTime =
           BillingAPI.getInstance()
               .maxAllowTime(callDetailRecord.getAccount(), origin, callDetailRecord.getTo());
@@ -202,7 +202,7 @@ public class FonosterJS extends Astivlet {
 
     if (callDetailRecord.isBillable()) {
       try {
-        DID origin = DIDsAPI.getInstance().getDID(callDetailRecord.getFrom());
+        DIDNumber origin = DIDNumbersAPI.getInstance().getDIDNumber(callDetailRecord.getFrom());
         BigDecimal cost =
             BillingAPI.getInstance().getPrice(origin, callDetailRecord.getTo(), duration);
         callDetailRecord.setCost(cost);
