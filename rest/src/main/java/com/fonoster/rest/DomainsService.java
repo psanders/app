@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DBManager;
+import com.fonoster.core.api.DIDsAPI;
 import com.fonoster.core.api.DomainsAPI;
-import com.fonoster.core.api.NumbersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
+import com.fonoster.model.DID;
 import com.fonoster.model.Domain;
-import com.fonoster.model.PhoneNumber;
 import com.fonoster.model.User;
 import com.google.common.base.Strings;
 import org.joda.time.DateTime;
@@ -112,21 +112,21 @@ public class DomainsService {
         URI domainUri = domain.getSpec().getContext().getDomainUri();
         String name = domain.getMetadata().get("name");
         String egressRule = null;
-        String egressDidRef = null;
+        String egressDIDRef = null;
 
         if (Strings.isNullOrEmpty(name)) { throw new InvalidParameterException("name"); }
 
         try {
             egressRule = domain.getSpec().getContext().getEgressPolicy().getRule();
-            egressDidRef = domain.getSpec().getContext().getEgressPolicy().getDidRef();
+            egressDIDRef = domain.getSpec().getContext().getEgressPolicy().getDidRef();
         } catch (Exception ignored) {}
 
-        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDidRef)) {
-            throw new InvalidParameterException("egressRule, egressDidRef");
+        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDIDRef)) {
+            throw new InvalidParameterException("egressRule, egressDIDRef");
         }
 
         if (domain.getId() == null) {
-            domainFromDB = DomainsAPI.getInstance().createDomain(user, domainUri, name, egressRule, egressDidRef);
+            domainFromDB = DomainsAPI.getInstance().createDomain(user, domainUri, name, egressRule, egressDIDRef);
             DBManager.getInstance().getDS().save(domainFromDB);
         } else {
             // Update object
@@ -136,14 +136,14 @@ public class DomainsService {
             if (!Objects.equals(domainFromDB.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException();
 
             // Both parameters must be present for it to work.
-            if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDidRef)) {
-                PhoneNumber pn = NumbersAPI.getInstance().getPhoneNumber(egressDidRef);
+            if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDIDRef)) {
+                DID did = DIDsAPI.getInstance().getDID(egressDIDRef);
                 // Verify didOwner
-                if (pn == null || !Objects.equals(pn.getUser().getEmail(), user.getEmail())) {
+                if (did == null || !Objects.equals(did.getRenter().getEmail(), user.getEmail())) {
                     throw new UnauthorizedAccessException("This DID is not assigned to you");
                 }
 
-                domainFromDB.getSpec().getContext().setEgressPolicy(new Domain.Spec.Context.EgressPolicy(egressRule, egressDidRef));
+                domainFromDB.getSpec().getContext().setEgressPolicy(new Domain.Spec.Context.EgressPolicy(egressRule, egressDIDRef));
             }
             domainFromDB.getMetadata().put("name", name);
 

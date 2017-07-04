@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2017 <fonosterteam@fonoster.com>
  * https://fonoster.com
  *
@@ -7,12 +7,6 @@
  * Fonoster can not be copied and/or distributed without the express
  * permission of Fonoster's copyright owners.
  */
-/*
-*Copyright (C) 2014 PhonyTive LLC
-*http://fonoster.com
-*
-*This file is part of Fonoster
-*/
 package com.fonoster.core.api;
 
 import com.fonoster.annotations.Since;
@@ -25,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Since("1.0")
@@ -62,13 +55,7 @@ public class BillingAPI {
             return match.get(0);
         }
 
-        // Warning: Fix this warning. But ensure a unit test is available
-        Collections.sort(match, (o1, o2) -> {
-            Rate r1 = (Rate) o1;
-            Rate r2 = (Rate) o1;
-
-            return (r1.getPrefix().length() < r2.getPrefix().length()) ? 1 : -1;
-        });
+        match.sort((o1, o2) -> (o1.getPrefix().length() < o2.getPrefix().length()) ? 1 : -1);
 
         if (match.size() == 0) {
             LOG.error("Unable to find rate for this number. spId => ".concat(provider.getId().toString()).concat(" dest => ").concat(dest));
@@ -78,19 +65,19 @@ public class BillingAPI {
         return match.get(0);
     }
 
-    public BigDecimal getPrice(PhoneNumber origin, String dest, long time) throws ApiException {
+    public BigDecimal getPrice(DID origin, String dest, long time) throws ApiException {
         // WARNING: Perhaps we may want to add a "connection" rate
         if (time == 0) return new BigDecimal("0");
 
-        Rate rate = getRate(origin.getProvider(), dest);
+        Rate rate = getRate(origin.getGateway().getProvider(), dest);
         // Up to minute billing
         BigDecimal minutes = new BigDecimal(Math.ceil((double) time / 60));
         return rate.getSelling().multiply(minutes);
     }
 
     // Maximum time allowed(approximate)
-    public long maxAllowTime(Account account, PhoneNumber origin, String dest) throws ApiException {
-        Rate rate = getRate(origin.getProvider(), dest);
+    public long maxAllowTime(Account account, DID origin, String dest) throws ApiException {
+        Rate rate = getRate(origin.getGateway().getProvider(), dest);
         BigDecimal balance = account.getUser().getPmntInfo().getBalance();
 
         if (balance.compareTo(new BigDecimal("0")) <= 0) return 0;

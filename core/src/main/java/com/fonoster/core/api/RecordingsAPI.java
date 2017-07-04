@@ -199,22 +199,22 @@ public class RecordingsAPI {
         return ds.find(Broadcast.class).order("-created").get();
     }
 
-    public void updatePhoneNumber(User user, PhoneNumber phoneNumber) throws ApiException {
+    public void updateDID(User user, DID did) throws ApiException {
 
-        if (!user.getEmail().equals(phoneNumber.getUser().getEmail())) {
+        if (!user.getEmail().equals(did.getRenter().getEmail())) {
             throw new UnauthorizedAccessException();
         }
 
         // JavaBean validation
-        if (!validator.validate(phoneNumber).isEmpty()) {
+        if (!validator.validate(did).isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            Set<ConstraintViolation<PhoneNumber>> validate = validator.validate(phoneNumber);
+            Set<ConstraintViolation<DID>> validate = validator.validate(did);
             for (ConstraintViolation<?> cv : validate) {
                 sb.append(cv.getMessage());
                 sb.append("\n");
             }
             throw new ApiException(sb.toString());
         }
-        ds.save(phoneNumber);
+        ds.save(did);
     }
 }

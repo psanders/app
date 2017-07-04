@@ -18,7 +18,9 @@ package com.fonoster.core.api;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
-import com.fonoster.model.*;
+import com.fonoster.model.Account;
+import com.fonoster.model.Activity;
+import com.fonoster.model.User;
 import com.fonoster.model.services.Service;
 import com.fonoster.services.MailManager;
 import org.bson.types.ObjectId;
@@ -29,9 +31,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -55,30 +55,14 @@ public class UsersAPI {
     }
 
     public User createUser(String firstName, String lastName, String email, String phone, String password) throws ApiException {
-        //if (!ValidatorUtil.isEmailValid(email)) throw new ApiException("Invalid email");
         if (getUserByEmail(email) != null) throw new ApiException("User already exist");
 
         User user = new User(firstName, lastName, email, phone, password);
         createAccount(user, "Main");
         ds.save(user);
-        // Add app
+
+        // Add sample app
         AppsAPI.getInstance().createApp(user, "monkeys.js", "play('tt-monkeys');");
-
-        // WARNING: This is only and only for early-access users
-        ServiceProvider sp = NumbersAPI.getInstance().getServiceProviderById(new ObjectId("562b7a2ec90a7eb3088a126a"));
-        PhoneNumber pn = NumbersAPI.getInstance().createPhoneNumber(user, sp, "+18296072077", "DO");
-        pn.setVoiceEnabled(true);
-        NumbersAPI.getInstance().updatePhoneNumber(user, pn);
-
-        pn = NumbersAPI.getInstance().createPhoneNumber(user, sp, "+17066041487", "US");
-        pn.setVoiceEnabled(true);
-        NumbersAPI.getInstance().updatePhoneNumber(user, pn);
-        NumbersAPI.getInstance().setDefault(user, pn);
-        // WARNING: This must be remove in production
-        PaymentInfo pi = new PaymentInfo();
-        pi.setBalance(new BigDecimal("15.0"));
-        user.setPmntInfo(pi);
-        UsersAPI.getInstance().updateUser(user);
 
         MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), user.getEmail(), "Welcome to Fonoster", "Thanks for trying out Fonoster. We are excited to have you with us. Happy coding!");
         MailManager.getInstance().sendMsg(commonsConfig.getTeamMail(), commonsConfig.getAdminMail(), "New Fonoster account", user.getFirstName() + "<" + user.getEmail() + "> just sign-up for an account.");
@@ -175,10 +159,7 @@ public class UsersAPI {
             user.setServices(new ArrayList<>());
         }
 
-        Iterator i = user.getServices().iterator();
-
-        while (i.hasNext()) {
-            Service s = (Service) i.next();
+        for (Service s : user.getServices()) {
             if (s.getName().equals(service.getName())) throw new ApiException("Service name must be unique");
         }
 
@@ -188,10 +169,8 @@ public class UsersAPI {
     }
 
     public Service getService(User user, String name) throws ApiException {
-        Iterator i = user.getServices().iterator();
 
-        while (i.hasNext()) {
-            Service service = (Service) i.next();
+        for (Service service : user.getServices()) {
             if (service.getName().equals(name)) return service;
         }
 

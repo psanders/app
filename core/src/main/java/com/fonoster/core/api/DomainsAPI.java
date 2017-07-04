@@ -14,8 +14,8 @@ import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.exception.UnauthorizedAccessException;
+import com.fonoster.model.DID;
 import com.fonoster.model.Domain;
-import com.fonoster.model.PhoneNumber;
 import com.fonoster.model.User;
 import com.google.common.base.Strings;
 import org.joda.time.DateTime;
@@ -43,22 +43,21 @@ public class DomainsAPI {
         return INSTANCE;
     }
 
-    public Domain createDomain(User user, URI domainUri, String name, String egressRule, String egressDidRef) throws ApiException {
+    public Domain createDomain(User user, URI domainUri, String name, String egressRule, String egressDIDRef) throws ApiException {
         if (domainExist(domainUri)) throw new ApiException("This domain already exist.");
 
         Domain.Spec.Context context = new Domain.Spec.Context(domainUri);
         Domain domain = new Domain(user, name, context);
 
-        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDidRef)) {
-            throw new InvalidParameterException("EgressRule and EgressDidRef parameters must both be present to enable the EgressPolicy");
+        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDIDRef)) {
+            throw new InvalidParameterException("EgressRule and EgressDIDRef parameters must both be present to enable the EgressPolicy");
         }
 
-        if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDidRef)) {
+        if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDIDRef)) {
+            DID did = DIDsAPI.getInstance().getDID(egressDIDRef);
+            if (did == null || !Objects.equals(did.getRenter().getEmail(), user.getEmail())) throw new UnauthorizedAccessException("This DID is not assigned to you");
 
-            PhoneNumber pn = NumbersAPI.getInstance().getPhoneNumber(egressDidRef);
-            if (pn == null || !Objects.equals(pn.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException("This DID is not assigned to you");
-
-            Domain.Spec.Context.EgressPolicy ep = new Domain.Spec.Context.EgressPolicy(egressRule, egressDidRef);
+            Domain.Spec.Context.EgressPolicy ep = new Domain.Spec.Context.EgressPolicy(egressRule, egressDIDRef);
             domain.getSpec().getContext().setEgressPolicy(ep);
         }
 
@@ -132,7 +131,7 @@ public class DomainsAPI {
         return getDomainByUri(domainUri) != null;
     }
 
-    public boolean ownsDomain(User user, URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
+    public boolean isDomainOwner(User user, URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
         if (domainUri == null || user == null) throw  new InvalidParameterException();
 
         Domain result = ds.createQuery(Domain.class)
