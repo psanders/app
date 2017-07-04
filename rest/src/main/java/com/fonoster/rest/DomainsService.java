@@ -12,13 +12,13 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DBManager;
-import com.fonoster.core.api.DIDsAPI;
+import com.fonoster.core.api.DIDNumbersAPI;
 import com.fonoster.core.api.DomainsAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
-import com.fonoster.model.DID;
+import com.fonoster.model.DIDNumber;
 import com.fonoster.model.Domain;
 import com.fonoster.model.User;
 import com.google.common.base.Strings;
@@ -137,9 +137,9 @@ public class DomainsService {
 
             // Both parameters must be present for it to work.
             if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDIDRef)) {
-                DID did = DIDsAPI.getInstance().getDID(egressDIDRef);
+                DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumber(egressDIDRef);
                 // Verify didOwner
-                if (did == null || !Objects.equals(did.getRenter().getEmail(), user.getEmail())) {
+                if (did == null || !Objects.equals(did.getUser().getEmail(), user.getEmail())) {
                     throw new UnauthorizedAccessException("This DID is not assigned to you");
                 }
 

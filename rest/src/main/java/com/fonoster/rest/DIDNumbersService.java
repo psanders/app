@@ -12,7 +12,6 @@ import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DIDNumbersAPI;
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.exception.ApiException;
-import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
 import com.fonoster.model.DIDNumber;
@@ -29,11 +28,11 @@ import java.util.List;
 @Since("1.0")
 @RolesAllowed({"USER"})
 @Path("/accounts/{accountId}/dids")
-public class DIDsService {
+public class DIDNumbersService {
 
   @GET
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  public Response getDIDs(
+  public Response getDIDNumbers(
       @QueryParam("page") @DefaultValue("0") int page,
       @QueryParam("pageSize") @DefaultValue("1000") int pageSize,
       @QueryParam("status") DIDNumber.Status status,
@@ -42,42 +41,40 @@ public class DIDsService {
 
     Account account = AuthUtil.getAccount(httpRequest);
 
-    List<DIDNumber> didsList =
+    List<DIDNumber> didList =
         DIDNumbersAPI.getInstance()
             .getDIDNumbersFor(account.getUser(), status, pageSize, pageSize * page);
 
     int total = DIDNumbersAPI.getInstance().getDIDNumbersFor(account.getUser(), status).size();
 
-    DIDs dids = new DIDs(page, pageSize, total, didsList);
+    DIDNumbers didNumbers = new DIDNumbers(page, pageSize, total, didList);
 
-    return Response.ok(dids).build();
+    return Response.ok(didNumbers).build();
   }
 
   @POST
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Path("/preferred")
-  public Response setPreferred(DIDNumber phone, @Context HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+  public Response setPreferred(DIDNumber didNumber, @Context HttpServletRequest httpRequest)
+          throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
 
-    try {
-      // This is just to  ensure that he owns the number
-      DIDNumber did =
-          DIDNumbersAPI.getInstance().getDIDNumber(account.getUser(), phone.getSpec().getLocation().getTelUrl().replace("tel:",""));
-      DIDNumbersAPI.getInstance().setDefault(account.getUser(), did);
+    final String number =  didNumber.getSpec().getLocation().getTelUrl().replace("tel:","");
 
-      UsersAPI.getInstance()
-          .createActivity(
-              account.getUser(),
-              "Your test number changed to ".concat(did.getSpec().getLocation().getTelUrl().replace("tel:", "")),
-              Activity.Type.SETTING);
+    DIDNumber didNumberFromDB = DIDNumbersAPI.getInstance().getDIDNumber(account.getUser(), number);
+    DIDNumbersAPI.getInstance().setDefault(account.getUser(), didNumberFromDB);
 
-      return Response.ok().build();
-    } catch (ApiException e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-    }
+    UsersAPI.getInstance()
+        .createActivity(
+            account.getUser(),
+            "Your test number changed to ".concat(didNumberFromDB.getSpec().getLocation().getTelUrl().replace("tel:", "")),
+            Activity.Type.SETTING);
+
+    System.out.println("DBG0005");
+
+    return Response.ok().build();
   }
 
   @GET
@@ -86,8 +83,8 @@ public class DIDsService {
   @Path("/preferred")
   public Response getPreferred(@Context HttpServletRequest httpRequest) throws ApiException {
     Account account = AuthUtil.getAccount(httpRequest);
-    DIDNumber did = DIDNumbersAPI.getInstance().getDefault(account.getUser());
-    return Response.ok(did).build();
+    DIDNumber didNumber = DIDNumbersAPI.getInstance().getDefault(account.getUser());
+    return Response.ok(didNumber).build();
   }
 
   @GET
@@ -101,20 +98,20 @@ public class DIDsService {
   // For media type "xml", this inner class must be static have the @XmlRootElement annotation
   // and a no-argument constructor.
   @XmlRootElement
-  static class DIDs {
+  static class DIDNumbers {
     private int page;
     private int total;
     private int pageSize;
-    private List<DIDNumber> dids;
+    private List<DIDNumber> didNumbers;
 
     // Must have no-argument constructor
-    public DIDs() {}
+    public DIDNumbers() {}
 
-    private DIDs(int page, int pageSize, int total, List<DIDNumber> dids) {
+    private DIDNumbers(int page, int pageSize, int total, List<DIDNumber> didNumbers) {
       this.page = page;
       this.pageSize = pageSize;
       this.total = total;
-      this.dids = dids;
+      this.didNumbers = didNumbers;
     }
 
     public int getPage() {
@@ -141,12 +138,12 @@ public class DIDsService {
       this.pageSize = pageSize;
     }
 
-    public List<DIDNumber> getDIDs() {
-      return dids;
+    public List<DIDNumber> getDIDNumbers() {
+      return didNumbers;
     }
 
-    public void setDIDs(List<DIDNumber> dids) {
-      this.dids = dids;
+    public void setDIDs(List<DIDNumber> didNumbers) {
+      this.didNumbers = didNumbers;
     }
   }
 }

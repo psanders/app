@@ -13,7 +13,6 @@ import com.fonoster.annotations.Since;
 import com.fonoster.core.api.*;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
-import org.bson.types.ObjectId;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -34,35 +33,25 @@ public class AdminService {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/numbers")
+  @Path("/dids")
   public Response addNumber(
-      PhoneNumberRequest phoneNumberRequest, @Context HttpServletRequest httpRequest)
+          DIDRequest didRequest, @Context HttpServletRequest httpRequest)
       throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
 
-    ServiceProvider sp =
-        NumbersAPI.getInstance().getServiceProviderById(new ObjectId(phoneNumberRequest.getSpId()));
-    PhoneNumber pn =
-        NumbersAPI.getInstance()
-            .createPhoneNumber(
-                account.getUser(),
-                sp,
-                phoneNumberRequest.getNumber(),
-                phoneNumberRequest.getCountryISOCode());
-    pn.setVoiceEnabled(phoneNumberRequest.voiceEnabled);
-    pn.setSmsEnabled(phoneNumberRequest.smsEnabled);
-    pn.setMmsEnabled(phoneNumberRequest.mmsEnabled);
+    DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumber("tel:" + didRequest.getNumber());
+    did.setUser(account.getUser());
 
-    NumbersAPI.getInstance().updatePhoneNumber(account.getUser(), pn);
+    DIDNumbersAPI.getInstance().updateDIDNumber(account.getUser(), did);
 
     UsersAPI.getInstance()
         .createActivity(
             account.getUser(),
-            "Added number: " + phoneNumberRequest.getNumber(),
+            "Added number: " + didRequest.getNumber(),
             Activity.Type.SYS);
 
-    return Response.ok(pn).build();
+    return Response.ok(did).build();
   }
 
   @GET
@@ -110,7 +99,7 @@ public class AdminService {
   // For media type "xml", this inner class must be static have the @XmlRootElement annotation
   // and a no-argument constructor.
   @XmlRootElement
-  static class PhoneNumberRequest {
+  static class DIDRequest {
     // Service Provider ID
     private String spId;
     private String number;
@@ -120,13 +109,13 @@ public class AdminService {
     private boolean mmsEnabled;
 
     // Must have no-argument constructor
-    public PhoneNumberRequest() {}
+    public DIDRequest() {}
 
     // Not marking this with JsonProperty was causing;
     // No suitable constructor found for type [simple type,
     // class CredentialsService$CredentialsRequest]:
     // can not instantiate from JSON object (need to add/enable type information?)
-    public PhoneNumberRequest(
+    public DIDRequest(
         // Warning: Are this JsonProperty necessary
         @JsonProperty("spId") String spId,
         @JsonProperty("number") String number,
