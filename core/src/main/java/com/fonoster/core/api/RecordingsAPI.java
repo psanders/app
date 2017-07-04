@@ -20,7 +20,6 @@ import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.ResourceNotFoundException;
-import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.*;
 import com.fonoster.utils.BeanValidatorUtil;
 import com.fonoster.utils.WavToMp3Util;
@@ -32,13 +31,11 @@ import org.mongodb.morphia.query.Query;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 @Since("1.0")
 public class RecordingsAPI {
@@ -197,24 +194,5 @@ public class RecordingsAPI {
 
     public Broadcast getBroadcast() {
         return ds.find(Broadcast.class).order("-created").get();
-    }
-
-    public void updateDID(User user, DID did) throws ApiException {
-
-        if (!user.getEmail().equals(did.getRenter().getEmail())) {
-            throw new UnauthorizedAccessException();
-        }
-
-        // JavaBean validation
-        if (!validator.validate(did).isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            Set<ConstraintViolation<DID>> validate = validator.validate(did);
-            for (ConstraintViolation<?> cv : validate) {
-                sb.append(cv.getMessage());
-                sb.append("\n");
-            }
-            throw new ApiException(sb.toString());
-        }
-        ds.save(did);
     }
 }
