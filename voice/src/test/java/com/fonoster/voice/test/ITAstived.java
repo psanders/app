@@ -14,7 +14,6 @@ public class ITAstived {
     User john = UsersAPI.getInstance().getUserByEmail("john@doe.com");
     Account johnAcct = UsersAPI.getInstance().getMainAccount(john);
 
-
     //App app = AppsAPI.getInstance().createApp(john, "Angry Monkeys", "play('tt-monkeys')");
     App app = AppsAPI.getInstance().createApp(john, "Monkey App", "loadJS('lib.js'); monkeys();");
 
@@ -27,15 +26,13 @@ public class ITAstived {
 
     DBManager.getInstance().getDS().save(app);
 
-    DID did = DIDsAPI.getInstance().getDefault(john);
+    DIDNumber didNumber = DIDNumbersAPI.getInstance().getDefault(john);
 
     String to = "+17853178070";
-    String from = did.getSpec().getLocation().getTelUrl().replace("tel:", "");
+    String from = didNumber.getSpec().getLocation().getTelUrl().replace("tel:", "");
 
     int cntBefore =
-        CallsAPI.getInstance()
-            .getCDRs(johnAcct, null, null, from, to, 1000, 0, null, null)
-            .size();
+        CallsAPI.getInstance().getCDRs(johnAcct, null, null, from, to, 1000, 0, null, null).size();
 
     CallRequest cr = new CallRequest();
     cr.setAccountId(johnAcct.getId().toString());
@@ -46,9 +43,7 @@ public class ITAstived {
     CallsAPI.getInstance().call(cr);
 
     int cntAfter =
-        CallsAPI.getInstance()
-            .getCDRs(johnAcct, null, null, from, to, 1000, 0, null, null)
-            .size();
+        CallsAPI.getInstance().getCDRs(johnAcct, null, null, from, to, 1000, 0, null, null).size();
 
     Assert.assertTrue("Verifies that a cdr was generated", cntBefore == (cntAfter - 1));
   }

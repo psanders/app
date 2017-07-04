@@ -1,23 +1,22 @@
 package com.fonoster.voice.test;
 
-import com.fonoster.exception.SequenceException;
-import com.fonoster.voice.js.SimpleHttp;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockserver.client.server.MockServerClient;
-import org.mockserver.integration.ClientAndProxy;
-import org.mockserver.integration.ClientAndServer;
-
-import javax.script.*;
-import java.io.IOException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.mockserver.integration.ClientAndProxy.startClientAndProxy;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+
+import com.fonoster.exception.SequenceException;
+import com.fonoster.voice.js.SimpleHttp;
+import java.io.IOException;
+import javax.script.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockserver.client.server.MockServerClient;
+import org.mockserver.integration.ClientAndProxy;
+import org.mockserver.integration.ClientAndServer;
 
 public class SimpleHttpTest {
 
