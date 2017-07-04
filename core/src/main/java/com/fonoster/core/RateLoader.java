@@ -11,7 +11,7 @@ package com.fonoster.core;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DBManager;
-import com.fonoster.core.api.DIDsAPI;
+import com.fonoster.core.api.DIDNumbersAPI;
 import com.fonoster.model.Rate;
 import com.fonoster.model.ServiceProvider;
 import org.apache.commons.csv.CSVFormat;
@@ -53,7 +53,7 @@ public class RateLoader {
             System.exit(99);
         }
 
-        ServiceProvider provider = DIDsAPI.getInstance().getServiceProviderById(new ObjectId(args[0]));
+        ServiceProvider provider = DIDNumbersAPI.getInstance().getServiceProviderById(new ObjectId(args[0]));
         String csvFile = args[1];
         BigDecimal sellingPercent = new BigDecimal(args[2]);
 
