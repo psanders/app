@@ -11,18 +11,17 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import java.util.UUID;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.UUID;
 
 @Since("1.0")
 @Entity

@@ -8,19 +8,19 @@
  */
 package com.fonoster.model.adapters;
 
-import com.fonoster.model.PhoneNumber;
+import com.fonoster.model.DID;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class PhoneNumberAdapter extends XmlAdapter<String, PhoneNumber> {
+public class DIDAdapter extends XmlAdapter<String, DID> {
 
   @Override
-  public String marshal(PhoneNumber phoneNumber) throws Exception {
-    return phoneNumber.getNumber();
+  public String marshal(DID did) throws Exception {
+    return did.getSpec().getLocation().getTelUrl();
   }
 
   @Override
   // We don't need to unmarshal for now
-  public PhoneNumber unmarshal(String phoneNumber) throws Exception {
+  public DID unmarshal(String phoneNumber) throws Exception {
     return null;
   }
 }

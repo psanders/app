@@ -11,7 +11,7 @@ package com.fonoster.core;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DBManager;
-import com.fonoster.core.api.NumbersAPI;
+import com.fonoster.core.api.DIDsAPI;
 import com.fonoster.model.Rate;
 import com.fonoster.model.ServiceProvider;
 import org.apache.commons.csv.CSVFormat;
@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
- * TODO: This could be automate to check for updates at the end of the day (or every time there is a change)
+ * TODO: This could be automated to check for updates at the end of the day (or every time there is a change)
  * A more advance approach to decide the "selling" price could be develop. Ideally the ability to update selling price
  * by service provider + region etc.
  */
@@ -43,7 +43,7 @@ public class RateLoader {
     private static final String PREFIX = "Numberplan";
     private final Datastore ds;
 
-    public RateLoader() {
+    private RateLoader() {
         ds = DBManager.getInstance().getDS();
     }
 
@@ -53,7 +53,7 @@ public class RateLoader {
             System.exit(99);
         }
 
-        ServiceProvider provider = NumbersAPI.getInstance().getServiceProviderById(new ObjectId(args[0]));
+        ServiceProvider provider = DIDsAPI.getInstance().getServiceProviderById(new ObjectId(args[0]));
         String csvFile = args[1];
         BigDecimal sellingPercent = new BigDecimal(args[2]);
 
@@ -67,7 +67,7 @@ public class RateLoader {
         new RateLoader().loadRates(provider, csvFile, sellingPercent);
     }
 
-    public void loadRates(ServiceProvider provider, String fileName, BigDecimal sellPercent) {
+    private void loadRates(ServiceProvider provider, String fileName, BigDecimal sellPercent) {
 
         FileReader fileReader = null;
 
@@ -105,6 +105,7 @@ public class RateLoader {
             LOG.error("Something happen while loading the new rate. Cause by: ", e);
         } finally {
             try {
+                assert fileReader != null;
                 fileReader.close();
                 csvFileParser.close();
             } catch (IOException e) {

@@ -11,13 +11,12 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Since("1.0")
 @JsonIgnoreProperties(ignoreUnknown = true)
