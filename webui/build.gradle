@@ -16,6 +16,7 @@ gretty {
 }
 
 farm {
+    httpPort 8081
     webapp ':rest'
     webapp ':resources'
     webapp ':webui'
