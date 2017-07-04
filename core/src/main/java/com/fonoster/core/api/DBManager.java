@@ -68,7 +68,7 @@ public final class DBManager {
         morphia.map(com.fonoster.model.CallDetailRecord.class);
         morphia.map(com.fonoster.model.CallStats.class);
         morphia.map(com.fonoster.model.PaymentInfo.class);
-        morphia.map(com.fonoster.model.PhoneNumber.class);
+        morphia.map(com.fonoster.model.DID.class);
         morphia.map(com.fonoster.model.Rate.class);
         morphia.map(com.fonoster.model.Recording.class);
         morphia.map(com.fonoster.model.ServiceProvider.class);
