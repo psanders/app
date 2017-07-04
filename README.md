@@ -1,20 +1,17 @@
 # Running the App
 
-In order to run Fonoster App you must lunch infrastructure that supports the system, including the database server,
-telephony network, and other elements. First go to the **ops** folder an run docker as follows:
+In order to run Fonoster App you must launch infrastructure that supports the system, including the database server,
+telephony network, and other elements. 
+
+Assuming that both `ops` and `app` are in the same folder:
 
 ```bash
-cd fonoster/ops
-docker-compose up fnast fnmongodb
-```
-
-Once the system is up, you can run Jetty using the following command inside the **app's** folder
-
-> Astive Toolkit and JsonPath must be installed manually in maven local :(
-
-```
-cd fonoster/app/webui
+cd ops
+docker-compose up &
+cd ..
+cd app/webui
 gradle farmRun 
 ```
 
-> Then the console will be available at http://localhost:8080
+> Then the web console will be available at http://localhost:8081
+> Astive Toolkit and JsonPath must be installed manually in maven local :(
