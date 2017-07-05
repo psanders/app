@@ -34,16 +34,16 @@ public class AdminService {
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Path("/dids")
-  public Response addNumber(
+  public Response addDIDNumber(
           DIDRequest didRequest, @Context HttpServletRequest httpRequest)
       throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
 
-    DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumber("tel:" + didRequest.getNumber());
-    did.setUser(account.getUser());
+    DIDNumber didNumber = DIDNumbersAPI.getInstance().getDIDNumber("tel:" + didRequest.getNumber());
+    didNumber.setUser(account.getUser());
 
-    DIDNumbersAPI.getInstance().updateDIDNumber(account.getUser(), did);
+    DIDNumbersAPI.getInstance().updateDIDNumber(account.getUser(), didNumber);
 
     UsersAPI.getInstance()
         .createActivity(
@@ -51,7 +51,7 @@ public class AdminService {
             "Added number: " + didRequest.getNumber(),
             Activity.Type.SYS);
 
-    return Response.ok(did).build();
+    return Response.ok(didNumber).build();
   }
 
   @GET
@@ -92,6 +92,38 @@ public class AdminService {
       // See: http://stackoverflow.com/a/6081716/1320815
       GenericEntity<List<Agent>> result =
         new GenericEntity<List<Agent>>(agents) {};
+
+    return Response.ok(result).build();
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/dids")
+  public Response getDIDNumbers(
+          @QueryParam("filter") String filter,
+          @Context HttpServletRequest httpRequest)
+          throws ApiException {
+    List<DIDNumber> didNumbers = SipIOResourcesAPI.getInstance().getDIDNumbers(filter);
+
+    // See: http://stackoverflow.com/a/6081716/1320815
+    GenericEntity<List<DIDNumber>> result =
+            new GenericEntity<List<DIDNumber>>(didNumbers) {};
+
+    return Response.ok(result).build();
+  }
+
+  @GET
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/gateways")
+  public Response getGateways(
+          @QueryParam("filter") String filter,
+          @Context HttpServletRequest httpRequest)
+          throws ApiException {
+    List<Gateway> gateways = SipIOResourcesAPI.getInstance().getGateways(filter);
+
+    // See: http://stackoverflow.com/a/6081716/1320815
+    GenericEntity<List<Gateway>> result =
+            new GenericEntity<List<Gateway>>(gateways) {};
 
     return Response.ok(result).build();
   }
