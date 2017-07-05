@@ -89,6 +89,9 @@ public class DIDNumbersAPI {
 
     public DIDNumber getDIDNumber(String number) throws ApiException {
         LOG.debug("Getting obj DIDNumber for: " + number);
+
+        number = number.replace("+", "");
+
         DIDNumber didNumber = ds.createQuery(DIDNumber.class)
                 .field("spec.location.telUrl").equal("tel:" + number)
                 .field("status").equal(DIDNumber.Status.ACTIVE).get();
@@ -100,6 +103,8 @@ public class DIDNumbersAPI {
 
     public DIDNumber getDIDNumber(User user, String number) throws ApiException {
         LOG.debug("Getting obj DIDNumber for: " + number + " and user => " + user.getEmail());
+
+        number = number.replace("+", "");
 
         DIDNumber didNumber = ds.createQuery(DIDNumber.class).field("user").equal(user)
                 .field("spec.location.telUrl").equal("tel:" + number)
