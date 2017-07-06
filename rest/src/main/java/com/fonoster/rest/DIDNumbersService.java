@@ -72,8 +72,6 @@ public class DIDNumbersService {
             "Your test number changed to ".concat(didNumberFromDB.getSpec().getLocation().getTelUrl().replace("tel:", "")),
             Activity.Type.SETTING);
 
-    System.out.println("DBG0005");
-
     return Response.ok().build();
   }
 
