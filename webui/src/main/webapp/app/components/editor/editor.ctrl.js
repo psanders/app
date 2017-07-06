@@ -37,14 +37,8 @@ import * as CodeMirror from 'codemirror';
 
         init();
 
-        // TODO: Make this more the same for the demo or old user
         self.call = function(event) {
-            // Temporal feature
-            if (Users.getUser().email == "john@doe.com" && getPgndPhone() === undefined) {
-                self.chgPgndPhone(function(){
-                    call(getPgndPhone());
-                }, event);
-            } else if (Users.getUser().email == "john@doe.com" && getPgndPhone() !== undefined) {
+            if (getPgndPhone() !== undefined) {
                 call(getPgndPhone());
             } else {
                 call();
@@ -301,7 +295,7 @@ import * as CodeMirror from 'codemirror';
         }
 
         function call(phone) {
-            var from = oPhone.number;
+            var from = oPhone;
             var to = Users.getUser().phone;
             var record = true;
 
@@ -313,8 +307,6 @@ import * as CodeMirror from 'codemirror';
             }
 
             var callRequest = {appId: self.app.id, from: from, to: to, record: record, billable: false};
-            console.debug("call.request = " + JSON.stringify(callRequest));
-
             var monitorId;
 
             simpleToast("Calling number " + to);
@@ -475,7 +467,8 @@ import * as CodeMirror from 'codemirror';
         function preferredNumber() {
             Numbers.getPreferredResource().get().$promise
             .then(function(result) {
-                oPhone = result;
+                console.log('oPhone ~> ' + result.spec.location.telUrl.replace('tel:', ''))
+                oPhone = '+' + result.spec.location.telUrl.replace('tel:', '');
             }).catch(function(error) {
                 if (error.data === undefined) {
                     simpleToast("Unable to find test number. First available will be used.");
