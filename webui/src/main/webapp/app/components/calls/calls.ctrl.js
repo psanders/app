@@ -41,7 +41,7 @@ import * as moment from 'moment-timezone';
             .catch(function(error) {
                 // Ignore 404 errors
                 if (error.status != 404)
-                    console.warn(JSON.stringify(error));
+                    console.log(JSON.stringify(error));
             });
 
             self.filter = false;
