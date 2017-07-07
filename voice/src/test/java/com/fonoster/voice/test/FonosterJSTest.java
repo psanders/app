@@ -1,5 +1,10 @@
 package com.fonoster.voice.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallDetailRecord;
@@ -8,18 +13,12 @@ import com.fonoster.voice.config.VoiceConfig;
 import com.fonoster.voice.js.Loader;
 import com.fonoster.voice.tts.BluemixTTS;
 import com.fonoster.voice.tts.TTSFactory;
+import java.io.File;
+import java.io.FileReader;
+import javax.script.*;
 import org.astivetoolkit.astivlet.AstivletResponse;
 import org.bson.types.ObjectId;
 import org.junit.Test;
-
-import javax.script.*;
-import java.io.File;
-import java.io.FileReader;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class FonosterJSTest {
 

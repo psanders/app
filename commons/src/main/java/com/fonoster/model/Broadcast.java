@@ -6,24 +6,19 @@
  * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
  * copyright owners.
  */
-/*
- *Copyright (C) 2014 PhonyTive LLC
- *http://fonoster.com
- *
- *This file is part of Fonoster
- */
 package com.fonoster.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @Since("1.0")
 @Entity

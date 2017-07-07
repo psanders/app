@@ -6,23 +6,18 @@
  * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
  * copyright owners.
  */
-/*
- *Copyright (C) 2014 PhonyTive LLC
- *http://fonoster.com
- *
- *This file is part of Fonoster
- */
 package com.fonoster.model.converters;
 
 import com.fonoster.annotations.Since;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import org.mongodb.morphia.converters.SimpleValueConverter;
 import org.mongodb.morphia.converters.TypeConverter;
 import org.mongodb.morphia.mapping.MappedField;
 import org.mongodb.morphia.mapping.MappingException;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Since("1.0")
 public class BigDecimalConverter extends TypeConverter implements SimpleValueConverter {

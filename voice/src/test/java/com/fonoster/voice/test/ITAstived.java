@@ -2,10 +2,9 @@ package com.fonoster.voice.test;
 
 import com.fonoster.core.api.*;
 import com.fonoster.model.*;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.List;
 
 public class ITAstived {
   // The only thing this test needs to prove is that we have access to astived

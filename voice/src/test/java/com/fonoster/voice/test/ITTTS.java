@@ -1,16 +1,15 @@
 package com.fonoster.voice.test;
 
+import static org.junit.Assert.assertTrue;
+
 import com.fonoster.core.api.UsersAPI;
 import com.fonoster.model.User;
 import com.fonoster.model.services.BluemixTTSService;
 import com.fonoster.model.services.IvonaTTSService;
 import com.fonoster.voice.tts.BluemixTTS;
 import com.fonoster.voice.tts.IvonaTTS;
-import org.junit.Test;
-
 import java.io.File;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class ITTTS {
 
