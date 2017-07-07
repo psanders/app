@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Since("1.0")
 public class CallsAPI {
@@ -114,9 +115,7 @@ public class CallsAPI {
         }
 
         // All crds until end date
-        if (end != null) {
-            q.field("created").lessThanOrEq(end);
-        }
+        if (end != null) q.field("created").lessThanOrEq(end);
 
         List<CallDetailRecord> cdrs = q.limit(maxResults).offset(firstResult).asList();
 
@@ -281,23 +280,18 @@ public class CallsAPI {
             throw new ApiException("Invalid parameter/s. " + BeanValidatorUtil.getValidationError(request));
         }
 
-        PhoneNumber phoneNumber = NumbersAPI.getInstance().getPhoneNumber(request.getFrom());
         Account account = UsersAPI.getInstance().getAccountById(new ObjectId(request.getAccountId()));
-        App app = AppsAPI.getInstance().getAppById(account.getUser(), new ObjectId(request.getAppId()), false);
+        DIDNumber didNumber = DIDNumbersAPI.getInstance().getDIDNumber(request.getFrom());
 
-        // Ensure user has enough balance
-        long maxAllowedTime = BillingAPI.getInstance().maxAllowTime(account, phoneNumber, request.getTo());
-
-        if (request.isBillable() && maxAllowedTime <= 0) throw new InsufficientFundsException();
-
-        // WARNING: Avoid this dom stuff by either creating more numbers all putting here a better note
-        //if (phoneNumber == null || !phoneNumber.getUser().getEmail()
-        //        .equals(account.getUser().getEmail())) {
-        //    throw new ResourceNotFoundException("Unable to find phone number '" + request.getFrom() + "' in your records");
-        //}
-        if (phoneNumber == null) {
+        if (didNumber == null || !didNumber.getUser().getEmail()
+                .equals(account.getUser().getEmail())) {
             throw new ResourceNotFoundException("Unable to find phone number '" + request.getFrom() + "' in your records");
         }
+
+        // Ensure user has enough balance
+        long maxAllowedTime = BillingAPI.getInstance().maxAllowTime(account, didNumber, request.getTo());
+
+        if (request.isBillable() && maxAllowedTime <= 0) throw new InsufficientFundsException();
 
         if (request.getSendDigits() != null && !request.getSendDigits().isEmpty() && !request.getSendDigits().matches("^[a-d0-9w/*/#]*$"))
             throw new InvalidParameterException("Invalid sendDigit: " + request.getSendDigits() + ". It must match with 0-9, *#abcd, w (.5s pause)");
@@ -306,12 +300,14 @@ public class CallsAPI {
 
         // Try to reformat the to parameter
         try {
-            reformattedTo = reformatNumber(phoneNumber, request.getTo());
+            reformattedTo = reformatNumber(didNumber, request.getTo());
         } catch (NumberParseException e) {
             throw new InvalidPhoneNumberException("Unable to format 'To' number. Try using a E.164 formatted number.");
         }
 
-        final CallDetailRecord callDetailRecord = new CallDetailRecord(account, app, phoneNumber.getNumber(), reformattedTo, null, CallDetailRecord.Direction.OUTBOUND_API);
+        App app = AppsAPI.getInstance().getAppById(account.getUser(), new ObjectId(request.getAppId()), false);
+        final String number = didNumber.getSpec().getLocation().getTelUrl().replace("tel:", "");
+        final CallDetailRecord callDetailRecord = new CallDetailRecord(account, app, number, reformattedTo, CallDetailRecord.Direction.OUTBOUND_API);
 
         callDetailRecord.setStatus(CallDetailRecord.Status.QUEUED);
         callDetailRecord.setAnswerBy(CallDetailRecord.AnswerBy.NONE);
@@ -333,16 +329,21 @@ public class CallsAPI {
         // or perhaps a better algorithm
         final OriginateAction originateAction;
 
+        String host = didNumber.getGateway().getSpec().getRegService().getHost();
+
         // Setting up the channel info
-        String channel = "SIP/".concat(reformattedTo.replace("+", "")).concat("@" + phoneNumber.getProvider().getTrunk());
+        String toURI = reformattedTo.replace("+", "") + "@" + host;
+        String fromURI = didNumber.getSpec().getLocation().getTelUrl().replace("tel:", "") + "@" + host;
+        String channel = "SIP/" + toURI + "!!" + fromURI;
 
         originateAction = new OriginateAction();
         originateAction.setChannel(channel);
-        originateAction.setContext(phoneNumber.getProvider().getContext());
-        originateAction.setExten(reformattedTo.replace("+", ""));
+
+        originateAction.setContext("fnus1");   // TODO: Get this from configs
+        originateAction.setExten("ast");       // TODO: Get this from configs
         originateAction.setPriority(1);
-        originateAction.setVariable("astivedHost", coreConfig.getAstivedHost());
-        originateAction.setVariable("astivedPort", "" + coreConfig.getAstivedPort());
+        originateAction.setVariable("astivedHost", coreConfig.getAstivedHost());            // TODO: Should deprecate
+        originateAction.setVariable("astivedPort", "" + coreConfig.getAstivedPort()); // TODO: Should deprecate
         originateAction.setVariable("callId", callDetailRecord.getId().toString());
         originateAction.setVariable("initDigits", request.getSendDigits());
         originateAction.setVariable("record", "" + request.isRecord());
@@ -408,8 +409,9 @@ public class CallsAPI {
         return callDetailRecord;
     }
 
-    public String reformatNumber(PhoneNumber referenceNumber, String to) throws NumberParseException {
-        Phonenumber.PhoneNumber toPn = PhoneNumberUtil.getInstance().parse(to, referenceNumber.getCountryISOCode());
+    public String reformatNumber(DIDNumber did, String to) throws NumberParseException {
+        Map geoInfo = (Map)did.getMetadata().get("geoInfo");
+        Phonenumber.PhoneNumber toPn = PhoneNumberUtil.getInstance().parse(to, geoInfo.get("countryISOCode").toString());
         return PhoneNumberUtil.getInstance().format(toPn, PhoneNumberUtil.PhoneNumberFormat.E164);
     }
 }
