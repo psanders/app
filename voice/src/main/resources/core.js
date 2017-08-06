@@ -11,7 +11,7 @@ sdk = undefined
 org = undefined
 Packages = undefined
 
-// Default synthesizer and  voice
+// Default synthesizer and voice
 var SYNTH_56579084eaa1f291d1c99900 = "default";
 var ASRENG_56579084eaa1f291d1c99900 = "default";
 var VOICE_56579084eaa1f291d1c99900 = 'allison';
