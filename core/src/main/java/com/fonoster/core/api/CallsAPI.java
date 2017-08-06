@@ -262,9 +262,6 @@ public class CallsAPI {
             // Too easy
             if (cdr.getStatus().equals(CallDetailRecord.Status.QUEUED) || cdr.getStatus().equals(CallDetailRecord.Status.RINGING))
                 cdr.setApp(new App());
-            else if (cdr.getStatus().equals(CallDetailRecord.Status.IN_PROGRESS)) {
-                //
-            }
             updateCDR(cdr);
         } catch (NullPointerException e) {
             // This channel is not live anymore.
@@ -325,25 +322,20 @@ public class CallsAPI {
         // Stash it in the database
         updateCDR(callDetailRecord);
 
-        // Set a delay base on server-load
-        // or perhaps a better algorithm
-        final OriginateAction originateAction;
-
-        String host = didNumber.getGateway().getSpec().getRegService().getHost();
-
         // Setting up the channel info
+        String host = didNumber.getGateway().getSpec().getRegService().getHost();
         String toURI = reformattedTo.replace("+", "") + "@" + host;
         String fromURI = didNumber.getSpec().getLocation().getTelUrl().replace("tel:", "") + "@" + host;
-        String channel = "SIP/" + toURI + "!!" + fromURI;
+        String gwUser = didNumber.getGateway().getSpec().getRegService().getCredentials().getUsername() + "@" + host;
+        String channel = "SIP/" + toURI + "!" + toURI  + "!" + gwUser;
 
-        originateAction = new OriginateAction();
+        // Set a delay base on server-loa
+        // or perhaps a better algorithm
+        OriginateAction originateAction = new OriginateAction();
         originateAction.setChannel(channel);
-
-        originateAction.setContext("fnus1");   // TODO: Get this from configs
-        originateAction.setExten("ast");       // TODO: Get this from configs
+        originateAction.setContext(coreConfig.getDialplanContext());
+        originateAction.setExten(coreConfig.getDialplanExt());
         originateAction.setPriority(1);
-        originateAction.setVariable("astivedHost", coreConfig.getAstivedHost());            // TODO: Should deprecate
-        originateAction.setVariable("astivedPort", "" + coreConfig.getAstivedPort()); // TODO: Should deprecate
         originateAction.setVariable("callId", callDetailRecord.getId().toString());
         originateAction.setVariable("initDigits", request.getSendDigits());
         originateAction.setVariable("record", "" + request.isRecord());
@@ -351,6 +343,11 @@ public class CallsAPI {
         originateAction.setAccount(callDetailRecord.getId().toString());
         originateAction.setActionId(callDetailRecord.getId().toString());
         originateAction.setTimeout(request.getTimeout() * 1000);
+
+        // Either Remote-Party-ID or P-Asserted-Identity will work with most providers to show the calling party to the
+        // receiving endpoint. Ideally we want to send both, but there seem to be no easy way to that.
+        //originateAction.setVariable("SIPADDHEADER", "Remote-Party-ID: <sip:" + fromURI + ">;party=calling;screen=yes;privacy=off, Sex: Yeah");
+        originateAction.setVariable("SIPADDHEADER", "P-Asserted-Identity: <sip:" + fromURI + ">");
 
         ManagerProvider.getInstance().getAsteriskServer().originateAsync(originateAction, new OriginateCallback() {
             @Override
@@ -375,6 +372,7 @@ public class CallsAPI {
                     }
 
                     // Ensures both sides of the conversation get mix.
+                    assert recording != null;
                     channel.startMonitoring(config.getRecordingsPath().concat("/").concat(recording.getId().toString()), "wav", true);
                 }
                 callDetailRecord.setStatus(CallDetailRecord.Status.IN_PROGRESS);
@@ -409,7 +407,7 @@ public class CallsAPI {
         return callDetailRecord;
     }
 
-    public String reformatNumber(DIDNumber did, String to) throws NumberParseException {
+    private String reformatNumber(DIDNumber did, String to) throws NumberParseException {
         Map geoInfo = (Map)did.getMetadata().get("geoInfo");
         Phonenumber.PhoneNumber toPn = PhoneNumberUtil.getInstance().parse(to, geoInfo.get("countryISOCode").toString());
         return PhoneNumberUtil.getInstance().format(toPn, PhoneNumberUtil.PhoneNumberFormat.E164);

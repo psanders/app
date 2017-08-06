@@ -22,14 +22,13 @@ public class CoreConfig extends AbstractConfig {
         config = super.getConfig();
 
         // Overwrite the default values if JVM values are used
-        if (System.getProperty("manager.host") != null) {
-            config.setProperty("manager.host", System.getProperty("manager.host"));
+        if (System.getProperty("ast.manager.host") != null) {
+            config.setProperty("ast.manager.host", System.getProperty("ast.manager.host"));
         }
 
-        if (System.getProperty("manager.port") != null) {
-            config.setProperty("manager.port", System.getProperty("manager.port"));
+        if (System.getProperty("ast.manager.port") != null) {
+            config.setProperty("ast.manager.port", System.getProperty("ast.manager.port"));
         }
-
 
         if (System.getProperty("astived.host") != null) {
             config.setProperty("astived.host", System.getProperty("astived.host"));
@@ -49,11 +48,11 @@ public class CoreConfig extends AbstractConfig {
 
         // Overwrite the default values if ENV values are used
         if (System.getenv("MANAGER_HOST") != null) {
-            config.setProperty("manager.host", System.getenv("MANAGER_HOST"));
+            config.setProperty("ast.manager.host", System.getenv("MANAGER_HOST"));
         }
 
         if (System.getenv("MANAGER_PORT") != null) {
-            config.setProperty("manager.port", System.getenv("MANAGER_PORT"));
+            config.setProperty("ast.manager.port", System.getenv("MANAGER_PORT"));
         }
 
         if (System.getenv("ASTIVED_HOST") != null) {
@@ -78,19 +77,27 @@ public class CoreConfig extends AbstractConfig {
     }
 
     public String getManagerHost() {
-        return config.getString("manager.host");
+        return config.getString("ast.manager.host");
     }
 
     public int getManagerPort() {
-        return config.getInt("manager.port");
+        return config.getInt("ast.manager.port");
     }
 
     public String getManagerUsername() {
-        return config.getString("manager.username");
+        return config.getString("ast.manager.username");
     }
 
     public String getManagerSecret() {
-        return config.getString("manager.secret");
+        return config.getString("ast.manager.secret");
+    }
+
+    public String getDialplanContext() {
+        return config.getString("ast.dialplan.context");
+    }
+
+    public String getDialplanExt() {
+        return config.getString("ast.dialplan.ext");
     }
 
     public String getAstivedHost() {
