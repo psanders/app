@@ -8,8 +8,6 @@
  */
 package com.fonoster.voice.js;
 
-import static java.util.logging.Level.WARNING;
-
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.core.api.*;
@@ -17,9 +15,6 @@ import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
 import com.fonoster.voice.asr.ASRFactory;
 import com.fonoster.voice.tts.TTSFactory;
-import java.math.BigDecimal;
-import java.util.Iterator;
-import javax.script.*;
 import org.astivetoolkit.agi.AgiException;
 import org.astivetoolkit.astivlet.Astivlet;
 import org.astivetoolkit.astivlet.AstivletRequest;
@@ -28,6 +23,11 @@ import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.script.*;
+import java.math.BigDecimal;
+
+import static java.util.logging.Level.WARNING;
 
 @Since("1.0")
 public class FonosterJS extends Astivlet {
@@ -56,22 +56,19 @@ public class FonosterJS extends Astivlet {
             CallsAPI.getInstance().getCDRById(new ObjectId(request.getQueryParameter("callId")));
       } else {
         DIDNumber destNumber = DIDNumbersAPI.getInstance().getDIDNumber(request.getContext());
-        app = destNumber.getIngressApp();
         Account account = destNumber.getIngressAcct();
+        app = destNumber.getIngressApp();
+        direction = CallDetailRecord.Direction.INBOUND;
 
         // Then use the main account
         if (account == null) {
           account = UsersAPI.getInstance().getMainAccount(destNumber.getUser());
         }
 
-        direction = CallDetailRecord.Direction.INBOUND;
-
-        //Account account, App app, String from, String to, CallDetailRecord.Direction direction
-
         final String number = destNumber.getSpec().getLocation().getTelUrl().replace("tel:", "");
-        // Then this is an INBOUND_CALL
+
         callDetailRecord =
-            new CallDetailRecord(account, app, request.getExtension(), number, direction);
+          new CallDetailRecord(account, app, request.getExtension(), number, direction);
         callDetailRecord.setStatus(CallDetailRecord.Status.IN_PROGRESS);
 
         // Then a sub-account was used
@@ -99,7 +96,6 @@ public class FonosterJS extends Astivlet {
 
       // Human or Machine?
       callDetailRecord.setAnswerBy(answerBy);
-
       CallsAPI.getInstance().updateCDR(callDetailRecord);
 
       // If the business logic changes to have appId == null this will have to be adapted
@@ -145,7 +141,6 @@ public class FonosterJS extends Astivlet {
 
       // Call context
       ScriptEngine engine = new ScriptEngineManager().getEngineByExtension("js");
-
       ScriptContext callContext = new SimpleScriptContext();
       callContext.setBindings(engine.createBindings(), ScriptContext.ENGINE_SCOPE);
       Bindings engineScope = callContext.getBindings(ScriptContext.ENGINE_SCOPE);
@@ -158,12 +153,10 @@ public class FonosterJS extends Astivlet {
       engineScope.put("APP_56579084eaa1f291d1c99900", app);
       engineScope.put("TTS_56579084eaa1f291d1c99900", ttsFactory);
       engineScope.put("ASR_56579084eaa1f291d1c99900", asrFactory);
-
       // Loading built-in libraries
       engineScope.put("LOADER_56579084eaa1f291d1c99900", new Loader(engine, engineScope));
       engine.eval("LOADER_56579084eaa1f291d1c99900.load('fn:loader.js')", engineScope);
       engine.eval("LOADER_56579084eaa1f291d1c99900.load('fn:core.js')", engineScope);
-
       engine.eval(getEntryPointSource(app), engineScope);
 
     } catch (AgiException e) {
@@ -229,9 +222,7 @@ public class FonosterJS extends Astivlet {
   }
 
   private String getEntryPointSource(App app) throws ApiException {
-    Iterator<Script> scripts = app.getScripts().iterator();
-    while (scripts.hasNext()) {
-      Script script = scripts.next();
+    for (Script script : app.getScripts()) {
       if (script.getName().equals("main.js")) {
         return script.getSource();
       }
