@@ -15,6 +15,7 @@ import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
 import com.fonoster.voice.asr.ASRFactory;
 import com.fonoster.voice.tts.TTSFactory;
+import com.google.common.base.Strings;
 import org.astivetoolkit.agi.AgiException;
 import org.astivetoolkit.astivlet.Astivlet;
 import org.astivetoolkit.astivlet.AstivletRequest;
@@ -45,7 +46,7 @@ public class FonosterJS extends Astivlet {
     long et;
     CallDetailRecord callDetailRecord = null;
     CallDetailRecord.AnswerBy answerBy;
-    CallDetailRecord.Direction direction;
+    CallDetailRecord.Direction direction = null;
     App app;
 
     try {
@@ -55,7 +56,8 @@ public class FonosterJS extends Astivlet {
         callDetailRecord =
             CallsAPI.getInstance().getCDRById(new ObjectId(request.getQueryParameter("callId")));
       } else {
-        DIDNumber destNumber = DIDNumbersAPI.getInstance().getDIDNumber(request.getContext());
+        String didNum = request.getQueryParameter("didNum");
+        DIDNumber destNumber = DIDNumbersAPI.getInstance().getDIDNumber(didNum);
         Account account = destNumber.getIngressAcct();
         app = destNumber.getIngressApp();
         direction = CallDetailRecord.Direction.INBOUND;
@@ -65,13 +67,10 @@ public class FonosterJS extends Astivlet {
           account = UsersAPI.getInstance().getMainAccount(destNumber.getUser());
         }
 
-        final String number = destNumber.getSpec().getLocation().getTelUrl().replace("tel:", "");
-
         callDetailRecord =
-          new CallDetailRecord(account, app, request.getExtension(), number, direction);
+            new CallDetailRecord(account, app, request.getCallerId(), didNum, direction);
         callDetailRecord.setStatus(CallDetailRecord.Status.IN_PROGRESS);
 
-        // Then a sub-account was used
         if (account.isSubAccount()) {
           callDetailRecord.setAccount(account.getParentAccount());
           callDetailRecord.setSubAccount(account);
@@ -84,7 +83,6 @@ public class FonosterJS extends Astivlet {
           callDetailRecord.setStatus(CallDetailRecord.Status.FAILED);
           response.hangup();
         }
-        CallsAPI.getInstance().updateCDR(callDetailRecord);
       }
 
       if (request.getQueryParameter("amdStatus") != null
@@ -96,7 +94,6 @@ public class FonosterJS extends Astivlet {
 
       // Human or Machine?
       callDetailRecord.setAnswerBy(answerBy);
-      CallsAPI.getInstance().updateCDR(callDetailRecord);
 
       // If the business logic changes to have appId == null this will have to be adapted
       app =
@@ -105,6 +102,18 @@ public class FonosterJS extends Astivlet {
                   callDetailRecord.getAccount().getUser(),
                   callDetailRecord.getApp().getId(),
                   false);
+
+      String initDigits = request.getQueryParameter("initDigits");
+      long timeout = 0;
+      Boolean record = true;
+
+      if (!Strings.isNullOrEmpty(request.getQueryParameter("timeout"))) {
+        timeout = new Integer(request.getQueryParameter("timeout"));
+      }
+
+      if (!Strings.isNullOrEmpty(request.getQueryParameter("record"))) {
+        record = Boolean.valueOf(request.getQueryParameter("record"));
+      }
 
       CallRequest cRequest = new CallRequest();
       cRequest.setAccountId(callDetailRecord.getAccount().getId().toString());
@@ -115,9 +124,9 @@ public class FonosterJS extends Astivlet {
       cRequest.setCallId(callDetailRecord.getId().toString());
       cRequest.setFrom(callDetailRecord.getFrom());
       cRequest.setTo(callDetailRecord.getTo());
-      cRequest.setSendDigits(request.getQueryParameter("initDigits"));
-      cRequest.setTimeout(new Integer(request.getQueryParameter("timeout")));
-      cRequest.setRecord(Boolean.valueOf(request.getQueryParameter("record")));
+      cRequest.setSendDigits(initDigits);
+      cRequest.setTimeout(timeout);
+      cRequest.setRecord(record);
 
       // Start time
       start = DateTime.now();
@@ -126,11 +135,14 @@ public class FonosterJS extends Astivlet {
       CallsAPI.getInstance().updateCDR(callDetailRecord);
 
       // Hangup the call if the user does not have enough balance
-      DIDNumber origin = DIDNumbersAPI.getInstance().getDIDNumber(callDetailRecord.getFrom());
-      long maxAllowedTime =
-          BillingAPI.getInstance()
-              .maxAllowTime(callDetailRecord.getAccount(), origin, callDetailRecord.getTo());
-      response.setAutoHangup((int) maxAllowedTime);
+      // This business rule must be reviewed
+      if (direction != CallDetailRecord.Direction.INBOUND) {
+        DIDNumber origin = DIDNumbersAPI.getInstance().getDIDNumber(callDetailRecord.getFrom());
+        long maxAllowedTime =
+                BillingAPI.getInstance()
+                        .maxAllowTime(callDetailRecord.getAccount(), origin, callDetailRecord.getTo());
+        response.setAutoHangup((int) maxAllowedTime);
+      }
 
       if (!callDetailRecord.isBillable()) {
         response.streamFile("beep");
@@ -158,7 +170,6 @@ public class FonosterJS extends Astivlet {
       engine.eval("LOADER_56579084eaa1f291d1c99900.load('fn:loader.js')", engineScope);
       engine.eval("LOADER_56579084eaa1f291d1c99900.load('fn:core.js')", engineScope);
       engine.eval(getEntryPointSource(app), engineScope);
-
     } catch (AgiException e) {
       LOG.debug("Channel error/disconnected, cause by: ", e);
     } catch (ScriptException e) {
@@ -193,6 +204,7 @@ public class FonosterJS extends Astivlet {
     callDetailRecord.setEnd(end);
     callDetailRecord.setModified(DateTime.now());
 
+    // This will be true for OUTBOUND calling but not for INBOUND. It must be reviewed.
     if (callDetailRecord.isBillable()) {
       try {
         DIDNumber origin = DIDNumbersAPI.getInstance().getDIDNumber(callDetailRecord.getFrom());
