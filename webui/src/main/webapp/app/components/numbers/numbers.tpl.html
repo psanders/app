@@ -1,9 +1,20 @@
+<style>
+    .chip {
+        display: inline-block;
+        padding: 0 15px;
+        height: 30px;
+        font-size: 14px;
+        line-height: 28px;
+        border-radius: 12px;
+        background-color: #f1f1f1;
+    }
+</style>
 <md-card id="numbers-widget" ng-controller="NumbersCtrl as ctrl">
     <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
         <div class="md-toolbar-tools">
             <span>DID Numbers</span>
             <span flex></span>
-            <md-button ng-click="numberRequest($event)" class="md-icon-button" aria-label="Add">
+            <md-button ng-click="ctrl.numberRequest($event)" class="md-icon-button" aria-label="Add">
                 <md-tooltip md-direction="left">
                     Rent new DID
                 </md-tooltip>
@@ -16,11 +27,12 @@
         <table md-table md-progress="deferred">
             <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
                 <tr md-row>
-                    <th md-column></th>
+                    <!--<th md-column></th>-->
                     <th md-column class="no-padding" order-by="number">Number</th>
+                    <th md-column>Ingress App</th>
                     <th md-column md-order-by="countryISOCode">Country Code</th>
                     <th md-column md-order-by="tech">Tech</th>
-                    <!--<th md-column md-order-by="app">Inbound App</th>-->
+                    <th md-column md-order-by="status">Status</th>
                     <th md-column md-order-by="modified">Modified</th>
                 </tr>
             </thead>
@@ -28,7 +40,7 @@
                 <!-- WARNING: Inline css here! -->
                 <tr md-row
                     ng-repeat="number in ctrl.didNumbers.didnumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
-                    <td md-cell style="padding: 0" layout-align="center end" layout="row">
+                    <!--<td md-cell style="padding: 0" layout-align="center end" layout="row">
                         <md-button style="margin: 0"  ng-show="number.preferred" class="md-icon-button" ng-click="ctrl.setPreferred(number)">
                             <md-icon md-font-library="material-icons">radio_button_checked</md-icon>
                             <md-tooltip md-direction="left">
@@ -41,9 +53,15 @@
                                 Click to select as test number
                             </md-tooltip>
                         </md-button>
-                    </td>
-                    <td md-cell style="padding: 0">
+                    </td>-->
+                    <!--<td md-cell style="padding: 0">-->
+                    <td md-cell>
                         {{ctrl.formatLocal(ctrl.user.countryCode, number.spec.location.telUrl.replace('tel:', ''))}}
+                    </td>
+                    <td md-cell>
+                        <div class="chip" ng-show="number.ingressApp">
+                            {{number.ingressApp.name}}
+                        </div>
                     </td>
                     <td md-cell>{{number.metadata.geoInfo.countryISOCode}}</td>
                     <td md-cell>
@@ -51,6 +69,7 @@
                         <span ng-show="number.metadata.tech.sms == true">, SMS</span>
                         <span ng-show="number.metadata.tech.mms == true">, MMS</span>
                     </td>
+                    <td md-cell>{{number.status | humanize}}</td>
                     <td md-cell>{{number.modified | asCalendar}}</td>
                 </tr>
             </tbody>

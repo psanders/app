@@ -3,10 +3,11 @@ import * as moment from 'moment-timezone';
 (function() {
     'use strict';
 
-    angular.module('fnNumbers')
-        .config(['$stateProvider', config])
-        .controller('NumbersCtrl', NumbersCtrl);
+    angular.module('fnNumbers').config(['$stateProvider', config]);
+    angular.module('fnNumbers').controller('NumbersCtrl', NumbersCtrl);
+    angular.module('fnNumbers').controller('DialogController', DialogController);
 
+    DialogController.$inject = ['$scope', '$mdDialog'];
     NumbersCtrl.$inject = ['$window',
         '$q', 
         '$timeout', 
@@ -95,12 +96,6 @@ import * as moment from 'moment-timezone';
             });
         }
 
-        function DialogController(self, $mdDialog) {
-            self.hide = function() {
-                $mdDialog.hide();
-            };
-        }
-
         function toastMe(msg, hideDelay) {
             if (!hideDelay) hideDelay = 2000;
             $mdToast.show($mdToast.simple()
@@ -116,6 +111,12 @@ import * as moment from 'moment-timezone';
         init();
     }
 
+    function DialogController($scope, $mdDialog) {
+        $scope.hide = function() {
+            $mdDialog.hide();
+        };
+    }
+
     function config($stateProvider) {
         $stateProvider.state('numbers', {
             url: '/numbers',
@@ -123,5 +124,4 @@ import * as moment from 'moment-timezone';
             controller: 'NumbersCtrl'
         });
     }
-
 })();
