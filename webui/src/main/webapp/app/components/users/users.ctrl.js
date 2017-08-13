@@ -6,10 +6,12 @@
     app.controller('AccountCtrl', AccountCtrl);
     app.controller('ProfileCtrl', ProfileCtrl);
     app.controller('PasswordCtrl', PasswordCtrl);
+    app.controller('DialogController', DialogController);
 
     AccountCtrl.$inject =  ['$mdToast', '$mdDialog', '$document', 'CredentialsService', 'LoginService'];
     ProfileCtrl.$inject =  ['$mdToast', '$document', 'Users'];
     PasswordCtrl.$inject = ['$mdToast', '$document', '$scope', 'Users'];
+    DialogController.$inject = ['$scope', '$mdDialog'];
 
     function AccountCtrl($mdToast, $mdDialog, $document, CredentialsService, LoginService) {
         var self = this;
