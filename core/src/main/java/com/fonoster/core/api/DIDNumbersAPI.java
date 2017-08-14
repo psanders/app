@@ -157,6 +157,7 @@ public class DIDNumbersAPI {
         return q.limit(maxResults).offset(firstResult).asList();
     }
 
+    @Deprecated
     public void setDefault(User user, DIDNumber did) throws ApiException {
 
         for (DIDNumber d : getDIDNumbersFor(user, DIDNumber.Status.ACTIVE)) {
