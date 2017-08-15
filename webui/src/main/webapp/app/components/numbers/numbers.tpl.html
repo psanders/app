@@ -20,7 +20,7 @@
         background-color: #ffe9be;
     }
 
-    tr.md-row:hover {
+    tr.data-rows:hover {
         background-color: #f1f1f1;
         cursor: pointer;
         cursor: hand;
@@ -58,7 +58,7 @@
                     </tr>
                 </thead>
                 <tbody md-body>
-                    <tr md-row ng-click="ctrl.openEditView(number)" ng-repeat="number in ctrl.didNumbers.didnumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
+                    <tr class="data-rows" md-row ng-click="ctrl.openEditView(number)" ng-repeat="number in ctrl.didNumbers.didnumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
                         <td md-cell>
                             {{ctrl.formatLocal(ctrl.user.countryCode, number.spec.location.telUrl.replace('tel:', ''))}}
                             <br/>
