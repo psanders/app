@@ -55,7 +55,34 @@ public class DIDNumbersService {
   @POST
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  public Response save(DIDNumber didNumber, @Context HttpServletRequest httpRequest)
+          throws ApiException {
+
+    Account account = AuthUtil.getAccount(httpRequest);
+
+    final String number =  didNumber.getSpec().getLocation().getTelUrl().replace("tel:","");
+    DIDNumber didNumberFromDB = DIDNumbersAPI.getInstance().getDIDNumber(account.getUser(), number);
+
+    if (didNumber.isPreferred() != didNumberFromDB.isPreferred()) {
+      UsersAPI.getInstance()
+        .createActivity(
+          account.getUser(),
+          "Your test number changed to ".concat(didNumberFromDB.getSpec().getLocation().getTelUrl().replace("tel:", "")),
+          Activity.Type.SETTING);
+    }
+
+    didNumberFromDB.setIngressApp(didNumber.getIngressApp());
+    didNumberFromDB.setPreferred(didNumber.isPreferred());
+    DIDNumbersAPI.getInstance().updateDIDNumber(account.getUser(), didNumberFromDB);
+
+    return Response.ok().build();
+  }
+
+  @POST
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Path("/preferred")
+  @Deprecated
   public Response setPreferred(DIDNumber didNumber, @Context HttpServletRequest httpRequest)
           throws ApiException {
 

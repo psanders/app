@@ -1,82 +1,137 @@
 <style>
+
+    .edit-view {
+        padding: 20px;
+        font-size: 13px;
+        line-height: 9px;
+    }
+
     .chip {
         display: inline-block;
         padding: 0 15px;
         height: 30px;
         font-size: 14px;
-        line-height: 28px;
+        line-height: 29px;
         border-radius: 12px;
         background-color: #f1f1f1;
     }
+
+    .chip-highlight {
+        background-color: #ffe9be;
+    }
+
+    tr.md-row:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+        cursor: hand;
+    }
+
+    .md-button.save-button {
+        margin-left: -0px;
+    }
 </style>
-<md-card id="numbers-widget" ng-controller="NumbersCtrl as ctrl">
-    <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
-        <div class="md-toolbar-tools">
-            <span>DID Numbers</span>
-            <span flex></span>
-            <md-button ng-click="ctrl.numberRequest($event)" class="md-icon-button" aria-label="Add">
-                <md-tooltip md-direction="left">
-                    Rent new DID
-                </md-tooltip>
-                <md-icon md-font-library="material-icons">add</md-icon>
-            </md-button>
+<div ng-controller="NumbersCtrl as ctrl">
+    <md-card ng-hide="ctrl.editView" id="numbers-widget" >
+        <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
+            <div class="md-toolbar-tools">
+                <span>DID Numbers</span>
+                <span flex></span>
+                <md-button ng-click="ctrl.numberRequest($event)" class="md-icon-button" aria-label="Add">
+                    <md-tooltip md-direction="left">
+                        Rent new DID
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">add</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-table-container>
+            <table md-table md-progress="deferred">
+                <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
+                    <tr md-row>
+                        <th md-column class="no-padding" order-by="number">Number</th>
+                        <th md-column>Ingress App</th>
+                        <th md-column md-order-by="countryISOCode">Country Code</th>
+                        <th md-column md-order-by="tech">Tech</th>
+                        <th md-column md-order-by="status">Status</th>
+                        <th md-column md-order-by="modified">Modified</th>
+                    </tr>
+                </thead>
+                <tbody md-body>
+                    <tr md-row ng-click="ctrl.openEditView(number)" ng-repeat="number in ctrl.didNumbers.didnumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
+                        <td md-cell>
+                            {{ctrl.formatLocal(ctrl.user.countryCode, number.spec.location.telUrl.replace('tel:', ''))}}
+                            <br/>
+                            <small ng-if="number.preferred">Apps test number</small>
+                        </td>
+                        <td md-cell>
+                            <div ng-if="number.ingressApp" class="chip chip-highlight">
+                                {{number.ingressApp.name | truncate:40:'...':false }}
+                            </div>
+                            <div ng-if="number.ingressApp == null" class="chip">
+                                None
+                            </div>
+                        </td>
+                        <td md-cell>{{number.metadata.geoInfo.countryISOCode}}</td>
+                        <td md-cell>
+                            <span ng-show="number.metadata.tech.voice == true">Voice</span>
+                            <span ng-show="number.metadata.tech.sms == true">, SMS</span>
+                            <span ng-show="number.metadata.tech.mms == true">, MMS</span>
+                        </td>
+                        <td md-cell>{{number.status | humanize}}</td>
+                        <td md-cell>{{number.modified | asCalendar}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+
+        <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
+            md-total="{{ctrl.dids.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
+    </md-card>
+
+    <md-card ng-show="ctrl.editView" id="edit-numbers-widget">
+        <md-toolbar class="md-table-toolbar md-hue-3" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <md-button ng-click="ctrl.closeEditView()" class="md-icon-button" aria-label="Go back">
+                    <md-tooltip md-direction="left">
+                        Back to DIDs
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">arrow_back</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <div class="edit-view">
+            <span><b>DID Number (Local Format)</b></span>
+            <p>{{ctrl.formatLocal(ctrl.user.countryCode, ctrl.number.spec.location.telUrl.replace('tel:', ''))}}</p>
+            <span><b>Status</b></span>
+            <p>{{ctrl.number.status | humanize}}</p>
+            <span><b>Country ISO Code</b></span>
+            <p>{{ctrl.number.metadata.geoInfo.countryISOCode}}</p>
+            <span><b>Supported Tech</b></span>
+            <p>
+                <span class="chip" ng-show="ctrl.number.metadata.tech.voice == true">Voice</span>
+                <span class="chip" ng-show="ctrl.number.metadata.tech.sms == true">, SMS</span>
+                <span class="chip" ng-show="ctrl.number.metadata.tech.mms == true">, MMS</span>
+            </p>
+            <label><b>Ingress App</b></label>
+            <br/>
+            <br/>
+            <div layout-gt-xs="row">
+                <md-autocomplete md-no-cache="true"
+                    md-selected-item="ctrl.number.ingressApp"
+                    md-items="app in ctrl.apps.apps"
+                    placeholder="Type your app name"
+                    md-search-text="searchText" md-item-text="app.name">
+                    <span>{{app.name}} - {{app.id}}</span>
+                </md-autocomplete>
+            </div>
+            <br/>
+            <md-switch md-inverted class="md-primary" md-no-ink aria-label="Switch Test" ng-model="ctrl.number.preferred">
+                <b>Use for test calls</b>
+            </md-switch>
+            <p><small>Enable this option to use this DID in your outbound test with the Apps editor.</small></p>
+            <md-button class="save-button md-raised md-accent" ng-click="ctrl.save(ctrl.number)">Save</md-button>
         </div>
-    </md-toolbar>
-
-    <md-table-container>
-        <table md-table md-progress="deferred">
-            <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
-                <tr md-row>
-                    <!--<th md-column></th>-->
-                    <th md-column class="no-padding" order-by="number">Number</th>
-                    <th md-column>Ingress App</th>
-                    <th md-column md-order-by="countryISOCode">Country Code</th>
-                    <th md-column md-order-by="tech">Tech</th>
-                    <th md-column md-order-by="status">Status</th>
-                    <th md-column md-order-by="modified">Modified</th>
-                </tr>
-            </thead>
-            <tbody md-body>
-                <!-- WARNING: Inline css here! -->
-                <tr md-row
-                    ng-repeat="number in ctrl.didNumbers.didnumbers | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
-                    <!--<td md-cell style="padding: 0" layout-align="center end" layout="row">
-                        <md-button style="margin: 0"  ng-show="number.preferred" class="md-icon-button" ng-click="ctrl.setPreferred(number)">
-                            <md-icon md-font-library="material-icons">radio_button_checked</md-icon>
-                            <md-tooltip md-direction="left">
-                                Default test number
-                            </md-tooltip>
-                        </md-button>
-                        <md-button style="margin:0" ng-show="!number.preferred" class="md-icon-button" ng-click="ctrl.setPreferred(number)">
-                            <md-icon md-font-library="material-icons">radio_button_unchecked</md-icon>
-                            <md-tooltip md-direction="left">
-                                Click to select as test number
-                            </md-tooltip>
-                        </md-button>
-                    </td>-->
-                    <!--<td md-cell style="padding: 0">-->
-                    <td md-cell>
-                        {{ctrl.formatLocal(ctrl.user.countryCode, number.spec.location.telUrl.replace('tel:', ''))}}
-                    </td>
-                    <td md-cell>
-                        <div class="chip" ng-show="number.ingressApp">
-                            {{number.ingressApp.name}}
-                        </div>
-                    </td>
-                    <td md-cell>{{number.metadata.geoInfo.countryISOCode}}</td>
-                    <td md-cell>
-                        <span ng-show="number.metadata.tech.voice == true">Voice</span>
-                        <span ng-show="number.metadata.tech.sms == true">, SMS</span>
-                        <span ng-show="number.metadata.tech.mms == true">, MMS</span>
-                    </td>
-                    <td md-cell>{{number.status | humanize}}</td>
-                    <td md-cell>{{number.modified | asCalendar}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </md-table-container>
-
-    <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
-                         md-total="{{ctrl.dids.total}}" md-on-paginate="ctrl.onPageChange"
-                         md-page-select></md-table-pagination>
-</md-card>
+    </md-card>
+</div>

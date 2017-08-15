@@ -16,11 +16,12 @@ import * as moment from 'moment-timezone';
         '$filter', 
         '$mdDialog', 
         'Numbers', 
-        'Users'];
+        'Users',
+        'Apps'];
 
-    function NumbersCtrl($window, $q, $timeout, $document, $mdToast, $filter, $mdDialog, Numbers, Users) {
+    function NumbersCtrl($window, $q, $timeout, $document, $mdToast, $filter, $mdDialog, Numbers, Users, Apps) {
         var self = this;
-
+        self.editView = false;
         self.user = Users.getUser();
 
         function formatLocal(code, number) {
@@ -54,16 +55,24 @@ import * as moment from 'moment-timezone';
             });
         };
 
-        self.setPreferred = function(number) {
-            Numbers.getPreferredResource().save(number).$promise
+        self.save = function(number) {
+            Numbers.save(number).$promise
             .then(function(result) {
-                toastMe('Your test number changed to ' +
-                    self.formatLocal(self.user.countryCode, number.spec.location.telUrl.replace('tel:', '')), 4000);
+                toastMe('Done!');
                 init();
             })
             .catch(function(error) {
                 toastMe(error.data.message);
             });
+        }
+
+        self.openEditView = function(number) {
+            self.number = number;
+            self.editView = true;
+        }
+
+        self.closeEditView = function() {
+            self.editView = false;
         }
 
         self.onPageChange = function(page, limit) {
@@ -87,12 +96,20 @@ import * as moment from 'moment-timezone';
         };
 
         function init() {
-            Numbers.getResource().get().$promise
+            Numbers.get().$promise
             .then(function(result){
                 self.didNumbers = result;
             })
             .catch(function(error) {
                 console.error(JSON.stringify(error));
+            });
+
+            Apps.get().$promise
+            .then(function(result) {
+                self.apps = result;
+            })
+            .catch(function(error) {
+                console.log(JSON.stringify(error));
             });
         }
 

@@ -7,9 +7,9 @@ import * as moment from 'moment-timezone';
         .config(['$stateProvider', config])
         .controller('RecordingsCtrl', RecordingsCtrl);
 
-    RecordingsCtrl.$inject = ['$window', '$q', '$timeout',  'Recordings', 'ngAudio', '$mdDialog', 'Users'];
+    RecordingsCtrl.$inject = ['$window', '$q', '$timeout',  'Recordings', 'ngAudio', 'Users'];
 
-    function RecordingsCtrl($window, $q, $timeout, Recordings, ngAudio, $mdDialog, Users) {
+    function RecordingsCtrl($window, $q, $timeout, Recordings, ngAudio, Users) {
         var self = this;
         self.startDate = new Date();
         self.endDate = new Date();

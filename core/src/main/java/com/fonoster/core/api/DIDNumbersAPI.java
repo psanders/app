@@ -159,7 +159,6 @@ public class DIDNumbersAPI {
 
     @Deprecated
     public void setDefault(User user, DIDNumber did) throws ApiException {
-
         for (DIDNumber d : getDIDNumbersFor(user, DIDNumber.Status.ACTIVE)) {
             if (did.getId().equals(d.getId())) {
                 d.setPreferred(true);
@@ -172,7 +171,6 @@ public class DIDNumbersAPI {
     }
 
     public DIDNumber getDefault(User user) throws ApiException {
-
         for (DIDNumber didNumber : getDIDNumbersFor(user, DIDNumber.Status.ACTIVE)) {
             if (didNumber.isPreferred()) return didNumber;
         }
@@ -219,5 +217,14 @@ public class DIDNumbersAPI {
             throw new ApiException("Invalid parameter. [" + sb.toString() + "]");
         }
         ds.save(didNumber);
+
+        if (didNumber.isPreferred()) {
+            for (DIDNumber d : getDIDNumbersFor(user, DIDNumber.Status.ACTIVE)) {
+                if (!didNumber.getId().equals(d.getId())) {
+                    d.setPreferred(false);
+                    ds.save(d);
+                }
+            }
+        }
     }
 }
