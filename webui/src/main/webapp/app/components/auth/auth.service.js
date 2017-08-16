@@ -11,7 +11,7 @@
         };
 
         this.getCredentials = function() {
-            if (!$window.localStorage.credentials) return;
+            if (!this.isAuthenticated()) return;
             return JSON.parse($window.localStorage.credentials);
         };
 
@@ -20,9 +20,7 @@
         };
 
         this.isAuthenticated = function() {
-            if ($window.localStorage.credentials &&
-                $window.localStorage.credentials.token &&
-                $window.localStorage.credentials.accountId) {
+            if ($window.localStorage.credentials && $window.localStorage.credentials != "{}") {
                 return true;
             } else {
                 return false;
