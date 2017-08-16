@@ -20,8 +20,13 @@
         };
 
         this.isAuthenticated = function() {
-            if ($window.localStorage.credentials) return true;
-            return false;
+            if ($window.localStorage.credentials &&
+                $window.localStorage.credentials.token &&
+                $window.localStorage.credentials.accountId) {
+                return true;
+            } else {
+                return false;
+            }
         };
     }]);
 
