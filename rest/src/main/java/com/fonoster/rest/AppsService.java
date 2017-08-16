@@ -11,6 +11,7 @@ package com.fonoster.rest;
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.AppsAPI;
 import com.fonoster.core.api.DBManager;
+import com.fonoster.core.api.DIDNumbersAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.Account;
 import com.fonoster.model.App;
@@ -103,7 +104,6 @@ public class AppsService {
       appFromDB.setStarred(app.isStarred());
       appFromDB.setStatus(app.getStatus());
       appFromDB.setModified(DateTime.now());
-
       DBManager.getInstance().getDS().save(appFromDB);
     }
 
@@ -117,10 +117,11 @@ public class AppsService {
       @PathParam("appId") String appId, @Context HttpServletRequest httpRequest)
       throws ApiException {
     Account account = AuthUtil.getAccount(httpRequest);
-
     App app = AppsAPI.getInstance().getAppById(account.getUser(), new ObjectId(appId), false);
     app.setStatus(App.Status.DELETED);
     DBManager.getInstance().getDS().save(app);
+    // Unlink app from all DIDs
+    DIDNumbersAPI.getInstance().removeIngressApp(app);
 
     return Response.ok().build();
   }
