@@ -31,7 +31,7 @@
     }
 </style>
 <div ng-controller="NumbersCtrl as ctrl">
-    <md-card ng-hide="ctrl.editView" id="numbers-widget" >
+    <md-card ng-if="!ctrl.editView" id="numbers-widget" >
         <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
             <div class="md-toolbar-tools">
                 <span>DID Numbers</span>
@@ -49,7 +49,7 @@
             <table md-table md-progress="deferred">
                 <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
                     <tr md-row>
-                        <th md-column class="no-padding" order-by="number">Number</th>
+                        <th md-column md-order-by="number" class="no-padding">Number</th>
                         <th md-column>Ingress App</th>
                         <th md-column md-order-by="countryISOCode">Country Code</th>
                         <th md-column md-order-by="tech">Tech</th>
@@ -89,7 +89,7 @@
             md-total="{{ctrl.dids.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
     </md-card>
 
-    <md-card ng-show="ctrl.editView" id="edit-numbers-widget">
+    <md-card ng-if="ctrl.editView" id="edit-numbers-widget">
         <md-toolbar class="md-table-toolbar md-hue-3" aria-hidden="false">
             <div class="md-toolbar-tools">
                 <md-button ng-click="ctrl.closeEditView()" class="md-icon-button" aria-label="Go back">

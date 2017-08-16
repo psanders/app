@@ -56,7 +56,7 @@ import * as moment from 'moment-timezone';
         };
 
         self.save = function(number) {
-            Numbers.save(number).$promise
+            Numbers.getResource().save(number).$promise
             .then(function(result) {
                 toastMe('Done!');
                 init();
@@ -73,6 +73,7 @@ import * as moment from 'moment-timezone';
 
         self.closeEditView = function() {
             self.editView = false;
+            init();
         }
 
         self.onPageChange = function(page, limit) {
@@ -96,7 +97,7 @@ import * as moment from 'moment-timezone';
         };
 
         function init() {
-            Numbers.get().$promise
+            Numbers.getResource().get().$promise
             .then(function(result){
                 self.didNumbers = result;
             })
