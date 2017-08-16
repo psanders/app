@@ -29,7 +29,7 @@
             $base64.encode(self.user.email + ':' + self.user.password);
 
             LoginService.getResource().get(self.user).$promise
-            .then(function(result){
+            .then(function(result) {
                 // So put it on the session
                 CredentialsService.setCredentials(result);
 
@@ -40,16 +40,16 @@
                     $location.url('/dashboard');
                     self.reset();
                 })
-                .catch(function(error){
+                .catch(function(error) {
                     toastMe(error.data.message);
                 });
 
                 self.reset();
             }).catch(function(error) {
-                if (error === undefined || error.data === undefined || error.data.message === undefined) {
-                    toastMe("Unable to login. Code #0008");
-                } else {
+                if (error.data && error.data.message) {
                     toastMe(error.data.message);
+                } else {
+                    toastMe("Unable to login. Code #0008");
                 }
             });
         }
