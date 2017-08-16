@@ -13,14 +13,13 @@ import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.UnauthorizedAccessException;
-import com.fonoster.model.DIDNumber;
-import com.fonoster.model.Gateway;
-import com.fonoster.model.ServiceProvider;
-import com.fonoster.model.User;
+import com.fonoster.model.*;
 import com.fonoster.utils.BeanValidatorUtil;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,5 +225,11 @@ public class DIDNumbersAPI {
                 }
             }
         }
+    }
+
+    public void removeIngressApp(App app) {
+        Query<DIDNumber> query = ds.createQuery(DIDNumber.class).field("ingressApp").equal(app);
+        UpdateOperations<DIDNumber> did = ds.createUpdateOperations(DIDNumber.class).unset("ingressApp");
+        UpdateResults ur = ds.update(query, did);
     }
 }
