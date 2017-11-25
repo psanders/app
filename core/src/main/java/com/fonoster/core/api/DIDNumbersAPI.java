@@ -92,8 +92,8 @@ public class DIDNumbersAPI {
         number = number.replace("+", "");
 
         DIDNumber didNumber = ds.createQuery(DIDNumber.class)
-                .field("spec.location.telUrl").equal("tel:" + number)
-                .field("status").equal(DIDNumber.Status.ACTIVE).get();
+        .field("spec.location.telUrl").equal("tel:" + number)
+            .field("status").equal(DIDNumber.Status.ACTIVE).get();
 
         if (didNumber == null) throw new ApiException("Unable to find DIDNumber for number '" + number + "'");
 
@@ -106,7 +106,7 @@ public class DIDNumbersAPI {
         number = number.replace("+", "");
 
         DIDNumber didNumber = ds.createQuery(DIDNumber.class).field("user").equal(user)
-                .field("spec.location.telUrl").equal("tel:" + number)
+            .field("spec.location.telUrl").equal("tel:" + number)
                 .field("status").equal(DIDNumber.Status.ACTIVE).get();
 
         if (didNumber == null) throw new ApiException("Unable to find number " + number);
@@ -114,11 +114,23 @@ public class DIDNumbersAPI {
         return didNumber;
     }
 
+    public DIDNumber getDIDNumberByRef(User user, String didRef) throws ApiException {
+        LOG.debug("Getting obj DIDNumber with reference: " + didRef + " and user => " + user.getEmail());
+
+        DIDNumber didNumber = ds.createQuery(DIDNumber.class).field("user").equal(user)
+            .field("id").equal(new ObjectId(didRef))
+                .field("status").equal(DIDNumber.Status.ACTIVE).get();
+
+        if (didNumber == null) throw new ApiException("Unable to find number with ref " + didRef);
+
+        return didNumber;
+    }
+
     private boolean existDIDNumber(String number) throws ApiException {
         LOG.debug("Getting obj DIDNumber for: " + number);
         DIDNumber didNumber = ds.createQuery(DIDNumber.class)
-                .field("spec.location.telUrl").equal("tel:" + number)
-                .field("deleted").equal(false).get();
+        .field("spec.location.telUrl").equal("tel:" + number)
+            .field("deleted").equal(false).get();
 
         if (didNumber == null) return false;
 

@@ -10,10 +10,7 @@
 package com.fonoster.core.api;
 
 import com.fonoster.annotations.Since;
-import com.fonoster.exception.ApiException;
-import com.fonoster.exception.InvalidParameterException;
-import com.fonoster.exception.ResourceNotFoundException;
-import com.fonoster.exception.UnauthorizedAccessException;
+import com.fonoster.exception.*;
 import com.fonoster.model.Agent;
 import com.fonoster.model.User;
 import org.bson.types.ObjectId;
@@ -25,6 +22,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -51,7 +49,9 @@ public class AgentsAPI {
         if (firstResult < 0) firstResult = 0;
         if (firstResult > 1000) firstResult = 1000;
 
-        Query<Agent> q = ds.createQuery(Agent.class).field("user").equal(user);
+        Query<Agent> q = ds.createQuery(Agent.class)
+            .field("user").equal(user)
+                .field("deleted").equal(false);
 
         // All recordings from start date
         if (start != null) {
@@ -68,10 +68,16 @@ public class AgentsAPI {
 
     public Agent createAgent(User user, URI domainUri, String name, String username, String secret) throws ApiException {
 
-        if (!DomainsAPI.getInstance().isDomainOwner(user, domainUri)) throw  new UnauthorizedAccessException();
+        if (!DomainsAPI.getInstance().isDomainOwner(user, domainUri)) throw new UnauthorizedAccessException();
 
+        if(agentExist(username, domainUri)) throw new AgentAlreadyExistException();
+
+        Agent.Spec spec = new Agent.Spec();
         Agent.Spec.Credentials credentials = new Agent.Spec.Credentials(username, secret);
-        Agent agent = new Agent(user, name, credentials);
+        spec.setCredentials(credentials);
+        spec.setDomains(Arrays.asList(domainUri));
+
+        Agent agent = new Agent(user, name, spec);
 
         // JavaBean validation
         if (!validator.validate(agent).isEmpty()) {
@@ -88,14 +94,27 @@ public class AgentsAPI {
         return agent;
     }
 
-    public Agent getAgent(User user, ObjectId agentId) throws ResourceNotFoundException {
-        Agent agent = ds.createQuery(Agent.class)
+    public Agent getAgentById(User user, ObjectId agentId, boolean ignoreDeleted) throws ResourceNotFoundException {
+        Query<Agent> q = ds.createQuery(Agent.class)
             .field("user").equal(user)
-                .field("id").equal(agentId)
-                        .field("deleted").equal(false).get();
+                .field("id").equal(agentId);
+
+        if (!ignoreDeleted) {
+            q.field("deleted").notEqual(true);
+        }
+
+        Agent agent = q.get();
 
         if (agent == null) throw new ResourceNotFoundException();
 
         return agent;
+    }
+
+    private boolean agentExist(String username, URI domain) {
+        return ds.createQuery(Agent.class)
+        .field("spec.credentials.username").equal(username)
+            .field("spec.domains").hasThisOne(domain)
+                .field("deleted").equal(false)
+                    .count() > 0;
     }
 }

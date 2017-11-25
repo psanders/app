@@ -14,6 +14,7 @@ import com.fonoster.exception.ApiException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.exception.UnauthorizedAccessException;
+import com.fonoster.model.Agent;
 import com.fonoster.model.DIDNumber;
 import com.fonoster.model.Domain;
 import com.fonoster.model.User;
@@ -26,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -54,7 +56,7 @@ public class DomainsAPI {
         }
 
         if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDIDRef)) {
-            DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumber(egressDIDRef);
+            DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumberByRef(user, egressDIDRef);
             if (did == null || !Objects.equals(did.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException("This DID is not assigned to you");
 
             Domain.Spec.Context.EgressPolicy ep = new Domain.Spec.Context.EgressPolicy(egressRule, egressDIDRef);
@@ -81,19 +83,6 @@ public class DomainsAPI {
         return domain;
     }
 
-    public Domain getDomain(User user, URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
-
-        if (domainUri == null || user == null) throw  new InvalidParameterException();
-
-        Domain result = ds.createQuery(Domain.class)
-            .field("id")
-                .equal(domainUri).field("deleted").equal(false)
-                    .field("user").equal(user).get();
-
-        if (result == null) throw new ResourceNotFoundException();
-        return result;
-    }
-
     public List<Domain> getDomains(User user, DateTime start, DateTime end, int maxResults, int firstResult) throws ApiException {
 
         if (user == null) throw new InvalidParameterException("Invalid user.");
@@ -104,7 +93,9 @@ public class DomainsAPI {
         if (firstResult < 0) firstResult = 0;
         if (firstResult > 1000) firstResult = 1000;
 
-        Query<Domain> q = ds.createQuery(Domain.class).field("user").equal(user);
+        Query<Domain> q = ds.createQuery(Domain.class)
+            .field("user").equal(user)
+                .field("deleted").equal(false);
 
         // All recordings from start date
         if (start != null) {
@@ -119,25 +110,54 @@ public class DomainsAPI {
         return q.limit(maxResults).offset(firstResult).asList();
     }
 
-    public Domain getDomainByUri(URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
-        if (domainUri == null) throw  new InvalidParameterException("domainUri");
-        Domain result = ds.createQuery(Domain.class).field("id").equal(domainUri).field("deleted").equal(false).get();
+    public Domain getDomain(User user, URI domainUri, boolean ignoreDeleted) throws ResourceNotFoundException, InvalidParameterException {
+
+        if (domainUri == null || user == null) throw  new InvalidParameterException();
+
+        Query<Domain> q = ds.createQuery(Domain.class)
+            .field("user").equal(user)
+                .field("spec.context.domainUri").equal(domainUri);
+
+        if (!ignoreDeleted) {
+            q.field("deleted").notEqual(true);
+        }
+
+        Domain result = q.get();
+
         if (result == null) throw new ResourceNotFoundException();
         return result;
     }
 
-    public boolean domainExist(URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
-        if (domainUri == null) throw  new InvalidParameterException();
-        return getDomainByUri(domainUri) != null;
+    public boolean domainExist(URI domainUri) throws InvalidParameterException {
+        if (domainUri == null) throw new InvalidParameterException("domainUri");
+        Domain result = ds.createQuery(Domain.class)
+            .field("spec.context.domainUri").equal(domainUri)
+                .field("deleted").equal(false).get();
+        return  result != null;
     }
 
     public boolean isDomainOwner(User user, URI domainUri) throws ResourceNotFoundException, InvalidParameterException {
         if (domainUri == null || user == null) throw  new InvalidParameterException();
 
         Domain result = ds.createQuery(Domain.class)
-                .field("id")
-                .equal(domainUri).field("deleted").equal(false)
-                .field("user").equal(user).get();
+            .field("spec.context.domainUri").equal(domainUri)
+                .field("deleted").equal(false)
+                    .field("user").equal(user).get();
         return result != null;
+    }
+
+    public boolean domainHasAgents(User user, URI domainUri) throws InvalidParameterException {
+        if (domainUri == null || user == null) throw  new InvalidParameterException();
+
+        return ds.createQuery(Agent.class)
+            .field("user").equal(user)
+                .field("spec.domains").hasThisOne(domainUri)
+                    .field("deleted").equal(false).count() > 0;
+    }
+
+    static public void main(String... args) throws URISyntaxException, InvalidParameterException {
+
+        boolean hey = DomainsAPI.getInstance().domainHasAgents(null, new URI("sip.asasasasa.fonoster.com"));
+        System.out.println("hey => " + hey);
     }
 }
