@@ -13,12 +13,11 @@ import * as moment from 'moment-timezone';
         '$timeout',
         '$mdToast',
         '$document',
-        'CredentialsService',
         'Apps',
         'Users'
         ];
 
-    function AppsCtrl($location, $window, $q, $timeout, $mdToast, $document, CredentialsService, Apps, Users) {
+    function AppsCtrl($location, $window, $q, $timeout, $mdToast, $document, Apps, Users) {
         // Sets proper timezone for 'asCalendar' filter
         moment.tz.setDefault(Users.getUser().timezone)
 
@@ -45,8 +44,6 @@ import * as moment from 'moment-timezone';
                  $window.location.href = 'app.html#/editor';
             }
         }
-
-        getApps();
 
         self.remove = function() {
             self.selected.forEach(function(app) {
@@ -82,7 +79,7 @@ import * as moment from 'moment-timezone';
             return deferred.promise;
         };
 
-        function getApps() {
+        function init() {
             Apps.get().$promise
             .then(function(result) {
                 self.apps = result;
@@ -115,7 +112,7 @@ import * as moment from 'moment-timezone';
                         // This selected apps are in their original status
                         Apps.save(app).$promise
                         .then(function(data) {
-                            getApps();
+                            init();
                         }).catch(function(error) {
                             console.error(error);
                         });
@@ -124,6 +121,8 @@ import * as moment from 'moment-timezone';
                 }
             });
         }
+
+        init();
     };
 
     function config($stateProvider) {
