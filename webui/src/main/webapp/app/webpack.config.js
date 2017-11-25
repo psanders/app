@@ -16,6 +16,7 @@ module.exports = function(env) {
                 'angular-base64',
                 'angular-resource',
                 'angular-material',
+                'angular-messages',
                 'angular-material-data-table',
                 'angular-sanitize',
                 'angular-audio',
