@@ -1,5 +1,4 @@
 <style>
-
     .edit-view {
         padding: 20px;
         font-size: 13px;
@@ -49,10 +48,10 @@
             <table md-table md-progress="deferred">
                 <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
                     <tr md-row>
-                        <th md-column md-order-by="number" class="no-padding">Number</th>
-                        <th md-column>Ingress App</th>
-                        <th md-column md-order-by="countryISOCode">Country Code</th>
-                        <th md-column md-order-by="tech">Tech</th>
+                        <th md-column md-order-by="spec.location.telUrl" class="no-padding">Number</th>
+                        <th md-column md-order-by="ingressApp">Ingress App</th>
+                        <th md-column md-order-by="metadata.geoInfo.countryISOCode">Country Code</th>
+                        <th md-column md-order-by="metadata.tech">Tech</th>
                         <th md-column md-order-by="status">Status</th>
                         <th md-column md-order-by="modified">Modified</th>
                     </tr>
@@ -118,7 +117,8 @@
             <br/>
             <br/>
             <div layout-gt-xs="row">
-                <md-autocomplete md-no-cache="true"
+                <md-autocomplete
+                    md-no-cache="true"
                     md-selected-item="ctrl.number.ingressApp"
                     md-items="app in ctrl.apps.apps"
                     placeholder="Type your app name"
@@ -131,7 +131,7 @@
                 <b>Use for test calls</b>
             </md-switch>
             <p><small>Enable this option to use this DID in your outbound test with the Apps editor.</small></p>
-            <md-button class="save-button md-raised md-accent" ng-click="ctrl.save(ctrl.number)">Save</md-button>
+            <md-button class="save-button" ng-click="ctrl.save(ctrl.number)">Save</md-button>
         </div>
     </md-card>
 </div>
