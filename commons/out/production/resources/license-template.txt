@@ -1,0 +1,9 @@
+Copyright (C) ${year} <fonosterteam@fonoster.com>
+https://fonoster.com
+
+<p>This file is part of Fonoster
+
+<p>Fonoster can not be copied and/or distributed without the express
+permission of Fonoster's copyright owners.
+
+

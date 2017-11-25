@@ -11,21 +11,22 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.validation.Valid;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
+
+import javax.validation.Valid;
+import javax.validation.constraints.AssertFalse;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Since("1.0")
 @Entity
@@ -44,7 +45,7 @@ public class Agent {
   // Must have no-argument constructor
   public Agent() {}
 
-  public Agent(User user, String name, Spec.Credentials credentials) {
+  public Agent(User user, String name, Spec spec) {
     this.id = new ObjectId();
     this.modified = new DateTime();
     this.created = new DateTime();
@@ -53,12 +54,9 @@ public class Agent {
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
     this.metadata = new HashMap();
     metadata.put("name", name);
-    this.spec = new Spec();
-    this.spec.setCredentials(credentials);
+    this.spec = spec;
   }
 
-  @JsonIgnore
-  @XmlTransient
   public ObjectId getId() {
     return id;
   }
@@ -67,8 +65,6 @@ public class Agent {
     this.id = id;
   }
 
-  @JsonIgnore
-  @XmlTransient
   public DateTime getCreated() {
     return created;
   }
@@ -77,8 +73,6 @@ public class Agent {
     this.created = created;
   }
 
-  @JsonIgnore
-  @XmlTransient
   public DateTime getModified() {
     return modified;
   }
@@ -162,7 +156,7 @@ public class Agent {
       return domains;
     }
 
-    public void setDomains(List<URI> domains) {
+    public void setDomains(List domains) {
       this.domains = domains;
     }
 
