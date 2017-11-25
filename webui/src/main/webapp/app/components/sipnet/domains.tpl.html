@@ -1,29 +1,172 @@
 <style>
-    .md-content {
-        background-color: #fff;
+    .domain-view {
+        padding: 20px;
+        font-size: 13px;
+        line-height: 9px;
+    }
+
+    tr.data-rows:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+        cursor: hand;
+    }
+
+    .md-button.save-button {
+        margin-left: -0px;
     }
 </style>
-<md-card id="settings-widget" ng-cloak>
-    <md-tabs md-dynamic-height>
-        <md-tab label="profile">
-            <md-content class="md-padding md-content">
-                <profile></profile>
-            </md-content>
-        </md-tab>
-        <md-tab label="account">
-            <md-content class="md-padding md-content">
-                <account></account>
-            </md-content>
-        </md-tab>
-        <md-tab label="billing">
-            <md-content class="md-padding md-content">
-                <billing></billing>
-            </md-content>
-        </md-tab>
-        <md-tab label="password">
-            <md-content class="md-padding md-content">
-                <password></password>
-            </md-content>
-        </md-tab>
-    </md-tabs>
-</md-card>
+<div id="domains" ng-controller="SIPNetDomainsCtrl as ctrl">
+
+    <md-card ng-show="ctrl.isView('LIST')" id="domains-list-widget">
+        <md-toolbar class="md-table-toolbar md-default" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <span>SIP Domains</span>
+                <span flex></span>
+                <md-button ng-click="ctrl.changeView('ADD')" class="md-icon-button" aria-label="Add">
+                    <md-tooltip md-direction="left">
+                        Add Domain
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">add</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-toolbar class="md-table-toolbar md-hue-3" ng-show="ctrl.selected.length" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <div>{{ctrl.selected.length}} {{ctrl.selected.length > 1 ? 'items' : 'item'}} selected</div>
+                <span flex></span>
+                <md-button class="md-icon-button" aria-label="Remove" ng-click="ctrl.remove()">
+                    <md-icon md-font-library="material-icons">delete</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-table-container>
+            <table md-table md-row-select multiple ng-model="ctrl.selected" md-progress="deferred">
+                <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
+                <tr md-row>
+                    <th md-column md-order-by="metadata.name" class="no-padding">Domain Name</th>
+                    <th md-column md-order-by="domain.spec.context.domainUri">URI</th>
+                    <th md-column md-order-by="modified">Modified</th>
+                </tr>
+                </thead>
+                <tbody md-body>
+                <tr md-row md-select="domain" ng-click="ctrl.openEditView(domain)" class="data-rows" ng-repeat="domain in ctrl.domains.domains | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
+                    <td md-cell>{{domain.metadata.name}}</td>
+                    <td md-cell>{{domain.spec.context.domainUri}}</td>
+                    <td md-cell>{{agent.modified | asCalendar}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+
+        <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
+                             md-total="{{ctrl.domains.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
+    </md-card>
+
+    <md-card ng-show="ctrl.isView('ADD')" id="create-domain-widget">
+        <md-toolbar class="md-table-toolbar md-hue-3" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <md-button ng-click="ctrl.changeView('LIST')" class="md-icon-button" aria-label="Go back">
+                    <md-tooltip md-direction="left">
+                        Domain list
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">arrow_back</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        {{ctrl.didNumbers.didNumbers}}
+
+        <form name="domainsForm" ng-submit="ctrl.save(ctrl.domain)" class="domain-view">
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Domain Name</label>
+                    <input ng-model="ctrl.domain.name" required>
+                </md-input-container>
+            </div>
+
+            <div layout-gt-xs="row">
+                <md-autocomplete md-input-name="autocompleteField"
+                    md-input-minlength="3"
+                    md-input-maxlength="18"
+                    md-no-cache="true"
+                    md-selected-item="ctrl.selectedDIDNumber"
+                    md-items="didNumber in ctrl.didNumbers.didnumbers"
+                    md-search-text="ctrl.searchText"
+                    md-item-text="didNumber.spec.location.telUrl.substring(4)"
+                    md-require-match
+                    md-floating-label="Select DID Number">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchText">{{didNumber.spec.location.telUrl.substring(4)}}</span>
+                    </md-item-template>
+                    <div ng-messages="domainsForm.autocompleteField.$error" ng-if="domainsForm.autocompleteField.$touched">
+                        <div ng-message="required">Please select a did Number.</div>
+                        <div ng-message="md-require-match">Please select an existing did number.</div>
+                        <div ng-message="minlength">Your entry is not long enough.</div>
+                        <div ng-message="maxlength">Your entry is too long.</div>
+                    </div>
+                </md-autocomplete>
+            </div>
+
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>
+                        <span ng-show="ctrl.domain.uri == '' || ctrl.domain.uri == undefined">URI</span>
+                        <span ng-show="ctrl.domain.uri != '' && ctrl.domain.uri != undefined">sip.{{ctrl.domain.uri}}.fonoster.com</span>
+                    </label>
+                    <input ng-model="ctrl.domain.uri" pattern="^[a-z0-9.\-_$@*!]{3,30}$" required>
+                </md-input-container>
+            </div>
+
+            <md-button ng-disabled="domainsForm.$invalid" type="submit">Save</md-button>
+        </form>
+    </md-card>
+
+    <md-card ng-show="ctrl.isView('EDIT')" id="edit-domain-widget">
+        <md-toolbar class="md-table-toolbar md-hue-3" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <md-button ng-click="ctrl.changeView('LIST')" class="md-icon-button" aria-label="Go back">
+                    <md-tooltip md-direction="left">
+                        Domains list
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">arrow_back</md-icon>
+                </md-button>
+                <label>{{domain.spec.context.domainUri}}</label>
+            </div>
+        </md-toolbar>
+
+        <form name="domainsForm" ng-submit="ctrl.save(ctrl.domain)" class="domain-view">
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Domain Name</label>
+                    <input ng-model="ctrl.domain.name" required>
+                </md-input-container>
+            </div>
+            <div layout-gt-xs="row">
+                <md-autocomplete md-input-name="autocompleteField"
+                    md-input-minlength="3"
+                    md-input-maxlength="18"
+                    md-no-cache="true"
+                    md-selected-item="ctrl.selectedDIDNumber"
+                    md-items="didNumber in ctrl.didNumbers.didnumbers"
+                    md-search-text="ctrl.searchText"
+                    md-item-text="didNumber.spec.location.telUrl.substring(4)"
+                    md-require-match
+                    md-floating-label="Select DID Number">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchText">{{didNumber.spec.location.telUrl.substring(4)}}</span>
+                    </md-item-template>
+                    <div ng-messages="domainsForm.autocompleteField.$error" ng-if="domainsForm.autocompleteField.$touched">
+                        <div ng-message="required">Please select a did Number.</div>
+                        <div ng-message="md-require-match">Please select an existing did number.</div>
+                        <div ng-message="minlength">Your entry is not long enough.</div>
+                        <div ng-message="maxlength">Your entry is too long.</div>
+                    </div>
+                </md-autocomplete>
+            </div>
+
+            <md-button class="save-button" ng-disabled="agentsForm.$invalid" type="submit">Save</md-button>
+        </form>
+    </md-card>
+</div>

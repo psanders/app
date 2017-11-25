@@ -1,1 +1,158 @@
-<p>SIP Accounts</p>
+<style>
+    .agent-view {
+        padding: 20px;
+        font-size: 13px;
+        line-height: 9px;
+    }
+
+    tr.data-rows:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+        cursor: hand;
+    }
+
+    .md-button.save-button {
+        margin-left: -0px;
+    }
+</style>
+<div id="agents" ng-controller="SIPNetAgentsCtrl as ctrl">
+    <md-card ng-show="ctrl.isView('LIST')" id="agents-list-widget">
+        <md-toolbar class="md-table-toolbar md-default" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <span>SIP Agents</span>
+                <span flex></span>
+                <md-button ng-click="ctrl.changeView('ADD')" class="md-icon-button" aria-label="Add">
+                    <md-tooltip md-direction="left">
+                        Add Agent
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">add</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-toolbar class="md-table-toolbar md-hue-3" ng-show="ctrl.selected.length" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <div>{{ctrl.selected.length}} {{ctrl.selected.length > 1 ? 'items' : 'item'}} selected</div>
+                <span flex></span>
+                <md-button class="md-icon-button" aria-label="Remove" ng-click="ctrl.remove()">
+                    <md-icon md-font-library="material-icons">delete</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-table-container>
+            <table md-table md-row-select multiple ng-model="ctrl.selected" md-progress="deferred">
+                <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
+                    <tr md-row>
+                        <th md-column md-order-by="metadata.name" class="no-padding">Friendly Name</th>
+                        <th md-column md-order-by="spec.credentials.username">Username</th>
+                        <th md-column md-order-by="spec.domains[0]">Domain {{spec.domains[0]}}</th>
+                        <th md-column md-order-by="modified">Modified</th>
+                    </tr>
+                </thead>
+                <tbody md-body>
+                <tr md-row md-select="agent" ng-click="ctrl.openEditView(agent)" class="data-rows" ng-repeat="agent in ctrl.agents.agents | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
+                        <td md-cell>{{agent.metadata.name}}</td>
+                        <td md-cell>{{agent.spec.credentials.username}}</td>
+                        <td md-cell>{{agent.spec.domains.join()}}</td>
+                        <td md-cell>{{agent.modified | asCalendar}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+
+        <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
+                             md-total="{{ctrl.agents.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
+    </md-card>
+
+    <md-card ng-show="ctrl.isView('ADD')" id="create-agents-widget">
+        <md-toolbar class="md-table-toolbar md-hue-3" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <md-button ng-click="ctrl.changeView('LIST')" class="md-icon-button" aria-label="Go back">
+                    <md-tooltip md-direction="left">
+                        Agents list
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">arrow_back</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <form name="agentsForm" ng-submit="ctrl.save(ctrl.agent)" class="agent-view">
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Friendly Name</label>
+                    <input ng-model="ctrl.agent.name" required>
+                </md-input-container>
+            </div>
+
+            <div layout-gt-xs="row">
+                <md-autocomplete required
+                                 md-input-name="autocompleteField"
+                                 md-input-minlength="2"
+                                 md-no-cache="true"
+                                 md-selected-item="ctrl.selectedDomain"
+                                 md-items="domain in ctrl.domains.domains"
+                                 md-search-text="ctrl.searchText"
+                                 md-item-text="domain.spec.context.domainUri"
+                                 md-require-match
+                                 md-floating-label="Select domain">
+                    <md-item-template>
+                        <span md-highlight-text="ctrl.searchText">{{domain.spec.context.domainUri}}</span>
+                    </md-item-template>
+                    <div ng-messages="agentsForm.autocompleteField.$error" ng-if="agentsForm.autocompleteField.$touched">
+                        <div ng-message="required">Please select a domain.</div>
+                        <div ng-message="md-require-match">Please select an existing domain.</div>
+                        <div ng-message="minlength">Your entry is not long enough.</div>
+                        <div ng-message="maxlength">Your entry is too long.</div>
+                    </div>
+                </md-autocomplete>
+            </div>
+
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Username</label>
+                    <input ng-model="ctrl.agent.username" pattern="^[a-z0-9.\-_$@*!]{3,30}$" required>
+                </md-input-container>
+            </div>
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Secret</label>
+                    <input type="password" ng-model="ctrl.agent.secret" autocomplete="new-password" required>
+                </md-input-container>
+            </div>
+
+            <md-button ng-disabled="agentsForm.$invalid" type="submit">Save</md-button>
+        </form>
+    </md-card>
+
+    <md-card ng-show="ctrl.isView('EDIT')" id="edit-agents-widget">
+        <md-toolbar class="md-table-toolbar md-hue-3" aria-hidden="false">
+            <div class="md-toolbar-tools">
+                <md-button ng-click="ctrl.changeView('LIST')" class="md-icon-button" aria-label="Go back">
+                    <md-tooltip md-direction="left">
+                        Agents list
+                    </md-tooltip>
+                    <md-icon md-font-library="material-icons">arrow_back</md-icon>
+                </md-button>
+                <label>{{ctrl.agent.spec.credentials.username}} @ {{ctrl.agent.spec.domains.join()}}</label>
+            </div>
+        </md-toolbar>
+
+        <form name="agentsForm" ng-submit="ctrl.save(ctrl.agent)" class="agent-view">
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Friendly Name</label>
+                    <input ng-model="ctrl.agent.name" required>
+                </md-input-container>
+            </div>
+            <div layout-gt-xs="row">
+                <md-input-container>
+                    <label>Secret</label>
+                    <input type="password" ng-model="ctrl.agent.secret" autocomplete="new-password">
+                </md-input-container>
+            </div>
+
+            <md-button class="save-button" ng-disabled="agentsForm.$invalid" type="submit">Save</md-button>
+        </form>
+    </md-card>
+</div>
