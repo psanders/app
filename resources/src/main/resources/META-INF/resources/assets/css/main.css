@@ -238,3 +238,9 @@ div.error {
 .nav-active { background-color: #efefef; }
 
 [role="tabpanel"] {transition: none;}
+
+/* To fix issue: https://github.com/daniel-nagy/md-data-table/issues/476 */
+md-icon {
+    min-height: 16px;
+    min-width: 16px;
+}
