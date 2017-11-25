@@ -15,6 +15,7 @@ import com.fonoster.core.api.DBManager;
 import com.fonoster.core.api.DIDNumbersAPI;
 import com.fonoster.core.api.DomainsAPI;
 import com.fonoster.exception.ApiException;
+import com.fonoster.exception.DomainHasAgentsException;
 import com.fonoster.exception.InvalidParameterException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
@@ -31,6 +32,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +52,7 @@ public class DomainsService {
             @Context HttpServletRequest httpRequest)
             throws ApiException {
 
-        User user = AuthUtil.getUser(httpRequest);
+        User user = AuthUtil.getAccount(httpRequest).getUser();
 
         DateTime jStart = null;
         DateTime jEnd = null;
@@ -83,8 +85,8 @@ public class DomainsService {
     @Path("/{domainUri}")
     public javax.ws.rs.core.Response getDomain(@PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
             throws ApiException {
-        User user = AuthUtil.getUser(httpRequest);
-        Domain domain = DomainsAPI.getInstance().getDomainByUri(domainUri);
+        User user = AuthUtil.getAccount(httpRequest).getUser();
+        Domain domain = DomainsAPI.getInstance().getDomain(user, domainUri, false);
 
         if (!Objects.equals(domain.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException();
 
@@ -105,11 +107,9 @@ public class DomainsService {
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public javax.ws.rs.core.Response saveDomain(Domain domain, @Context HttpServletRequest httpRequest) throws ApiException {
-        User user = AuthUtil.getUser(httpRequest);
-
+    public javax.ws.rs.core.Response saveDomain(Domain domain, @Context HttpServletRequest httpRequest) throws ApiException, URISyntaxException {
+        User user = AuthUtil.getAccount(httpRequest).getUser();
         Domain domainFromDB;
-        URI domainUri = domain.getSpec().getContext().getDomainUri();
         String name = domain.getMetadata().get("name");
         String egressRule = null;
         String egressDIDRef = null;
@@ -126,18 +126,21 @@ public class DomainsService {
         }
 
         if (domain.getId() == null) {
+            URI domainUri = new URI("sip." +
+                domain.getSpec().getContext().getDomainUri().toString()
+                    + ".fonoster.com");
             domainFromDB = DomainsAPI.getInstance().createDomain(user, domainUri, name, egressRule, egressDIDRef);
             DBManager.getInstance().getDS().save(domainFromDB);
         } else {
             // Update object
-            domainFromDB = DomainsAPI.getInstance().getDomainByUri(domainUri);
+            domainFromDB = DomainsAPI.getInstance().getDomain(user, domain.getSpec().getContext().getDomainUri(), true);
 
             // User does not own domain
             if (!Objects.equals(domainFromDB.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException();
 
             // Both parameters must be present for it to work.
             if (!Strings.isNullOrEmpty(egressRule) && !Strings.isNullOrEmpty(egressDIDRef)) {
-                DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumber(egressDIDRef);
+                DIDNumber did = DIDNumbersAPI.getInstance().getDIDNumberByRef(user, egressDIDRef);
                 // Verify didOwner
                 if (did == null || !Objects.equals(did.getUser().getEmail(), user.getEmail())) {
                     throw new UnauthorizedAccessException("This DID is not assigned to you");
@@ -146,10 +149,11 @@ public class DomainsService {
                 domainFromDB.getSpec().getContext().setEgressPolicy(new Domain.Spec.Context.EgressPolicy(egressRule, egressDIDRef));
             }
             domainFromDB.getMetadata().put("name", name);
-
             domainFromDB.setModified(DateTime.now());
-            DBManager.getInstance().getDS().save(domainFromDB);
+            domainFromDB.setDeleted(domain.isDeleted());
         }
+
+        DBManager.getInstance().getDS().save(domainFromDB);
 
         return javax.ws.rs.core.Response.ok(domainFromDB).build();
     }
@@ -157,11 +161,16 @@ public class DomainsService {
     @DELETE
     @Path("/{domainUri}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public javax.ws.rs.core.Response deleteApp(
+    public javax.ws.rs.core.Response deleteDomain(
             @PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
             throws ApiException {
         Account account = AuthUtil.getAccount(httpRequest);
-        Domain domain = DomainsAPI.getInstance().getDomain(account.getUser(), domainUri);
+        Domain domain = DomainsAPI.getInstance().getDomain(account.getUser(), domainUri, false);
+
+        if (DomainsAPI.getInstance().domainHasAgents(account.getUser(), domainUri)) {
+            throw new DomainHasAgentsException();
+        }
+
         domain.setDeleted(true);
         DomainsAPI.getInstance().updateDomain(domain);
         return javax.ws.rs.core.Response.ok().build();
@@ -210,11 +219,11 @@ public class DomainsService {
             this.pageSize = pageSize;
         }
 
-        public List<Domain> getApps() {
+        public List<Domain> getDomains() {
             return domains;
         }
 
-        public void setApps(List<Domain> domains) {
+        public void setDomains(List<Domain> domains) {
             this.domains = domains;
         }
     }

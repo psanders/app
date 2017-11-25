@@ -8,16 +8,12 @@
  */
 package com.fonoster.rest;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.AgentsAPI;
 import com.fonoster.core.api.DBManager;
-import com.fonoster.core.api.DomainsAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Agent;
-import com.fonoster.model.Domain;
 import com.fonoster.model.User;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -29,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,8 +44,7 @@ public class AgentsService {
             @QueryParam("pageSize") @DefaultValue("1000") int pageSize,
             @Context HttpServletRequest httpRequest)
             throws ApiException {
-
-        User user = AuthUtil.getUser(httpRequest);
+        User user = AuthUtil.getAccount(httpRequest).getUser();
 
         DateTime jStart = null;
         DateTime jEnd = null;
@@ -61,7 +57,7 @@ public class AgentsService {
                 .getAgents(user, jStart, jEnd, pageSize, pageSize * page);
 
         int total =
-                AgentsAPI.getInstance()
+            AgentsAPI.getInstance()
                 .getAgents(
                     user,
                     jStart,
@@ -78,62 +74,59 @@ public class AgentsService {
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{domainUri}")
-    public javax.ws.rs.core.Response getAgent(@PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
+    @Path("/{agentId}")
+    public javax.ws.rs.core.Response getAgent(@PathParam("agentId") String agentId, @Context HttpServletRequest httpRequest)
             throws ApiException {
-        User user = AuthUtil.getUser(httpRequest);
-        Domain domain = DomainsAPI.getInstance().getDomainByUri(domainUri);
+        User user = AuthUtil.getAccount(httpRequest).getUser();
+        Agent agent = AgentsAPI.getInstance().getAgentById(user, new ObjectId(agentId), false);
 
-        if (!Objects.equals(domain.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException();
+        if (!Objects.equals(agent.getUser().getEmail(), user.getEmail())) throw new UnauthorizedAccessException();
 
-        return javax.ws.rs.core.Response.ok(domain).build();
-    }
-
-    @GET
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Path("/{domainUri}/exist")
-    public javax.ws.rs.core.Response domainExist(@PathParam("domainUri") URI domainUri, @Context HttpServletRequest httpRequest)
-            throws ApiException {
-        JsonNodeFactory factory = JsonNodeFactory.instance;
-        ObjectNode json = factory.objectNode();
-        json.put("exist", DomainsAPI.getInstance().domainExist(domainUri));
-        return javax.ws.rs.core.Response.ok(json).build();
+        return javax.ws.rs.core.Response.ok(agent).build();
     }
 
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public javax.ws.rs.core.Response saveAgent(Agent agent, @Context HttpServletRequest httpRequest) throws ApiException {
-        User user = AuthUtil.getUser(httpRequest);
-
-        Agent agentFromDB;
+    public javax.ws.rs.core.Response saveAgent(Agent agent, @Context HttpServletRequest httpRequest) throws ApiException, URISyntaxException {
+        User user = AuthUtil.getAccount(httpRequest).getUser();
         String name = agent.getMetadata().get("name");
         Agent.Spec.Credentials credentials =  agent.getSpec().getCredentials();
-        URI domainUri = agent.getSpec().getDomains().get(0);
         String username = credentials.getUsername();
         String secret = credentials.getSecret();
 
+        Agent agentFromDB;
+
         if (agent.getId() == null) {
+            // This feels like a hack :(
+            String domain = String.valueOf(agent.getSpec().getDomains().get(0));
+            URI domainUri = new URI(domain);
             agentFromDB = AgentsAPI.getInstance().createAgent(user, domainUri, name, username, secret);
-            DBManager.getInstance().getDS().save(agentFromDB);
         } else {
-            agentFromDB = AgentsAPI.getInstance().getAgent(user, agent.getId());
+            agentFromDB = AgentsAPI.getInstance().getAgentById(user, agent.getId(), true);
             agentFromDB.getMetadata().put("name", agent.getMetadata().get("name"));
-            agentFromDB.getSpec().getCredentials().setSecret(secret);
-            DBManager.getInstance().getDS().save(agentFromDB);
+            agentFromDB.setDeleted(agent.isDeleted());
+            agentFromDB.setModified(DateTime.now());
+
+            // Only update if not empty and not null
+            if (!secret.equals(null) && !secret.isEmpty()) {
+                agentFromDB.getSpec().getCredentials().setSecret(secret);
+            }
         }
+
+        DBManager.getInstance().getDS().save(agentFromDB);
 
         return javax.ws.rs.core.Response.ok(agentFromDB).build();
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("/{agentId}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public javax.ws.rs.core.Response deleteAgent(
-            @PathParam("id") ObjectId agentId, @Context HttpServletRequest httpRequest)
+            @PathParam("agentId") ObjectId agentId, @Context HttpServletRequest httpRequest)
             throws ApiException {
-        User user = AuthUtil.getUser(httpRequest);
-        Agent agent = AgentsAPI.getInstance().getAgent(user, agentId);
+        User user = AuthUtil.getAccount(httpRequest).getUser();
+        Agent agent = AgentsAPI.getInstance().getAgentById(user, agentId, false);
         agent.setDeleted(true);
         DBManager.getInstance().getDS().save(agent);
         return javax.ws.rs.core.Response.ok().build();
