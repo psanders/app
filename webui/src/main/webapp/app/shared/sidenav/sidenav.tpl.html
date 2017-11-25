@@ -1,10 +1,14 @@
+<style>
+    .sidenav {
+        background-color: #fff;
+    }
+</style>
 <md-sidenav
     class="sidenav"
     layout-fill
     md-component-id="sidenav"
     md-is-open="ctrl.navOpen"
     md-is-locked-open="ctrl.navOpen && $mdMedia('gt-xs')">
-
     <md-content>
         <md-list flex>
             <md-list-item id="dashboard-item" ng-class="{'nav-active': ctrl.currentSec('dashboard')}" ng-click="ctrl.go('dashboard')">
@@ -14,6 +18,27 @@
             <md-list-item id="numbers-item" ng-class="{'nav-active': ctrl.currentSec('numbers')}" ng-click="ctrl.go('numbers')">
                 <md-icon md-font-library="material-icons" class="md-24">phone</md-icon>
                 <p>DID Numbers</p>
+            </md-list-item>
+            <md-list-item id="sipnet-item" ng-class="{'nav-active': ctrl.currentSec('sipnet_accts') || ctrl.currentSec('sipnet_domains')}">
+                <md-icon md-font-library="material-icons" class="md-24">domain</md-icon>
+                <p>SIP Net</p>
+                <md-menu class="md-secondary" md-position-mode="target-right target">
+                    <button class="md-icon-button md-button">
+                        <md-icon style="margin-top: 2px" md-font-library="material-icons" class="md-24">keyboard_arrow_right</md-icon>
+                    </button>
+                    <md-menu-content width="4">
+                        <md-menu-item>
+                            <md-button ng-click="ctrl.go('sipnet_agents')">
+                                SIP Agents
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="ctrl.go('sipnet_domains')">
+                                Domains
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
             </md-list-item>
             <md-list-item id="apps-item" ng-class="{'nav-active': ctrl.currentSec('apps')}" ng-click="ctrl.go('apps')">
                 <md-icon md-font-library="material-icons" class="md-24">apps</md-icon>
