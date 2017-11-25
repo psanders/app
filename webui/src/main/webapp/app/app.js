@@ -37,9 +37,12 @@
         // Calls
         require('./components/calls/calls.service.js'),
         require('./components/calls/calls.ctrl.js'),
-        // Phone/Sip Numbers
+        // PSTN Numbers
         require('./components/numbers/numbers.service.js'),
         require('./components/numbers/numbers.ctrl.js'),
+        // SIP Network
+        require('./components/sipnet/sipnet.service.js'),
+        require('./components/sipnet/sipnet.ctrl.js'),
         // Recordings
         require('./components/recordings/recordings.service.js'),
         require('./components/recordings/recordings.ctrl.js'),
@@ -58,6 +61,7 @@
         var app = angular.module('fonoster',
             ['ui.router',
             'ngMaterial',
+            'ngMessages',
             'fnConfig',
             'fnAuth',
             'fnUsers',
@@ -71,6 +75,7 @@
             'ngAudio',
             'fnBilling',
             'fnSettings',
+            'fnSIPNet',
             'fnNumbers',
             'fnRecordings',
             'fnCalls',
