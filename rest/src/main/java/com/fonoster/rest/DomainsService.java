@@ -121,10 +121,6 @@ public class DomainsService {
             egressDIDRef = domain.getSpec().getContext().getEgressPolicy().getDidRef();
         } catch (Exception ignored) {}
 
-        if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDIDRef)) {
-            throw new InvalidParameterException("Parameters `egressRule` and `egressDIDRef` must both be present for egress routing to work.");
-        }
-
         if (domain.getId() == null) {
             URI domainUri = new URI("sip." +
                 domain.getSpec().getContext().getDomainUri().toString().toLowerCase()
