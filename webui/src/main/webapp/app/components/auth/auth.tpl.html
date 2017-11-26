@@ -1,17 +1,31 @@
-<div ng-hide="ctrl.isAuthenticated()"
-     layout="row"
-     layout-align="center center"
-     layout-fill>
+<style>
+    .wbox {
+        background-color: #fff;
+        padding: 20px;
+        border-style: solid;
+        border-color: #f7f6f6;
+        border-width: 1px;
+        min-width: 300px;
+        max-width: 300px;
+    }
 
-    <div class="auth-card" >
-        <hgroup>
-            <a href="https://fonoster.com">
-                <img style="height: 45px" src="static/assets/images/logo.png">
-            </a>
-        </hgroup>
-        <login layout-margin ng-show="ctrl.isView('login')"></login>
-        <forgot layout-margin ng-show="ctrl.isView('forgot')"></forgot>
-        <signup layout-margin ng-show="ctrl.isView('signup')"></signup>
+    hgroup {
+        margin-top: 5px;
+        margin-bottom: 25px;
+    }
+
+    .logo {
+        height: 45px;
+    }
+</style>
+<div ng-hide="ctrl.isAuthenticated()"
+    layout="row"
+    layout-align="center center"
+    layout-fill>
+    <div>
+        <login layout-margin ng-if="ctrl.isView('login')"></login>
+        <forgot layout-margin ng-if="ctrl.isView('forgot')"></forgot>
+        <signup layout-margin ng-if="ctrl.isView('signup')"></signup>
         <div class="auth-footer">
             <small>© 2017 Fonoster. All rights reserved.</small>
         </div>

@@ -84,7 +84,6 @@
         }
 
         self.signup = function() {
-            console.log(self.user);
             Users.getResource().save(self.user).$promise
             .then(function(result) {
                 loginNow(self.user.email, self.user.password);

@@ -5,7 +5,6 @@
     var app = angular.module('fnAuth', ['base64', 'ngResource']);
 
     app.service('CredentialsService', ['$window', function($window) {
-
         this.setCredentials = function(credentials) {
             $window.localStorage.credentials = JSON.stringify(credentials);
         };
