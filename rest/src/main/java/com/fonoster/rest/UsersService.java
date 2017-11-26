@@ -188,11 +188,10 @@ public class UsersService {
     public ChangePasswordRequest() {}
 
     // Not marking this with JsonProperty was causing;
-    //  No suitable constructor found for type [simple type,
+    // No suitable constructor found for type [simple type,
     // class CredentialsService$CredentialsRequest]:
     // can not instantiate from JSON object (need to add/enable type information?)
-    public ChangePasswordRequest(
-        @JsonProperty("email") String email, @JsonProperty("password") String password) {
+    public ChangePasswordRequest(@JsonProperty("email") String email, @JsonProperty("password") String password) {
       this.setEmail(email);
       this.setPassword(password);
     }
