@@ -122,12 +122,12 @@ public class DomainsService {
         } catch (Exception ignored) {}
 
         if (Strings.isNullOrEmpty(egressRule) != Strings.isNullOrEmpty(egressDIDRef)) {
-            throw new InvalidParameterException("egressRule, egressDIDRef");
+            throw new InvalidParameterException("Parameters `egressRule` and `egressDIDRef` must both be present for egress routing to work.");
         }
 
         if (domain.getId() == null) {
             URI domainUri = new URI("sip." +
-                domain.getSpec().getContext().getDomainUri().toString()
+                domain.getSpec().getContext().getDomainUri().toString().toLowerCase()
                     + ".fonoster.com");
             domainFromDB = DomainsAPI.getInstance().createDomain(user, domainUri, name, egressRule, egressDIDRef);
             DBManager.getInstance().getDS().save(domainFromDB);
