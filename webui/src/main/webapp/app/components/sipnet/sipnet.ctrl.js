@@ -200,13 +200,15 @@
             self.domain.metadata = { name: d.name };
             self.domain.spec = {
                 context: {
-                    domainUri: d.uri,
-                    egressPolicy: {
-                        rule: ".*",
-                        didRef: self.selectedDIDNumber.metadata.ref
-                    }
+                    domainUri: d.uri
                 }
             };
+
+            if(!!self.selectedDIDNumber) {
+                self.domain.spec.context.egressPolicy = {};
+                self.domain.spec.context.egressPolicy.rule = ".*";
+                self.domain.spec.context.egressPolicy.didRef = self.selectedDIDNumber.metadata.ref;
+            }
 
             Domains.save(self.domain).$promise
             .then(function(result) {
