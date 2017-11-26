@@ -7,11 +7,11 @@
  * copyright owners.
  */
 @XmlJavaTypeAdapters({
-    @XmlJavaTypeAdapter(value = DateTimeAdapter.class, type = DateTime.class),
-    @XmlJavaTypeAdapter(value = ObjectIdAdapter.class, type = ObjectId.class),
-    @XmlJavaTypeAdapter(value = AccountAdapter.class, type = Account.class),
-    @XmlJavaTypeAdapter(value = CDRAdapter.class, type = CallDetailRecord.class),
-    // @XmlJavaTypeAdapter(value = AppAdapter.class, type = App.class)
+  @XmlJavaTypeAdapter(value = DateTimeAdapter.class, type = DateTime.class),
+  @XmlJavaTypeAdapter(value = ObjectIdAdapter.class, type = ObjectId.class),
+  @XmlJavaTypeAdapter(value = AccountAdapter.class, type = Account.class),
+  @XmlJavaTypeAdapter(value = CDRAdapter.class, type = CallDetailRecord.class),
+  // @XmlJavaTypeAdapter(value = AppAdapter.class, type = App.class)
 })
 package com.fonoster.model;
 
