@@ -14,7 +14,10 @@
             <label>Password</label>
             <input ng-model="ctrl.user.password" type="password" name="password" required tabindex="3" autocomplete="new-password"/>
         </md-input-container>
-        <md-button class="md-primary" type="submit" tabindex="3">Sign in</md-button>
+        <div layout="row">
+            <span flex></span>
+            <md-button class="md-primary" type="submit" tabindex="3">Sign in</md-button>
+        </div>
     </form>
 </div>
 <div layout="row" class="top20">

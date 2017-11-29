@@ -4,7 +4,7 @@
             <img class="logo" src="static/assets/images/logo.png">
         </a>
     </hgroup>
-    <form name="ctrl.signupForm" ng-submit="ctrl.signup()" novalidate layout="column" autocomplete="nope">
+    <form name="ctrl.signupForm" ng-submit="ctrl.signup()" layout="column" autocomplete="nope" novalidate>
         <md-input-container ng-hide="ctrl.hasCode()">
             <label>Email</label>
             <input required autofocus type="email" name="clientEmail" ng-model="ctrl.user.email" maxlength="100" ng-pattern="/^.+@.+\..+$/" tabindex="1" autocomplete="nope"/>
