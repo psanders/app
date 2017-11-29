@@ -29,7 +29,6 @@
                 </md-button>
             </div>
         </md-toolbar>
-
         <md-toolbar class="md-table-toolbar md-hue-3" ng-show="ctrl.selected.length" aria-hidden="false">
             <div class="md-toolbar-tools">
                 <div>{{ctrl.selected.length}} {{ctrl.selected.length > 1 ? 'items' : 'item'}} selected</div>
@@ -39,7 +38,6 @@
                 </md-button>
             </div>
         </md-toolbar>
-
         <md-table-container>
             <table md-table md-row-select multiple ng-model="ctrl.selected" md-progress="deferred">
                 <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
@@ -60,7 +58,6 @@
                 </tbody>
             </table>
         </md-table-container>
-
         <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
                              md-total="{{ctrl.agents.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
     </md-card>
@@ -76,26 +73,24 @@
                 </md-button>
             </div>
         </md-toolbar>
-
-        <form name="agentsForm" ng-submit="ctrl.save(ctrl.agent)" class="agent-view">
+        <form name="agentsForm" class="agent-view" novalidate>
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Friendly Name</label>
-                    <input ng-model="ctrl.agent.name" required>
+                    <input ng-model="ctrl.agent.metadata.name" required>
                 </md-input-container>
             </div>
-
             <div layout-gt-xs="row">
                 <md-autocomplete required
-                                 md-input-name="autocompleteField"
-                                 md-input-minlength="2"
-                                 md-no-cache="true"
-                                 md-selected-item="ctrl.selectedDomain"
-                                 md-items="domain in ctrl.domains.domains"
-                                 md-search-text="ctrl.searchText"
-                                 md-item-text="domain.spec.context.domainUri"
-                                 md-require-match
-                                 md-floating-label="Select domain">
+                    md-input-name="autocompleteField"
+                    md-input-minlength="2"
+                    md-no-cache="true"
+                    md-selected-item="ctrl.selectedDomain"
+                    md-items="domain in ctrl.domains.domains"
+                    md-search-text="ctrl.searchText"
+                    md-item-text="domain.spec.context.domainUri"
+                    md-require-match
+                    md-floating-label="Select domain">
                     <md-item-template>
                         <span md-highlight-text="ctrl.searchText">{{domain.spec.context.domainUri}}</span>
                     </md-item-template>
@@ -107,21 +102,19 @@
                     </div>
                 </md-autocomplete>
             </div>
-
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Username</label>
-                    <input ng-model="ctrl.agent.username" pattern="^[a-z0-9.\-_$@*!]{3,30}$" required>
+                    <input ng-model="ctrl.agent.spec.credentials.username" pattern="^[a-z0-9.\-_$@*!]{3,30}$" required>
                 </md-input-container>
             </div>
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Secret</label>
-                    <input type="password" ng-model="ctrl.agent.secret" autocomplete="new-password" required>
+                    <input type="password" ng-model="ctrl.agent.spec.credentials.secret" autocomplete="new-password" required>
                 </md-input-container>
             </div>
-
-            <md-button ng-disabled="agentsForm.$invalid" type="submit">Save</md-button>
+            <md-button ng-click="agentsForm.$valid && ctrl.save(ctrl.agent)" class="md-primary">Save</md-button>
         </form>
     </md-card>
 
@@ -137,22 +130,20 @@
                 <label>{{ctrl.agent.spec.credentials.username}} @ {{ctrl.agent.spec.domains.join()}}</label>
             </div>
         </md-toolbar>
-
-        <form name="agentsForm" ng-submit="ctrl.save(ctrl.agent)" class="agent-view">
+        <form name="editAgentsForm" class="agent-view" novalidate>
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Friendly Name</label>
-                    <input ng-model="ctrl.agent.name" required>
+                    <input ng-model="ctrl.agent.metadata.name" required>
                 </md-input-container>
             </div>
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Secret</label>
-                    <input type="password" ng-model="ctrl.agent.secret" autocomplete="new-password">
+                    <input type="password" ng-model="ctrl.agent.spec.credentials.secret" autocomplete="new-password">
                 </md-input-container>
             </div>
-
-            <md-button class="save-button" ng-disabled="agentsForm.$invalid" type="submit">Save</md-button>
+            <md-button ng-click="editAgentsForm.$valid && ctrl.save(ctrl.agent)"  class="md-primary save-button">Save</md-button>
         </form>
     </md-card>
 </div>

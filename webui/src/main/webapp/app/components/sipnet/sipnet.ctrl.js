@@ -27,8 +27,8 @@
 
         self.openEditView = function(agent) {
             self.agent = agent;
+            self.agent.spec.credentials.secret = '';
             self.selectedDomain = '';
-            self.agent.name = agent.metadata.name;
             self.view = 'EDIT';
         }
 
@@ -58,24 +58,22 @@
         }
 
         self.save = function(a) {
-            self.agent = {};
-            self.agent.id = a.id;
-            self.agent.metadata = {name: a.name};
-            self.agent.spec = {};
-            self.agent.spec.credentials = {username: a.username, secret: a.secret};
-            self.agent.spec.domains = [];
+            console.log('agent => ' + JSON.stringify(a));
+            var agent = a;
 
             // This will only apply for agent update
             if(!!self.selectedDomain) {
-                self.agent.spec.domains[0] = self.selectedDomain.spec.context.domainUri;
+                agent.spec.domains = [];
+                agent.spec.domains[0] = self.selectedDomain.spec.context.domainUri;
             }
 
-            Agents.save(self.agent).$promise
+            Agents.save(agent).$promise
             .then(function(result) {
                 toastMe('Done!');
                 self.changeView('LIST');
             })
             .catch(function(error) {
+                console.error(JSON.stringify(error));
                 toastMe(error.data.message);
             });
         }
@@ -180,10 +178,10 @@
 
         self.openEditView = function(domain) {
             self.domain = domain;
-            self.domain.name = domain.metadata.name;
             self.selectedDIDNumber = '';
             self.didNumbers.didnumbers.forEach(function(did) {
-                if (domain.spec.context.egressPolicy.didRef ==
+                if (!!domain.spec.context.egressPolicy &&
+                    domain.spec.context.egressPolicy.didRef ==
                     did.metadata.ref) {
                     self.selectedDIDNumber = did;
                 }
@@ -191,24 +189,19 @@
             self.view = 'EDIT';
         }
 
-        self.save = function(d) {
-            self.domain = {};
-            if (self.isView('EDIT')) {
-                d.uri = d.spec.context.domainUri;
-                self.domain.id = d.spec.context.domainUri;
-            }
-            self.domain.metadata = { name: d.name };
-            self.domain.spec = {
-                context: {
-                    domainUri: d.uri
-                }
-            };
+        self.save = function(d, e) {
+            self.domain = d;
 
             if(!!self.selectedDIDNumber) {
                 self.domain.spec.context.egressPolicy = {};
                 self.domain.spec.context.egressPolicy.rule = ".*";
                 self.domain.spec.context.egressPolicy.didRef = self.selectedDIDNumber.metadata.ref;
+            } else {
+                self.domain.spec.context.egressPolicy = {};
             }
+
+            console.log('self.selectedDIDNumber => ' + JSON.stringify(self.selectedDIDNumber));
+            console.log('self.domain => ' + JSON.stringify(self.domain));
 
             Domains.save(self.domain).$promise
             .then(function(result) {

@@ -37,11 +37,9 @@ import * as moment from 'moment-timezone';
         // Create or open and app
         self.open = function(appId) {
             if (appId) {
-                console.debug('open appId ->' + appId);
-                $window.location.href = 'app.html#app/editor?appId=' + appId;
+                $window.open('app.html#!/editor?appId=' + appId, '_blank');
             } else {
-                console.debug('Create new app');
-                 $window.location.href = 'app.html#/editor';
+                $window.open('app.html#!/editor', '_blank');
             }
         }
 

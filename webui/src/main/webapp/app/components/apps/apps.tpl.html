@@ -1,3 +1,10 @@
+<style>
+    tr.data-rows:hover {
+        background-color: #f1f1f1;
+        cursor: pointer;
+        cursor: hand;
+    }
+</style>
 <md-card id="apps-widget" ng-controller="AppsCtrl as ctrl">
     <md-toolbar class="md-table-toolbar md-default" aria-hidden="false" ng-show="!selected.length">
         <div class="md-toolbar-tools">
@@ -32,7 +39,7 @@
                 </tr>
             </thead>
             <tbody md-body>
-                <tr md-row md-select="app" md-select-id="id" md-auto-select="false" ng-repeat="app in ctrl.apps.apps | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
+                <tr md-row class="data-rows" ng-click="ctrl.open(app.id)" md-select="app" md-select-id="id" md-auto-select="false" ng-repeat="app in ctrl.apps.apps | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
                     <td md-cell>
                         <md-tooltip md-direction="down">
                             Id: {{app.id}}

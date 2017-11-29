@@ -59,7 +59,6 @@
                 </tbody>
             </table>
         </md-table-container>
-
         <md-table-pagination md-limit-options="[10, 20, 50]" md-limit="ctrl.query.limit" md-page="ctrl.query.page"
                              md-total="{{ctrl.domains.total}}" md-on-paginate="ctrl.onPageChange" md-page-select></md-table-pagination>
     </md-card>
@@ -75,17 +74,13 @@
                 </md-button>
             </div>
         </md-toolbar>
-
-        {{ctrl.didNumbers.didNumbers}}
-
-        <form name="domainsForm" ng-submit="ctrl.save(ctrl.domain)" class="domain-view">
+        <form name="domainsForm" class="domain-view" novalidate>
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Domain Name</label>
-                    <input ng-model="ctrl.domain.name" required>
+                    <input ng-model="ctrl.domain.metadata.name" required>
                 </md-input-container>
             </div>
-
             <div layout-gt-xs="row">
                 <md-autocomplete md-input-name="autocompleteField"
                     md-input-minlength="3"
@@ -108,18 +103,16 @@
                     </div>
                 </md-autocomplete>
             </div>
-
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>
-                        <span ng-show="ctrl.domain.uri == '' || ctrl.domain.uri == undefined">URI</span>
-                        <span ng-show="ctrl.domain.uri != '' && ctrl.domain.uri != undefined">sip.{{ctrl.domain.uri}}.fonoster.com</span>
+                        <span ng-show="ctrl.domain.spec.context.domainUri == '' || ctrl.domain.spec.context.domainUri == undefined">URI</span>
+                        <span ng-show="ctrl.domain.spec.context.domainUri != '' && ctrl.domain.spec.context.domainUri != undefined">sip.{{ctrl.domain.spec.context.domainUri}}.fonoster.com</span>
                     </label>
-                    <input ng-model="ctrl.domain.uri" pattern="^[a-z0-9.\-_$@*!]{3,30}$" required>
+                    <input ng-model="ctrl.domain.spec.context.domainUri" pattern="^[a-z0-9.\-_$@*!]{3,30}$" required>
                 </md-input-container>
             </div>
-
-            <md-button ng-disabled="domainsForm.$invalid" type="submit">Save</md-button>
+            <md-button ng-click="domainsForm.$valid && ctrl.save(ctrl.domain)" class="md-primary" >Save</md-button>
         </form>
     </md-card>
 
@@ -135,12 +128,11 @@
                 <label>{{domain.spec.context.domainUri}}</label>
             </div>
         </md-toolbar>
-
-        <form name="domainsForm" ng-submit="ctrl.save(ctrl.domain)" class="domain-view">
+        <form name="editDomainsForm" class="domain-view" novalidate>
             <div layout-gt-xs="row">
                 <md-input-container>
                     <label>Domain Name</label>
-                    <input ng-model="ctrl.domain.name" required>
+                    <input ng-model="ctrl.domain.metadata.name" required>
                 </md-input-container>
             </div>
             <div layout-gt-xs="row">
@@ -157,7 +149,7 @@
                     <md-item-template>
                         <span md-highlight-text="ctrl.searchText">{{didNumber.spec.location.telUrl.substring(4)}}</span>
                     </md-item-template>
-                    <div ng-messages="domainsForm.autocompleteField.$error" ng-if="domainsForm.autocompleteField.$touched">
+                    <div ng-messages="editDomainsForm.autocompleteField.$error" ng-if="editDomainsForm.autocompleteField.$touched">
                         <div ng-message="required">Please select a did Number.</div>
                         <div ng-message="md-require-match">Please select an existing did number.</div>
                         <div ng-message="minlength">Your entry is not long enough.</div>
@@ -165,8 +157,7 @@
                     </div>
                 </md-autocomplete>
             </div>
-
-            <md-button class="save-button" ng-disabled="agentsForm.$invalid" type="submit">Save</md-button>
+            <md-button ng-click="editDomainsForm.$valid && ctrl.save(ctrl.domain, $event)" class="md-primary save-button">Save</md-button>
         </form>
     </md-card>
 </div>

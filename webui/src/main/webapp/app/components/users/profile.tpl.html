@@ -1,25 +1,25 @@
 <div ng-controller="ProfileCtrl as ctrl" id="profile">
-    <form name="profileForm" ng-submit="ctrl.save(ctrl.user)" >
+    <form name="profileForm" ng-submit="profileForm.$valid && ctrl.save(ctrl.user)" novalidate>
         <div layout-padding layout="column" >
             <md-input-container>
                 <label>Email</label>
-                <input ng-model="ctrl.user.email" type="email" disabled required novalidate>
+                <input ng-model="ctrl.user.email" type="email" disabled required>
             </md-input-container>
         </div>
         <div layout-padding layout="row" >
             <md-input-container flex>
                 <label>First Name</label>
-                <input  ng-model="ctrl.user.firstName" type="text" required novalidate>
+                <input  ng-model="ctrl.user.firstName" type="text" required>
             </md-input-container>
             <md-input-container flex>
                 <label>Last Name</label>
-                <input ng-model="ctrl.user.lastName" type="text" required novalidate>
+                <input ng-model="ctrl.user.lastName" type="text" required>
             </md-input-container>
         </div>
         <div layout-padding layout="column" >
             <md-input-container>
                 <label>Phone (E.164 format required)</label>
-                <input ng-model="ctrl.user.phone" required pattern="^\+(?:[0-9] ?){6,14}[0-9]$" novalidate>
+                <input ng-model="ctrl.user.phone" required pattern="^\+(?:[0-9] ?){6,14}[0-9]$">
             </md-input-container>
             <md-input-container>
                 <label>Company (Optional)</label>
@@ -27,7 +27,7 @@
             </md-input-container>
             <md-input-container>
                 <label>Country</label>
-                <md-select ng-model="ctrl.user.countryCode" required autofocus novalidate>
+                <md-select ng-model="ctrl.user.countryCode" required autofocus>
                     <md-option ng-selected="country.code == ctrl.user.countryCode" ng-repeat="country in ctrl.countries"
                                value="{{ country.code }}">{{country.name}}
                     </md-option>
@@ -35,7 +35,7 @@
             </md-input-container>
             <md-input-container>
                 <label>Timezone</label>
-                <md-select ng-model="ctrl.user.timezone" required autofocus novalidate>
+                <md-select ng-model="ctrl.user.timezone" required autofocus>
                     <md-optgroup ng-repeat="group in ctrl.gtzs" label="{{ group.group }}">
                         <md-option ng-selected="zone.value == ctrl.user.timezone" ng-repeat="zone in group.zones" value="{{ zone.value }}">
                             {{ zone.name }}
@@ -46,7 +46,7 @@
         </div>
         <div layout="row">
             <span flex></span>
-            <md-button ng-disabled="profileForm.$invalid" type="submit">Update</md-button>
+            <md-button class="md-primary" type="submit">Update</md-button>
         </div>
     </form>
 </div>
