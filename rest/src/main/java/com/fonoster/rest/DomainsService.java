@@ -143,7 +143,10 @@ public class DomainsService {
                 }
 
                 domainFromDB.getSpec().getContext().setEgressPolicy(new Domain.Spec.Context.EgressPolicy(egressRule, egressDIDRef));
+            } else {
+                domainFromDB.getSpec().getContext().setEgressPolicy(null);
             }
+
             domainFromDB.getMetadata().put("name", name);
             domainFromDB.setModified(DateTime.now());
             domainFromDB.setDeleted(domain.isDeleted());
