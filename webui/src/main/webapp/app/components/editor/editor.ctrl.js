@@ -139,6 +139,7 @@ import * as CodeMirror from 'codemirror';
         };
 
         self.renameApp = function(event) {
+            console.log('DBG001');
             // Appending dialog to document.body to cover sidenav in docs app
             var confirm = $mdDialog.prompt()
               .title('What would you name your app?')

@@ -11,8 +11,12 @@
                             {{script.name}}
                         </div>
                         <span flex></span>
-                        <md-icon ng-click="ctrl.renameScript($event, script)" ng-show="show && script.name != 'main.js'" md-font-library="material-icons" class="md-18">edit</md-icon>
-                        <md-icon ng-click="ctrl.removeScript($index)" ng-show="show && script.name != 'main.js'" md-font-library="material-icons" class="md-18">delete</md-icon>
+                        <md-button ng-show="show && script.name != 'main.js'" ng-click="ctrl.renameScript($event, script)" class="md-icon-button">
+                            <md-icon md-font-library="material-icons" class="md-18">edit</md-icon>
+                        </md-button>
+                        <md-button ng-show="show && script.name != 'main.js'" ng-click="ctrl.removeScript($index)" class="md-icon-button">
+                            <md-icon md-font-library="material-icons" class="md-18">delete</md-icon>
+                        </md-button>
                     </md-list-item>
                     <md-list-item id="add-script" ng-click="ctrl.add($event)">
                         <div class="md-list-item-text">
@@ -23,7 +27,6 @@
                         </div>
                     </md-list-item>
                 </md-list>
-
                 <div id="code-area" ng-mouseleave="ctrl.save()" ng-show="ctrl.currentScript.name == script.name" ng-repeat="script in ctrl.app.scripts" class="hg-hundred" flex>
                     <md-progress-circular md-theme="alt" class="md-hue-3 loading" ng-hide="!ctrl.loading" md-mode="indeterminate"></md-progress-circular>
                     <md-button ng-click="ctrl.call($event)" ng-show="!ctrl.loading" md-theme="alt" class="md-fab md-mini md-primary test-button" aria-label="Fullscreen">
