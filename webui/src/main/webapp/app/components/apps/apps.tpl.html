@@ -33,20 +33,15 @@
         <table md-table md-row-select multiple ng-model="ctrl.selected" md-progress="deferred">
             <thead md-head md-order="ctrl.query.order" md-on-reorder="ctrl.onOrderChange">
                 <tr md-row>
-                    <th md-column>ID</th>
                     <th md-column md-order-by="name">Title</th>
+                    <th md-column>ID</th>
                     <th md-column md-order-by="modified">Modified</th>
                 </tr>
             </thead>
             <tbody md-body>
                 <tr md-row class="data-rows" ng-click="ctrl.open(app.id)" md-select="app" md-select-id="id" md-auto-select="false" ng-repeat="app in ctrl.apps.apps | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
-                    <td md-cell>
-                        <md-tooltip md-direction="down">
-                            Id: {{app.id}}
-                        </md-tooltip>
-                        <a target="_blank" href="app.html#!/editor?appId={{app.id}}">{{app.id | truncate:4:'':true | uppercase}}</a>
-                    </td>
                     <td md-cell>{{app.name}}</td>
+                    <td md-cell><i>{{app.id | uppercase}}</i></td>
                     <td md-cell>{{app.modified | asCalendar}}</td>
                 </tr>
             </tbody>
