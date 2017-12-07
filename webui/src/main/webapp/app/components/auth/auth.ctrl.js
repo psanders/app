@@ -109,10 +109,9 @@
         init();
 
         function init() {
-            if ($location.search().playground !== undefined) {
-                loginNow("john@doe.com", "osamayor");
-            }
-
+            //if ($location.search().playground !== undefined) {
+            //    loginNow("john@doe.com", "...");
+            //}
             if (CredentialsService.isAuthenticated() && $location.path() == "/login") {
                $location.url('apps');
             }
