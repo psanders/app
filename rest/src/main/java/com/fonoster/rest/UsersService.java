@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -36,7 +37,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 
 @Since("1.0")
-@RolesAllowed({"USER"})
+@RolesAllowed({"USER"}) // Is this needed?
+@PermitAll
 @Path("/users")
 public class UsersService {
   private static final Logger LOG = LoggerFactory.getLogger(CredentialsService.class);
