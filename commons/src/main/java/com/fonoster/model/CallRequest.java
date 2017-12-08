@@ -11,9 +11,10 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 @Since("1.0")
 @XmlRootElement
@@ -32,6 +33,7 @@ public class CallRequest {
   // Default is false
   private boolean record;
   private boolean billable;
+  private boolean amdEnabled;
   @NotNull private String apiVersion;
 
   // Must have no-argument constructor
@@ -53,7 +55,8 @@ public class CallRequest {
       @JsonProperty("sendDigits") String sendDigits,
       @JsonProperty("record") boolean record,
       @JsonProperty("apiVersion") String apiVersion,
-      @JsonProperty("billable") Boolean billable) {
+      @JsonProperty("billable") Boolean billable,
+      @JsonProperty("amdEnabled") boolean amdEnabled) {
 
     this.setAppId(appId);
     this.setCallId(callId);
@@ -64,6 +67,7 @@ public class CallRequest {
     this.setSendDigits(sendDigits);
     this.setApiVersion(apiVersion);
     this.setRecord(record);
+    this.setAmdEnabled(amdEnabled);
 
     if (timeout == null) this.timeout = 60;
 
@@ -170,6 +174,14 @@ public class CallRequest {
 
   public void setBillable(boolean billable) {
     this.billable = billable;
+  }
+
+  public boolean isAmdEnabled() {
+    return amdEnabled;
+  }
+
+  public void setAmdEnabled(boolean amdEnabled) {
+    this.amdEnabled = amdEnabled;
   }
 
   // Creates toString using reflection

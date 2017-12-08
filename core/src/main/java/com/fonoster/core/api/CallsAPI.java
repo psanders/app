@@ -340,6 +340,7 @@ public class CallsAPI {
         originateAction.setVariable("initDigits", request.getSendDigits());
         originateAction.setVariable("record", "" + request.isRecord());
         originateAction.setVariable("timeout", "" + request.getTimeout() * 1000);
+        originateAction.setVariable("amdEnabled", "" + request.isAmdEnabled());
         originateAction.setAccount(callDetailRecord.getId().toString());
         originateAction.setActionId(callDetailRecord.getId().toString());
         originateAction.setTimeout(request.getTimeout() * 1000);
