@@ -114,7 +114,7 @@ public class RecordingsAPI {
 
         File recording = new File(path.toString() + "." + ext);
 
-        if (!recording.exists()) throw new ResourceNotFoundException("Can't find file: " + recording.getAbsolutePath());
+        if (!recording.exists()) throw new ResourceNotFoundException("Can't find file: " + recording.getName());
         return recording;
     }
 

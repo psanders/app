@@ -38,13 +38,13 @@
                 <tr ng-show="recording.audio.audio.duration > 0" md-row ng-init='ctrl.load(recording)' ng-repeat="recording in ctrl.recordings.recordings | orderBy: ctrl.query.order | limitTo: ctrl.query.limit: (ctrl.query.page - 1) * ctrl.query.limit">
                     <td md-cell>
                         <div class="recordings-player">
-                            <md-button ng-show="recording.audio.currentTime == recording.audio.audio.duration && isAva(recording)" ng-model="recording.audio" ng-click="play(recording)" class="md-icon-button md-accent" aria-label="Favorite">
+                            <md-button ng-show="recording.audio.currentTime == recording.audio.audio.duration && ctrl.isAva(recording)" ng-model="recording.audio" ng-click="ctrl.play(recording)" class="md-icon-button md-accent" aria-label="Favorite">
                                 <md-icon md-font-library="material-icons">replay</md-icon>
                             </md-button>
-                            <md-button ng-show="recording.audio.currentTime > 0 && recording.audio.currentTime != recording.audio.audio.duration && isAva(recording)" ng-model="recording.audio" ng-click="ctrl.stop(recording)" class="md-icon-button md-accent" aria-label="Favorite">
+                            <md-button ng-show="recording.audio.currentTime > 0 && recording.audio.currentTime != recording.audio.audio.duration && ctrl.isAva(recording)" ng-model="recording.audio" ng-click="ctrl.stop(recording)" class="md-icon-button md-accent" aria-label="Favorite">
                                 <md-icon ng-hide="!isAva(recording)" md-font-library="material-icons">stop</md-icon>
                             </md-button>
-                            <md-button ng-hide="recording.audio.currentTime > 0 || !isAva(recording)" ng-model="recording.audio" ng-click="ctrl.play(recording)" class="md-icon-button md-accent" aria-label="Favorite">
+                            <md-button ng-hide="recording.audio.currentTime > 0 || !ctrl.isAva(recording)" ng-model="recording.audio" ng-click="ctrl.play(recording)" class="md-icon-button md-accent" aria-label="Favorite">
                                 <md-icon md-font-library="material-icons">play_circle_outline</md-icon>
                             </md-button>
                             <span ng-hide="!ctrl.isAva(recording)">{{recording.audio.currentTime | trackTime}}</span>

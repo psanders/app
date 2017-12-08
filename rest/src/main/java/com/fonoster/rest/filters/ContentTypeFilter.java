@@ -35,6 +35,10 @@ public class ContentTypeFilter implements ContainerResponseFilter {
       response.getHeaders().putSingle("content-type", "application/json");
     } else if (result.equals("xml")) {
       response.getHeaders().putSingle("content-type", "application/xml");
+    } else if (result.equals("wav")) {
+      // Do nothing
+    } else if (result.equals("mp3")) {
+      // Do nothing
     } else {
       request.abortWith(NOT_ACCEPTABLE);
     }
