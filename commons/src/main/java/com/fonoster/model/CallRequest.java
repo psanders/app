@@ -11,10 +11,9 @@ package com.fonoster.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 @Since("1.0")
 @XmlRootElement
