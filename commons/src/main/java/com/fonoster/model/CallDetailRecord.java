@@ -14,6 +14,18 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.ApiException;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.bson.types.ObjectId;
+import org.joda.time.DateTime;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Reference;
+
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,17 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.bson.types.ObjectId;
-import org.joda.time.DateTime;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Reference;
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @JsonPropertyOrder({
@@ -391,7 +392,7 @@ public class CallDetailRecord {
   public static enum AnswerBy {
     HUMAN("HUMAN"),
     MACHINE("MACHINE"),
-    NOT_SURE("NOTSURE"),
+    UNKNOWN("UNKNOWN"),
     NONE("HANGUP");
 
     private String value;
@@ -410,10 +411,10 @@ public class CallDetailRecord {
           return MACHINE;
         case "HANGUP":
           return NONE;
-        case "NOTSURE":
-          return NOT_SURE;
+        case "UNKNOWN":
+          return UNKNOWN;
       }
-      return null;
+      return UNKNOWN;
     }
 
     public String getValue() {
