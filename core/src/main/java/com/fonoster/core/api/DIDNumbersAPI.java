@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,15 +34,23 @@ import java.util.Set;
 @Since("1.0")
 public class DIDNumbersAPI {
     private static final Logger LOG = LoggerFactory.getLogger(DIDNumbersAPI.class);
-    private static final DIDNumbersAPI INSTANCE = new DIDNumbersAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static DIDNumbersAPI instance = new DIDNumbersAPI();
+    private static Datastore ds;
 
     private DIDNumbersAPI() {
     }
 
-    public static DIDNumbersAPI getInstance() {
-        return INSTANCE;
+    public static DIDNumbersAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new DIDNumbersAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public DIDNumber createDIDNumber(Gateway gateway, String number, Map<String, String> geoInfo,

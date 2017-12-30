@@ -22,6 +22,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.mongodb.morphia.Datastore;
 
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,15 +31,23 @@ import java.util.stream.Collectors;
  */
 @Since("1.0")
 public class SipIOResourcesAPI {
-    private static final SipIOResourcesAPI INSTANCE = new SipIOResourcesAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private ObjectMapper mapper = new ObjectMapper();
+    private static SipIOResourcesAPI instance;
+    private static Datastore ds;
 
     private SipIOResourcesAPI() {
     }
 
-    public static SipIOResourcesAPI getInstance() {
-        return INSTANCE;
+    public static SipIOResourcesAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new SipIOResourcesAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public List<Domain> getDomains(String f) throws ApiException {

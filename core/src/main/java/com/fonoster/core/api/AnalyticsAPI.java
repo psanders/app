@@ -10,6 +10,7 @@
 package com.fonoster.core.api;
 
 import com.fonoster.annotations.Since;
+import com.fonoster.exception.ApiException;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallDetailRecord;
 import com.fonoster.model.CallStats;
@@ -18,17 +19,26 @@ import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+import java.net.UnknownHostException;
+
 @Since("1.0")
 public class AnalyticsAPI {
-    private static final AnalyticsAPI INSTANCE = new AnalyticsAPI();
-    final private Datastore ds;
+    private static AnalyticsAPI instance;
+    private static Datastore ds;
 
     private AnalyticsAPI() {
-        ds = DBManager.getInstance().getDS();
     }
 
-    public static AnalyticsAPI getInstance() {
-        return INSTANCE;
+    public static AnalyticsAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new AnalyticsAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     // NOTICE: This method could add more data, like duration avg etc.

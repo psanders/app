@@ -22,21 +22,30 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 @Since("1.0")
 public class AgentsAPI {
-    private static final AgentsAPI INSTANCE = new AgentsAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static AgentsAPI instance;
+    private static Datastore ds;
 
     private AgentsAPI() {
     }
 
-    public static AgentsAPI getInstance() {
-        return INSTANCE;
+    public static AgentsAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new AgentsAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public List<Agent> getAgents(User user, DateTime start, DateTime end, int maxResults, int firstResult) throws ApiException {

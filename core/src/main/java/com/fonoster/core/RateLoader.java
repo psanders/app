@@ -12,6 +12,7 @@ package com.fonoster.core;
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.DBManager;
 import com.fonoster.core.api.DIDNumbersAPI;
+import com.fonoster.exception.ApiException;
 import com.fonoster.model.Rate;
 import com.fonoster.model.ServiceProvider;
 import org.apache.commons.csv.CSVFormat;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.UnknownHostException;
 
 /**
  * TODO: This could be automated to check for updates at the end of the day (or every time there is a change)
@@ -43,11 +45,11 @@ public class RateLoader {
     private static final String PREFIX = "Numberplan";
     private final Datastore ds;
 
-    private RateLoader() {
+    private RateLoader() throws UnknownHostException {
         ds = DBManager.getInstance().getDS();
     }
 
-    static public void main(String... args) {
+    static public void main(String... args) throws UnknownHostException, ApiException {
         if (args.length < 3) {
             System.out.println("Expected: {providerId} {rate.csv file} {sellingPercent ie.: 0.05} in that order!");
             System.exit(99);

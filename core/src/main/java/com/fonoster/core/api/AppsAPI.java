@@ -19,18 +19,27 @@ import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+import java.net.UnknownHostException;
 import java.util.List;
 
 @Since("1.0")
 public class AppsAPI {
-    private static final AppsAPI INSTANCE = new AppsAPI();
-    final private Datastore ds = DBManager.getInstance().getDS();
+    private static AppsAPI instance;
+    private static Datastore ds;
 
     private AppsAPI() {
     }
 
-    public static AppsAPI getInstance() {
-        return INSTANCE;
+    public static AppsAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new AppsAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public App createApp(User user, String name, String script) throws ApiException {

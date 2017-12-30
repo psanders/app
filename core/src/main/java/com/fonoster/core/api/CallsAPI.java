@@ -31,22 +31,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
 @Since("1.0")
 public class CallsAPI {
     private static final Logger LOG = LoggerFactory.getLogger(CallsAPI.class);
-    private static final CallsAPI INSTANCE = new CallsAPI();
     private static final CommonsConfig config = CommonsConfig.getInstance();
     private static final CoreConfig coreConfig = CoreConfig.getInstance();
-    private static final Datastore ds = DBManager.getInstance().getDS();
+    private static CallsAPI instance;
+    private static Datastore ds;
 
     private CallsAPI() {
     }
 
-    public static CallsAPI getInstance() {
-        return INSTANCE;
+    public static CallsAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new CallsAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public CallDetailRecord getCDRById(ObjectId id) throws ApiException {
@@ -385,7 +394,11 @@ public class CallsAPI {
                 LOG.info("call.id: " + callDetailRecord.getId() + "  no answer");
                 callDetailRecord.setStatus(CallDetailRecord.Status.NO_ANSWER);
                 updateCDR(callDetailRecord);
-                AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                try {
+                    AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                } catch (ApiException e) {
+                    LOG.warn(e.getMessage());
+                }
             }
 
             @Override
@@ -393,7 +406,11 @@ public class CallsAPI {
                 LOG.info("call.id: " + callDetailRecord.getId() + " busy");
                 callDetailRecord.setStatus(CallDetailRecord.Status.BUSY);
                 updateCDR(callDetailRecord);
-                AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                try {
+                    AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                } catch (ApiException e) {
+                    LOG.warn(e.getMessage());
+                }
             }
 
             @Override
@@ -401,7 +418,11 @@ public class CallsAPI {
                 LOG.info("call.id: " + callDetailRecord.getId() + " fail (cause->" + cause.getMessage() + ")");
                 callDetailRecord.setStatus(CallDetailRecord.Status.FAILED);
                 updateCDR(callDetailRecord);
-                AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                try {
+                    AnalyticsAPI.getInstance().aggregateCall(callDetailRecord.getAccount(), callDetailRecord.getStatus(), callDetailRecord.getAnswerBy(), callDetailRecord.getDirection());
+                } catch (ApiException e) {
+                    LOG.warn(e.getMessage());
+                }
             }
         });
 

@@ -25,6 +25,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -32,16 +33,24 @@ import java.util.Set;
 @Since("1.0")
 public class UsersAPI {
     private static final CommonsConfig commonsConfig = CommonsConfig.getInstance();
-    private static final UsersAPI INSTANCE = new UsersAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
+    private static UsersAPI instance;
+    private static Datastore ds;
 
     private UsersAPI() {
     }
 
-    public static UsersAPI getInstance() {
-        return INSTANCE;
+    public static UsersAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new UsersAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public User createUser(String firstName, String lastName, String email, String password) throws ApiException {

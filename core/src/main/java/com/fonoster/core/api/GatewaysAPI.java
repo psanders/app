@@ -18,20 +18,29 @@ import org.mongodb.morphia.Datastore;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.net.UnknownHostException;
 import java.util.Set;
 
 @Since("1.0")
 public class GatewaysAPI {
-    private static final GatewaysAPI INSTANCE = new GatewaysAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static GatewaysAPI instance;
+    private static Datastore ds;
 
     private GatewaysAPI() {
 
     }
 
-    public static GatewaysAPI getInstance() {
-        return INSTANCE;
+    public static GatewaysAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new GatewaysAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public Gateway createGateway(ServiceProvider provider, String name, Gateway.Spec.RegService regService) throws ApiException {

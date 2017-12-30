@@ -18,20 +18,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Since("1.0")
 public class BillingAPI {
     private static final Logger LOG = LoggerFactory.getLogger(BillingAPI.class);
-    private static final BillingAPI INSTANCE = new BillingAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
+    private static BillingAPI instance;
+    private static Datastore ds;
 
     private BillingAPI() {
     }
 
-    public static BillingAPI getInstance() {
-        return INSTANCE;
+    public static BillingAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new BillingAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     // WARNING: Modo bestia sin cache
@@ -92,7 +101,7 @@ public class BillingAPI {
         return seconds.longValue();
     }
 
-    public synchronized void applyAmount(Account account, BigDecimal amount) {
+    public synchronized void applyAmount(Account account, BigDecimal amount) throws ApiException {
         // Ensure is from database
         User u = account.getUser();
         u = UsersAPI.getInstance().getUserByEmail(u.getEmail());

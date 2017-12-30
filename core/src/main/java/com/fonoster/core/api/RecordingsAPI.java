@@ -29,21 +29,30 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.File;
+import java.net.UnknownHostException;
 import java.util.List;
 
 @Since("1.0")
 public class RecordingsAPI {
-    private static final RecordingsAPI INSTANCE = new RecordingsAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
     private static final CommonsConfig config = CommonsConfig.getInstance();
+    private static RecordingsAPI instance;
+    private static Datastore ds;
 
     private RecordingsAPI() {
     }
 
-    public static RecordingsAPI getInstance() {
-        return INSTANCE;
+    public static RecordingsAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new RecordingsAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public Recording createRecording(CallDetailRecord callDetailRecord) throws ApiException {

@@ -27,22 +27,30 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 @Since("1.0")
 public class DomainsAPI {
-    private static final DomainsAPI INSTANCE = new DomainsAPI();
-    private static final Datastore ds = DBManager.getInstance().getDS();
     private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static DomainsAPI instance = new DomainsAPI();
+    private static Datastore ds;
 
     private DomainsAPI() {
     }
 
-    public static DomainsAPI getInstance() {
-        return INSTANCE;
+    public static DomainsAPI getInstance() throws ApiException {
+        if (instance == null || ds == null) {
+            try {
+                ds = DBManager.getInstance().getDS();
+                instance = new DomainsAPI();
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
+        }
+        return instance;
     }
 
     public Domain createDomain(User user, URI domainUri, String name, String egressRule, String egressDIDRef) throws ApiException {
@@ -153,11 +161,5 @@ public class DomainsAPI {
             .field("user").equal(user)
                 .field("spec.domains").hasThisOne(domainUri)
                     .field("deleted").equal(false).count() > 0;
-    }
-
-    static public void main(String... args) throws URISyntaxException, InvalidParameterException {
-
-        boolean hey = DomainsAPI.getInstance().domainHasAgents(null, new URI("sip.asasasasa.fonoster.com"));
-        System.out.println("hey => " + hey);
     }
 }
