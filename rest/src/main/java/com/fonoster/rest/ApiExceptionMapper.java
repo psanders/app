@@ -21,7 +21,7 @@ public class ApiExceptionMapper implements ExceptionMapper<ApiException> {
   private com.fonoster.rest.Response response;
 
   public Response toResponse(ApiException e) {
-    int status = 400;
+    int status = 500;
 
     if (e instanceof InvalidParameterException) status = 400;
     if (e instanceof InvalidPaymentMethodException) status = 400;
