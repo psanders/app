@@ -10,6 +10,7 @@ package com.fonoster.rest.filters;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.UsersAPI;
+import com.fonoster.exception.ApiException;
 import com.fonoster.model.Account;
 import com.fonoster.model.User;
 import com.fonoster.rest.AuthUtil;
@@ -90,7 +91,12 @@ public class AuthFilter implements ContainerRequestFilter {
         Iterator i = rolesSet.iterator();
 
         //Is user valid?
-        if (!isAllowed(username.trim(), password.trim(), rolesSet)) {
+        try {
+          if (!isAllowed(username.trim(), password.trim(), rolesSet)) {
+            requestContext.abortWith(ACCESS_DENIED);
+          }
+        } catch (ApiException e) {
+          // ?
           requestContext.abortWith(ACCESS_DENIED);
         }
       }
@@ -99,7 +105,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
   // Role will be base on User, Account, Admin or SP
   private boolean isAllowed(
-      final String username, final String secret, final Set<String> rolesSet) {
+      final String username, final String secret, final Set<String> rolesSet) throws ApiException {
     boolean isAllowed = false;
     boolean access = false;
     String userRole = "";

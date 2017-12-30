@@ -11,6 +11,7 @@ package com.fonoster.rest;
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.core.api.UsersAPI;
+import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.User;
@@ -28,7 +29,7 @@ public class AuthUtil {
 
   // Obtain account from http request
   public static Account getAccount(HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+          throws ApiException {
     final Credentials credentials = getCredentialsFromRequest(httpRequest);
     final AccountCredentials accountCredentials = new AccountCredentials(credentials.getUsername(), credentials.getSecret());
     final Account account =
@@ -42,7 +43,7 @@ public class AuthUtil {
   }
 
   // Obtain user from http request
-  public static User getUser(HttpServletRequest httpRequest) throws UnauthorizedAccessException {
+  public static User getUser(HttpServletRequest httpRequest) throws ApiException {
     final Credentials credentials = getCredentialsFromRequest(httpRequest);
     final UserCredentials userCredentials = new UserCredentials(credentials.getUsername(), credentials.getSecret());
     final User user = UsersAPI.getInstance().getUserByEmail(userCredentials.getEmail());

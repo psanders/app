@@ -83,7 +83,7 @@ public class UsersService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Path("/{email}")
   public Response getUser(@PathParam("email") String email, @Context HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+          throws ApiException {
     Account account = AuthUtil.getAccount(httpRequest);
     if (!account.getUser().getEmail().equals(email.trim())) throw new UnauthorizedAccessException();
     User u = UsersAPI.getInstance().getUserByEmail(email);
@@ -148,7 +148,7 @@ public class UsersService {
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Path("/{email}/signup")
-  public Response signup(@PathParam("email") String email) throws UserAlreadyExistException {
+  public Response signup(@PathParam("email") String email) throws ApiException {
 
     User user = UsersAPI.getInstance().getUserByEmail(email);
 

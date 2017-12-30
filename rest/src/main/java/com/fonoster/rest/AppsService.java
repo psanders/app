@@ -25,6 +25,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.net.UnknownHostException;
 import java.util.List;
 
 
@@ -104,7 +105,11 @@ public class AppsService {
       appFromDB.setStarred(app.isStarred());
       appFromDB.setStatus(app.getStatus());
       appFromDB.setModified(DateTime.now());
-      DBManager.getInstance().getDS().save(appFromDB);
+      try {
+        DBManager.getInstance().getDS().save(appFromDB);
+      } catch (UnknownHostException e) {
+        throw new ApiException();
+      }
     }
 
     return Response.ok(appFromDB).build();
@@ -119,7 +124,11 @@ public class AppsService {
     Account account = AuthUtil.getAccount(httpRequest);
     App app = AppsAPI.getInstance().getAppById(account.getUser(), new ObjectId(appId), false);
     app.setStatus(App.Status.DELETED);
-    DBManager.getInstance().getDS().save(app);
+    try {
+      DBManager.getInstance().getDS().save(app);
+    } catch (UnknownHostException e) {
+      throw new ApiException();
+    }
     // Unlink app from all DIDs
     DIDNumbersAPI.getInstance().removeIngressApp(app);
 

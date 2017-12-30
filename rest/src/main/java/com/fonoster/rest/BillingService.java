@@ -112,7 +112,7 @@ public class BillingService {
   @Path("/{email}/autopay/{autopay}")
   public Response autoCharge(
       @PathParam("autopay") Boolean autopay, @Context HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+          throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
     User u = account.getUser();
@@ -195,7 +195,7 @@ public class BillingService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @Path("/{email}/payment_method")
   public Response getPntInfo(@Context HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+          throws ApiException {
     Account account = AuthUtil.getAccount(httpRequest);
     User user = account.getUser();
     return Response.ok(user.getPmntInfo()).build();

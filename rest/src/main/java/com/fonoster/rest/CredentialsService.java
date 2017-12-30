@@ -10,6 +10,7 @@ package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.UsersAPI;
+import com.fonoster.exception.ApiException;
 import com.fonoster.exception.UnauthorizedAccessException;
 import com.fonoster.model.Account;
 import com.fonoster.model.Activity;
@@ -35,7 +36,7 @@ public class CredentialsService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   @PermitAll
   public Response login(@Context HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+          throws ApiException {
     User user = AuthUtil.getUser(httpRequest);
     Account main = UsersAPI.getInstance().getMainAccount(user);
     AccountCredentials accountCredentials = new AccountCredentials(main.getId().toHexString(), main.getToken());
@@ -47,7 +48,7 @@ public class CredentialsService {
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
   // Re-generates the users main account
   // Warning: Should I allow regen of sub-accounts with this method?
-  public Response regenToken(UserCredentials credentials) throws UnauthorizedAccessException {
+  public Response regenToken(UserCredentials credentials) throws ApiException {
     User user = UsersAPI.getInstance().getUserByEmail(credentials.getEmail());
     String encodedSecret = new String(Base64.encodeAsString(credentials.getPassword()));
 

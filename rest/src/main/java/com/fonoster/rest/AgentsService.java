@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
 
@@ -109,12 +110,16 @@ public class AgentsService {
             agentFromDB.setModified(DateTime.now());
 
             // Only update if not empty and not null
-            if (!secret.equals(null) && !secret.isEmpty()) {
+            if (secret != null && !secret.isEmpty()) {
                 agentFromDB.getSpec().getCredentials().setSecret(secret);
             }
         }
 
-        DBManager.getInstance().getDS().save(agentFromDB);
+        try {
+            DBManager.getInstance().getDS().save(agentFromDB);
+        } catch (UnknownHostException e) {
+            throw new ApiException();
+        }
 
         return javax.ws.rs.core.Response.ok(agentFromDB).build();
     }
@@ -128,7 +133,13 @@ public class AgentsService {
         User user = AuthUtil.getAccount(httpRequest).getUser();
         Agent agent = AgentsAPI.getInstance().getAgentById(user, agentId, false);
         agent.setDeleted(true);
-        DBManager.getInstance().getDS().save(agent);
+
+        try {
+            DBManager.getInstance().getDS().save(agent);
+        } catch (UnknownHostException e) {
+            throw new ApiException();
+        }
+
         return javax.ws.rs.core.Response.ok().build();
     }
 

@@ -10,7 +10,7 @@ package com.fonoster.rest;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.core.api.AnalyticsAPI;
-import com.fonoster.exception.UnauthorizedAccessException;
+import com.fonoster.exception.ApiException;
 import com.fonoster.model.Account;
 import com.fonoster.model.CallStats;
 import org.joda.time.DateTime;
@@ -33,7 +33,7 @@ public class AnalyticsService {
   @Path("/calls/{period}")
   public Response getTrafficAnalysis(
       @PathParam("period") CallStats.Period period, @Context HttpServletRequest httpRequest)
-      throws UnauthorizedAccessException {
+          throws ApiException {
 
     Account account = AuthUtil.getAccount(httpRequest);
     CallStats cs = AnalyticsAPI.getInstance().getStats(account, period, DateTime.now());

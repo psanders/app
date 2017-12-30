@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Objects;
 
@@ -126,7 +127,11 @@ public class DomainsService {
                 domain.getSpec().getContext().getDomainUri().toString().toLowerCase()
                     + ".fonoster.com");
             domainFromDB = DomainsAPI.getInstance().createDomain(user, domainUri, name, egressRule, egressDIDRef);
-            DBManager.getInstance().getDS().save(domainFromDB);
+            try {
+                DBManager.getInstance().getDS().save(domainFromDB);
+            } catch (UnknownHostException e) {
+                throw new ApiException();
+            }
         } else {
             // Update object
             domainFromDB = DomainsAPI.getInstance().getDomain(user, domain.getSpec().getContext().getDomainUri(), true);
@@ -152,7 +157,11 @@ public class DomainsService {
             domainFromDB.setDeleted(domain.isDeleted());
         }
 
-        DBManager.getInstance().getDS().save(domainFromDB);
+        try {
+            DBManager.getInstance().getDS().save(domainFromDB);
+        } catch (UnknownHostException e) {
+            throw new ApiException();
+        }
 
         return javax.ws.rs.core.Response.ok(domainFromDB).build();
     }
