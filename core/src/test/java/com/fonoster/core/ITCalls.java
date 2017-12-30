@@ -8,21 +8,14 @@
  */
 package com.fonoster.core;
 
-import com.fonoster.core.api.CallsAPI;
-import com.fonoster.core.api.UsersAPI;
-import com.fonoster.model.Account;
-import com.fonoster.model.CallRequest;
-import com.fonoster.model.User;
-import org.junit.Test;
-
 public class ITCalls {
 
-    @Test
+    /*@Test
     public void call() throws Exception {
         User john = UsersAPI.getInstance().getUserByEmail("john@doe.com");
         Account account = UsersAPI.getInstance().getMainAccount(john);
 
-        CallRequest cr = new CallRequest("59838da929de851aada867c2",
+        /*CallRequest cr = new CallRequest("59838da929de851aada867c2",
                 "",
                 account.getId().toString(),
                 "+9198972120",
@@ -34,6 +27,6 @@ public class ITCalls {
                 "v1.0",
                 false);
 
-        CallsAPI.getInstance().call(cr);
-    }
+       // CallsAPI.getInstance().call(cr);
+    }*/
 }

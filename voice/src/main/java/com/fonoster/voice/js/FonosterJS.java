@@ -8,6 +8,8 @@
  */
 package com.fonoster.voice.js;
 
+import static java.util.logging.Level.WARNING;
+
 import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
 import com.fonoster.core.api.*;
@@ -16,6 +18,8 @@ import com.fonoster.model.*;
 import com.fonoster.voice.asr.ASRFactory;
 import com.fonoster.voice.tts.TTSFactory;
 import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import javax.script.*;
 import org.astivetoolkit.agi.AgiException;
 import org.astivetoolkit.astivlet.Astivlet;
 import org.astivetoolkit.astivlet.AstivletRequest;
@@ -24,11 +28,6 @@ import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.script.*;
-import java.math.BigDecimal;
-
-import static java.util.logging.Level.WARNING;
 
 @Since("1.0")
 public class FonosterJS extends Astivlet {
@@ -223,14 +222,22 @@ public class FonosterJS extends Astivlet {
       callDetailRecord.setStatus(CallDetailRecord.Status.COMPLETED);
     }
 
-    CallsAPI.getInstance().updateCDR(callDetailRecord);
+    try {
+      CallsAPI.getInstance().updateCDR(callDetailRecord);
+    } catch (ApiException e) {
+      LOG.error(e.getMessage());
+    }
 
-    AnalyticsAPI.getInstance()
-        .aggregateCall(
-            callDetailRecord.getAccount(),
-            callDetailRecord.getStatus(),
-            callDetailRecord.getAnswerBy(),
-            callDetailRecord.getDirection());
+    try {
+      AnalyticsAPI.getInstance()
+          .aggregateCall(
+              callDetailRecord.getAccount(),
+              callDetailRecord.getStatus(),
+              callDetailRecord.getAnswerBy(),
+              callDetailRecord.getDirection());
+    } catch (ApiException e) {
+      LOG.error(e.getMessage());
+    }
   }
 
   private String getEntryPointSource(App app) throws ApiException {
