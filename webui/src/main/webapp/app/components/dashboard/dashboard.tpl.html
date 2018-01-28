@@ -38,7 +38,7 @@
             </md-menu>
         </md-card-header>
         <md-card-content>
-            <small ng-hide="ctrl.data.length > 1" >Nothing yet</small>
+            <small ng-hide="ctrl.data.length > 1" >No data</small>
             <nvd3 ng-show="ctrl.data.length > 1" options="ctrl.options" data="ctrl.data" com.fonoster.config="{refreshDataOnly: false}"></nvd3>
         </md-card-content>
     </md-card>
