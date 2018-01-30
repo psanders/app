@@ -15,7 +15,9 @@ public class ApiException extends Exception {
 
   private static final long serialVersionUID = 1L;
 
-  public ApiException() {}
+  public ApiException() {
+    super("Service is temporarily unavailable, please try again later");
+  }
 
   public ApiException(String message) {
     super(message);
