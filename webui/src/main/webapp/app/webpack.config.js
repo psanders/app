@@ -11,7 +11,7 @@ module.exports = function(env) {
             app: ['./app.js'],
             vendor: [
                 'angular',
-                'angular-ui-router',
+                '@uirouter/angularjs',
                 'angular-route',
                 'angular-base64',
                 'angular-resource',
