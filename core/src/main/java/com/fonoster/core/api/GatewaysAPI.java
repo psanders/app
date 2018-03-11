@@ -11,9 +11,13 @@ package com.fonoster.core.api;
 
 import com.fonoster.annotations.Since;
 import com.fonoster.exception.ApiException;
+import com.fonoster.exception.InvalidParameterException;
+import com.fonoster.exception.ResourceNotFoundException;
 import com.fonoster.model.Gateway;
 import com.fonoster.model.ServiceProvider;
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -63,5 +67,17 @@ public class GatewaysAPI {
         ds.save(gateway);
         return gateway;
     }
+
+    public Gateway getGatewayById(ObjectId id) throws ResourceNotFoundException, InvalidParameterException {
+
+        if (id == null) throw  new InvalidParameterException();
+
+        Query q = ds.createQuery(Gateway.class).field("_id").equal(id);
+        Gateway result = (Gateway) q.get();
+
+        if (result == null) throw new ResourceNotFoundException();
+        return result;
+    }
+
 
 }
