@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Response {
   private int status;
   private String message;
+  private Object result;
 
   // Must have no-argument constructor
   public Response() {}
@@ -46,9 +47,18 @@ public class Response {
     this.message = message;
   }
 
+  public Object getResult() {
+    return result;
+  }
+
+  public void setResult(Object result) {
+    this.result = result;
+  }
+
   // Creates toString using reflection
   @Override
   public String toString() {
     return ReflectionToStringBuilder.toString(this);
   }
+
 }
