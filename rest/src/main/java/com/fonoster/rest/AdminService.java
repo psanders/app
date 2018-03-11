@@ -8,21 +8,20 @@
  */
 package com.fonoster.rest;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fonoster.annotations.Since;
-import com.fonoster.core.api.*;
+import com.fonoster.core.api.SipIOResourcesAPI;
 import com.fonoster.exception.ApiException;
 import com.fonoster.model.*;
+import net.minidev.json.JSONObject;
 
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.net.URI;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Since("1.0")
@@ -33,181 +32,153 @@ public class AdminService {
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/dids")
-  public Response addDIDNumber(
-          DIDRequest didRequest, @Context HttpServletRequest httpRequest)
-      throws ApiException {
+  @Path("/{collection}")
+  public Response addResource(
+          @PathParam("collection") String collection,
+          JSONObject jsonObj, @Context HttpServletRequest httpRequest)
+          throws ApiException, IOException {
+    String result = SipIOResourcesAPI.getInstance().insert(jsonObj);
 
-    Account account = AuthUtil.getAccount(httpRequest);
+    com.fonoster.rest.Response res = new com.fonoster.rest.Response(
+        Status.CREATED.getValue(),
+        Status.getMessage(Status.CREATED)
+    );
 
-    DIDNumber didNumber = DIDNumbersAPI.getInstance().getDIDNumber("tel:" + didRequest.getNumber());
-    didNumber.setUser(account.getUser());
+    res.setResult(result);
 
-    DIDNumbersAPI.getInstance().updateDIDNumber(account.getUser(), didNumber);
-
-    UsersAPI.getInstance()
-        .createActivity(
-            account.getUser(),
-            "Added number: " + didRequest.getNumber(),
-            Activity.Type.SYS);
-
-    return Response.ok(didNumber).build();
+    return Response.ok(res.getStatus()).entity(res).build();
   }
 
   @GET
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/domains")
-  public Response getDomains(
-      @QueryParam("filter") String filter, @Context HttpServletRequest httpRequest)
-      throws ApiException {
+  @Path("/{collection}/{ref}")
+  public Response get(
+          @PathParam("collection") String collection,
+          @PathParam("ref") String ref,
+          @Context HttpServletRequest httpRequest)
+          throws ApiException {
 
-      List<Domain> domains = SipIOResourcesAPI.getInstance().getDomains(filter);
+    Object obj = null;
 
-     // See: http://stackoverflow.com/a/6081716/1320815
-      GenericEntity<List<Domain>> result =
-          new GenericEntity<List<Domain>>(domains) {};
+    switch (collection) {
+      case "gateways":
+        obj = SipIOResourcesAPI.getInstance().get(Gateway.class, ref);
+        break;
+      case "dids":
+        obj = SipIOResourcesAPI.getInstance().get(DIDNumber.class, ref);
+        break;
+      case "agents":
+        obj = SipIOResourcesAPI.getInstance().get(Agent.class, ref);
+        break;
+      case "domains":
+        obj = SipIOResourcesAPI.getInstance().get(Domain.class, ref);
+        break;
+    }
 
-    return Response.ok(result).build();
+    Status status = Status.OK;
+    if (obj == null) status = Status.NOT_FOUND;
+
+    com.fonoster.rest.Response res = new com.fonoster.rest.Response(
+        status.getValue(),
+        Status.getMessage(status)
+    );
+
+    res.setResult(obj);
+
+    return Response.ok(res.getStatus()).entity(res).build();
   }
+
+  @DELETE
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{collection}/{ref}")
+  public Response remove(
+          @PathParam("collection") String collection,
+          @PathParam("ref") String ref,
+          @Context HttpServletRequest httpRequest)
+          throws ApiException {
+
+    switch (collection) {
+      case "gateways":
+        SipIOResourcesAPI.getInstance().remove(Gateway.class, ref);
+        break;
+      case "dids":
+        SipIOResourcesAPI.getInstance().remove(DIDNumber.class, ref);
+        break;
+      case "agents":
+        SipIOResourcesAPI.getInstance().remove(Agent.class, ref);
+        break;
+      case "domains":
+        SipIOResourcesAPI.getInstance().remove(Domain.class, ref);
+        break;
+    }
+
+    Status status = Status.OK;
+
+    com.fonoster.rest.Response res = new com.fonoster.rest.Response(
+            status.getValue(),
+            Status.getMessage(status)
+    );
+
+    return Response.ok(res.getStatus()).entity(res).build();
+  }
+
+  @PUT
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  @Path("/{collection}/{ref}")
+  public Response updateResource(
+          @PathParam("collection") String collection,
+          @PathParam("ref") String ref,
+          JSONObject jsonObj, @Context HttpServletRequest httpRequest)
+          throws ApiException, IOException {
+    SipIOResourcesAPI.getInstance().update(jsonObj);
+
+    com.fonoster.rest.Response res = new com.fonoster.rest.Response(
+            Status.OK.getValue(),
+            Status.getMessage(Status.OK)
+    );
+
+    return Response.ok(res.getStatus()).entity(res).build();
+  }
+
 
   @GET
   @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/domains/{uri}")
-  public Response getDomainsByUri(
-      @PathParam("uri") URI uri, @Context HttpServletRequest httpRequest) throws ApiException {
-    Domain domain = SipIOResourcesAPI.getInstance().getDomainByUri(uri);
-    return Response.ok(domain).build();
-  }
-
-  @GET
-  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/agents")
-  public Response getAgents(
-      @QueryParam("domainUri") URI domainUri,
-      @QueryParam("filter") String filter,
-      @Context HttpServletRequest httpRequest)
-      throws ApiException {
-      List<Agent> agents = SipIOResourcesAPI.getInstance().getAgents(domainUri, filter);
-
-      // See: http://stackoverflow.com/a/6081716/1320815
-      GenericEntity<List<Agent>> result =
-        new GenericEntity<List<Agent>>(agents) {};
-
-    return Response.ok(result).build();
-  }
-
-  @GET
-  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/dids")
-  public Response getDIDNumbers(
+  @Path("/{collection}")
+  public Response getCollection(
+          @PathParam("collection") String collection,
           @QueryParam("filter") String filter,
           @Context HttpServletRequest httpRequest)
           throws ApiException {
-    List<DIDNumber> didNumbers = SipIOResourcesAPI.getInstance().getDIDNumbers(filter);
 
-    // See: http://stackoverflow.com/a/6081716/1320815
-    GenericEntity<List<DIDNumber>> result =
-            new GenericEntity<List<DIDNumber>>(didNumbers) {};
+    List<Agent> list = new ArrayList<>();
 
-    return Response.ok(result).build();
+    switch (collection) {
+      case "gateways":
+        list = SipIOResourcesAPI.getInstance().find(Gateway.class, filter);
+        break;
+      case "dids":
+        list = SipIOResourcesAPI.getInstance().find(DIDNumber.class, filter);
+        break;
+      case "agents":
+        list = SipIOResourcesAPI.getInstance().find(Agent.class, filter);
+        break;
+      case "domains":
+        list = SipIOResourcesAPI.getInstance().find(Domain.class, filter);
+        break;
+    }
+
+    Status status = Status.OK;
+    if (list.isEmpty()) status = Status.NOT_FOUND;
+
+    com.fonoster.rest.Response res = new com.fonoster.rest.Response(
+        status.getValue(),
+        Status.getMessage(status)
+    );
+
+    res.setResult(list);
+
+    return Response.ok(res.getStatus()).entity(res).build();
   }
 
-  @GET
-  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-  @Path("/gateways")
-  public Response getGateways(
-          @QueryParam("filter") String filter,
-          @Context HttpServletRequest httpRequest)
-          throws ApiException {
-    List<Gateway> gateways = SipIOResourcesAPI.getInstance().getGateways(filter);
-
-    // See: http://stackoverflow.com/a/6081716/1320815
-    GenericEntity<List<Gateway>> result =
-            new GenericEntity<List<Gateway>>(gateways) {};
-
-    return Response.ok(result).build();
-  }
-
-  // For media type "xml", this inner class must be static have the @XmlRootElement annotation
-  // and a no-argument constructor.
-  @XmlRootElement
-  static class DIDRequest {
-    // Service Provider ID
-    private String spId;
-    private String number;
-    private String countryISOCode;
-    private boolean voiceEnabled;
-    private boolean smsEnabled;
-    private boolean mmsEnabled;
-
-    // Must have no-argument constructor
-    public DIDRequest() {}
-
-    // Not marking this with JsonProperty was causing;
-    // No suitable constructor found for type [simple type,
-    // class CredentialsService$CredentialsRequest]:
-    // can not instantiate from JSON object (need to add/enable type information?)
-    public DIDRequest(
-        // Warning: Are this JsonProperty necessary
-        @JsonProperty("spId") String spId,
-        @JsonProperty("number") String number,
-        @JsonProperty("voiceEnabled") boolean voiceEnabled,
-        @JsonProperty("smsEnabled") boolean smsEnabled,
-        @JsonProperty("mmsEnabled") boolean mmsEnabled) {
-      this.setSpId(spId);
-      this.setNumber(number);
-      this.setCountryISOCode(getCountryISOCode());
-      this.setVoiceEnabled(voiceEnabled);
-      this.setSmsEnabled(smsEnabled);
-      this.setMmsEnabled(mmsEnabled);
-    }
-
-    public String getSpId() {
-      return spId;
-    }
-
-    public void setSpId(String spId) {
-      this.spId = spId;
-    }
-
-    public String getNumber() {
-      return number;
-    }
-
-    public void setNumber(String number) {
-      this.number = number;
-    }
-
-    public String getCountryISOCode() {
-      return countryISOCode;
-    }
-
-    public void setCountryISOCode(String countryISOCode) {
-      this.countryISOCode = countryISOCode;
-    }
-
-    public boolean isVoiceEnabled() {
-      return voiceEnabled;
-    }
-
-    public void setVoiceEnabled(boolean voiceEnabled) {
-      this.voiceEnabled = voiceEnabled;
-    }
-
-    public boolean isSmsEnabled() {
-      return smsEnabled;
-    }
-
-    public void setSmsEnabled(boolean smsEnabled) {
-      this.smsEnabled = smsEnabled;
-    }
-
-    public boolean isMmsEnabled() {
-      return mmsEnabled;
-    }
-
-    public void setMmsEnabled(boolean mmsEnabled) {
-      this.mmsEnabled = mmsEnabled;
-    }
-  }
 }
