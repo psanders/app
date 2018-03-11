@@ -54,6 +54,7 @@ public class Agent {
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
     this.metadata = new HashMap();
     metadata.put("name", name);
+    metadata.put("ref", this.id.toString());
     this.spec = spec;
   }
 
