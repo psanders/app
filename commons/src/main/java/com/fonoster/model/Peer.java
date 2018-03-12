@@ -16,26 +16,21 @@ import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Reference;
 
-import javax.validation.Valid;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Since("1.0")
 @Entity
 @XmlRootElement
-public class Agent {
+public class Peer {
   @Id private ObjectId id;
   @NotNull private DateTime created;
   @NotNull private DateTime modified;
-  @NotNull @Reference @Valid private User user;
   @AssertFalse private boolean deleted;
   @NotNull private String apiVersion;
   @NotNull private String kind = getClass().getSimpleName();
@@ -43,13 +38,12 @@ public class Agent {
   @NotNull private Spec spec;
 
   // Must have no-argument constructor
-  public Agent() {}
+  public Peer() {}
 
-  public Agent(User user, String name, Spec spec) {
+  public Peer(String name, Spec spec) {
     this.id = new ObjectId();
     this.modified = new DateTime();
     this.created = new DateTime();
-    this.user = user;
     this.deleted = false;
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
     this.metadata = new HashMap();
@@ -81,16 +75,6 @@ public class Agent {
 
   public void setModified(DateTime modified) {
     this.modified = modified;
-  }
-
-  @JsonIgnore
-  @XmlTransient
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
   }
 
   // Can only be deleted if is a sub-account
@@ -137,8 +121,9 @@ public class Agent {
   }
 
   public static class Spec {
+    private String device;
+    private String contactAddress;
     @NotNull private Credentials credentials;
-    private List<URI> domains;
 
     public Credentials getCredentials() {
       return credentials;
@@ -148,12 +133,20 @@ public class Agent {
       this.credentials = credentials;
     }
 
-    public List<URI> getDomains() {
-      return domains;
+    public String getDevice() {
+      return device;
     }
 
-    public void setDomains(List domains) {
-      this.domains = domains;
+    public void setDevice(String device) {
+      this.device = device;
+    }
+
+    public String getContactAddress() {
+      return contactAddress;
+    }
+
+    public void setContactAddress(String contactAddress) {
+      this.contactAddress = contactAddress;
     }
 
     public static class Credentials {
@@ -183,6 +176,7 @@ public class Agent {
         this.secret = secret;
       }
     }
+
   }
 
   // Creates toString using reflection
