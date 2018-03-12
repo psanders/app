@@ -135,6 +135,19 @@ public class DIDNumbersAPI {
         return didNumber;
     }
 
+    public DIDNumber getDIDNumberByRef(String didRef) throws ApiException {
+        LOG.debug("Getting obj DIDNumber with reference: " + didRef);
+
+        DIDNumber didNumber = ds.createQuery(DIDNumber.class)
+                .field("id").equal(new ObjectId(didRef))
+                .field("status").equal(DIDNumber.Status.ACTIVE).get();
+
+        if (didNumber == null) throw new ApiException("Unable to find number with ref " + didRef);
+
+        return didNumber;
+    }
+
+
     private boolean existDIDNumber(String number) throws ApiException {
         LOG.debug("Getting obj DIDNumber for: " + number);
         DIDNumber didNumber = ds.createQuery(DIDNumber.class)
