@@ -4,6 +4,7 @@ nodes/
 clients/
 astivetoolkit/
 out
+*.class
 
 # eclipse
 .classpath

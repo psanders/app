@@ -73,6 +73,9 @@ public class AdminService {
       case "domains":
         obj = SipIOResourcesAPI.getInstance().get(Domain.class, ref);
         break;
+      case "peers":
+        obj = SipIOResourcesAPI.getInstance().get(Peer.class, ref);
+        break;
     }
 
     Status status = Status.OK;
@@ -109,6 +112,9 @@ public class AdminService {
         break;
       case "domains":
         SipIOResourcesAPI.getInstance().remove(Domain.class, ref);
+        break;
+      case "peers":
+        SipIOResourcesAPI.getInstance().remove(Peer.class, ref);
         break;
     }
 
@@ -165,6 +171,9 @@ public class AdminService {
         break;
       case "domains":
         list = SipIOResourcesAPI.getInstance().find(Domain.class, filter);
+        break;
+      case "peers":
+        list = SipIOResourcesAPI.getInstance().find(Peer.class, filter);
         break;
     }
 

@@ -73,9 +73,6 @@ public class SipIOResourcesAPI {
                         throw new MissingDepencyException();
                     }
 
-                    System.out.println("username: " + gateway.getSpec().getRegService().getCredentials().getUsername());
-                    System.out.println("host: " + gateway.getSpec().getRegService().getHost());
-
                     // Look for GW using this reference
                     List l = find(Gateway.class, "@.spec.regService.credentials.username=='"
                             + gateway.getSpec().getRegService().getCredentials().getUsername()
@@ -87,6 +84,7 @@ public class SipIOResourcesAPI {
 
                     return GatewaysAPI.getInstance().createGateway(sp, gateway.getMetadata().get("name")
                             , gateway.getSpec().getRegService()).getId().toString();
+
                 case "DID":
                     DIDNumber d = mapper.readValue(jsonObj.toJSONString(), DIDNumber.class);
 
@@ -104,6 +102,7 @@ public class SipIOResourcesAPI {
                     ds.save(didNumber);
 
                     return didNumber.getId().toString();
+
                 case "Agent":
                     Agent a = mapper.readValue(jsonObj.toJSONString(), Agent.class);
 
@@ -116,6 +115,7 @@ public class SipIOResourcesAPI {
                     ds.save(agent);
 
                     return agent.getId().toString();
+
                 case "Domain":
                     Domain dm = mapper.readValue(jsonObj.toJSONString(), Domain.class);
 
@@ -127,6 +127,12 @@ public class SipIOResourcesAPI {
                     Domain domain = new Domain(u, dm.getMetadata().get("name"), dm.getSpec().getContext());
                     ds.save(domain);
                     return domain.getId().toString();
+
+                case "Peer":
+                    Peer pr = mapper.readValue(jsonObj.toJSONString(), Peer.class);
+                    Peer peer = new Peer(pr.getMetadata().get("name"), pr.getSpec());
+                    ds.save(peer);
+                    return peer.getId().toString();
             }
         } catch(IOException e) {
             throw new ApiException(e.getMessage());
@@ -234,6 +240,18 @@ public class SipIOResourcesAPI {
 
                     ds.save(domainFromDb);
                     return domainFromDb.getId().toString();
+
+                case "Peer":
+                    Peer pr = mapper.readValue(jsonObj.toJSONString(), Peer.class);
+                    ObjectId peerId = new ObjectId(pr.getMetadata().get("ref"));
+
+                    Peer peerFromDb = PeersAPI.getInstance().getPeerById(peerId, false);
+                    peerFromDb.setModified(new DateTime());
+                    peerFromDb.setSpec(pr.getSpec());
+                    peerFromDb.setMetadata(pr.getMetadata());
+
+                    ds.save(peerFromDb);
+                    return peerFromDb.getId().toString();
             }
         } catch(IOException e) {
             throw new ApiException(e.getMessage());
@@ -273,10 +291,14 @@ public class SipIOResourcesAPI {
                             .field("_id").equal(ref)
                                 .get();
                     break;
+                case "Peer":
+                    obj = ds.createQuery(Peer.class)
+                        .field("deleted").equal(false)
+                            .field("_id").equal(ref)
+                                .get();
+                    break;
             }
-        }  catch(InstantiationException e) {
-            throw new ApiException(e.getMessage());
-        } catch (IllegalAccessException e) {
+        }  catch(InstantiationException | IllegalAccessException e) {
             throw new ApiException(e.getMessage());
         }
 
@@ -307,6 +329,9 @@ public class SipIOResourcesAPI {
                     break;
                 case "Domain":
                     objs = ds.createQuery(Domain.class).field("deleted").equal(false).asList();
+                    break;
+                case "Peer":
+                    objs = ds.createQuery(Peer.class).field("deleted").equal(false).asList();
                     break;
             }
 
