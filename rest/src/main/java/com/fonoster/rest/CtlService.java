@@ -26,8 +26,8 @@ import java.util.List;
 
 @Since("1.0")
 @RolesAllowed({"ADMIN"})
-@Path("/admin")
-public class AdminService {
+@Path("/ctl")
+public class CtlService {
 
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
