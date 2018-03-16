@@ -15,8 +15,7 @@ public class FoundDependentResourcesException extends ApiException {
 
   private static final long serialVersionUID = 1L;
 
-  public FoundDependentResourcesException() {
-  }
+  public FoundDependentResourcesException() {}
 
   public FoundDependentResourcesException(String message) {
     super(message);

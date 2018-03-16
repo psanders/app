@@ -15,8 +15,7 @@ public class MissingDepencyException extends ApiException {
 
   private static final long serialVersionUID = 1L;
 
-  public MissingDepencyException() {
-  }
+  public MissingDepencyException() {}
 
   public MissingDepencyException(String message) {
     super(message);

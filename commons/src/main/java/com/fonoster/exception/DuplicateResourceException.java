@@ -15,8 +15,7 @@ public class DuplicateResourceException extends ApiException {
 
   private static final long serialVersionUID = 1L;
 
-  public DuplicateResourceException() {
-  }
+  public DuplicateResourceException() {}
 
   public DuplicateResourceException(String message) {
     super(message);
