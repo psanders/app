@@ -133,11 +133,12 @@ public class SipIOResourcesAPI {
                     Peer peer = new Peer(pr.getMetadata().get("name"), pr.getSpec());
                     ds.save(peer);
                     return peer.getId().toString();
+                default:
+                    throw new ApiException("Invalid resource type");
             }
         } catch(IOException e) {
             throw new ApiException(e.getMessage());
         }
-        return null;
     }
 
     public String update(JSONObject jsonObj) throws ApiException {
