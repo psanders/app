@@ -108,7 +108,7 @@ public class AuthFilter implements ContainerRequestFilter {
       final String username, final String secret, final Set<String> rolesSet) throws ApiException {
     boolean isAllowed = false;
     boolean access = false;
-    String userRole = "";
+    String userRole;
 
     // Is an account request
     if(ObjectId.isValid(username)) {
