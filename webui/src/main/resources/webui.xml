@@ -9,9 +9,8 @@
     <Set name="virtualHosts">
         <Array type="java.lang.String">
             <Item>localhost</Item>
-            <Item>192.168.99.100</Item>
+            <Item>127.0.0.1</Item>
             <Item>console.fonoster.com</Item>
-            <Item>qa.fonoster.com</Item>
         </Array>
     </Set>
 </Configure>
