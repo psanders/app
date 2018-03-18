@@ -157,7 +157,7 @@ public class CtlService {
           @Context HttpServletRequest httpRequest)
           throws ApiException {
 
-    List<Agent> list = new ArrayList<>();
+    List list = new ArrayList<>();
 
     switch (collection) {
       case "gateways":
@@ -174,6 +174,9 @@ public class CtlService {
         break;
       case "peers":
         list = SipIOResourcesAPI.getInstance().find(Peer.class, filter);
+        break;
+      case "users":
+        list = SipIOResourcesAPI.getInstance().getSystemUsers();
         break;
     }
 

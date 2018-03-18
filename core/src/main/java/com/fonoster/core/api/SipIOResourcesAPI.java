@@ -12,6 +12,7 @@ package com.fonoster.core.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fonoster.annotations.Since;
+import com.fonoster.config.CommonsConfig;
 import com.fonoster.exception.*;
 import com.fonoster.model.*;
 import com.google.common.base.Strings;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -374,4 +376,16 @@ public class SipIOResourcesAPI {
             throw new ApiException(e.getMessage());
         }
     }
+
+    public List<SystemUser> getSystemUsers() {
+        SystemUser.Spec spec = new SystemUser.Spec();
+        spec.setCredentials(new SystemUser.Spec.Credentials(CommonsConfig.getInstance().getAdminUsername(),
+                CommonsConfig.getInstance().getAdminSecret()));
+        SystemUser user = new SystemUser("CTLUser", spec);
+        ArrayList<SystemUser> list = new ArrayList();
+        list.add(user);
+        return list;
+    }
+
+
 }

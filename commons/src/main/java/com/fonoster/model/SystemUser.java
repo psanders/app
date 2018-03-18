@@ -1,69 +1,28 @@
-/**
- * Copyright (C) 2017 <fonosterteam@fonoster.com> https://fonoster.com
- *
- * <p>This file is part of Fonoster
- *
- * <p>Fonoster can not be copied and/or distributed without the express permission of Fonoster's
- * copyright owners.
- */
 package com.fonoster.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fonoster.annotations.Since;
 import com.fonoster.config.CommonsConfig;
-import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import javax.validation.Valid;
-import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Reference;
 
-@Since("1.0")
-@Entity
-@XmlRootElement
-public class Agent {
-  @Id private ObjectId id;
+public class SystemUser {
   @NotNull private DateTime created;
   @NotNull private DateTime modified;
-  @NotNull @Reference @Valid private User user;
-  @AssertFalse private boolean deleted;
   @NotNull private String apiVersion;
-  @NotNull private String kind = getClass().getSimpleName();
+  @NotNull private String kind = "User";
   @NotNull private Map<String, String> metadata;
   @NotNull private Spec spec;
 
-  // Must have no-argument constructor
-  public Agent() {}
-
-  public Agent(User user, String name, Spec spec) {
-    this.id = new ObjectId();
+  public SystemUser(String name, Spec spec) {
     this.modified = new DateTime();
     this.created = new DateTime();
-    this.user = user;
-    this.deleted = false;
     this.apiVersion = CommonsConfig.getInstance().getCurrentVersion();
     this.metadata = new HashMap();
     metadata.put("name", name);
-    metadata.put("ref", this.id.toString());
+    metadata.put("ref", new ObjectId().toString());
     this.spec = spec;
-  }
-
-  @JsonIgnore
-  public ObjectId getId() {
-    return id;
-  }
-
-  public void setId(ObjectId id) {
-    this.id = id;
   }
 
   public DateTime getCreated() {
@@ -80,27 +39,6 @@ public class Agent {
 
   public void setModified(DateTime modified) {
     this.modified = modified;
-  }
-
-  @JsonIgnore
-  @XmlTransient
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  // Can only be deleted if is a sub-account
-  @JsonIgnore
-  @XmlTransient
-  public boolean isDeleted() {
-    return deleted;
-  }
-
-  public void setDeleted(boolean deleted) {
-    this.deleted = deleted;
   }
 
   public String getApiVersion() {
@@ -137,7 +75,6 @@ public class Agent {
 
   public static class Spec {
     @NotNull private Credentials credentials;
-    private List<URI> domains;
 
     public Credentials getCredentials() {
       return credentials;
@@ -145,14 +82,6 @@ public class Agent {
 
     public void setCredentials(Credentials credentials) {
       this.credentials = credentials;
-    }
-
-    public List<URI> getDomains() {
-      return domains;
-    }
-
-    public void setDomains(List domains) {
-      this.domains = domains;
     }
 
     public static class Credentials {
@@ -182,11 +111,5 @@ public class Agent {
         this.secret = secret;
       }
     }
-  }
-
-  // Creates toString using reflection
-  @Override
-  public String toString() {
-    return ReflectionToStringBuilder.toString(this);
   }
 }
