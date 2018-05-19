@@ -332,10 +332,10 @@ public class CallsAPI {
         updateCDR(callDetailRecord);
 
         // Setting up the channel info
-        String host = didNumber.getGateway().getSpec().getRegService().getHost();
+        String host = didNumber.getGateway().getSpec().getHost();
         String toURI = reformattedTo.replace("+", "") + "@" + host;
         String fromURI = didNumber.getSpec().getLocation().getTelUrl().replace("tel:", "") + "@" + host;
-        String gwUser = didNumber.getGateway().getSpec().getRegService().getCredentials().getUsername() + "@" + host;
+        String gwUser = didNumber.getGateway().getSpec().getCredentials().getUsername() + "@" + host;
         String channel = "SIP/" + toURI + "!" + toURI  + "!" + gwUser;
 
         // Set a delay base on server-loa

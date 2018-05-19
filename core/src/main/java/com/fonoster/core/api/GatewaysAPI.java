@@ -47,11 +47,8 @@ public class GatewaysAPI {
         return instance;
     }
 
-    public Gateway createGateway(ServiceProvider provider, String name, Gateway.Spec.RegService regService) throws ApiException {
-        Gateway gateway = new Gateway(provider, name, regService);
-        Gateway.Spec spec = new Gateway.Spec();
-        spec.setRegService(regService);
-        gateway.setSpec(spec);
+    public Gateway createGateway(ServiceProvider provider, String name, Gateway.Spec spec) throws ApiException {
+        Gateway gateway = new Gateway(provider, name, spec);
 
         // JavaBean validation
         if (!validator.validate(gateway).isEmpty()) {

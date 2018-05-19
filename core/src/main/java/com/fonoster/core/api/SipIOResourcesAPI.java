@@ -76,16 +76,16 @@ public class SipIOResourcesAPI {
                     }
 
                     // Look for GW using this reference
-                    List l = find(Gateway.class, "@.spec.regService.credentials.username=='"
-                            + gateway.getSpec().getRegService().getCredentials().getUsername()
-                            + "' && @.spec.regService.host=='" + gateway.getSpec().getRegService().getHost() + "'");
+                    List l = find(Gateway.class, "@.spec.credentials.username=='"
+                            + gateway.getSpec().getCredentials().getUsername()
+                            + "' && @.spec.host=='" + gateway.getSpec().getHost() + "'");
 
                     if(l.size() > 0) {
                         throw new DuplicateResourceException();
                     }
 
                     return GatewaysAPI.getInstance().createGateway(sp, gateway.getMetadata().get("name")
-                            , gateway.getSpec().getRegService()).getId().toString();
+                            , gateway.getSpec()).getId().toString();
 
                 case "DID":
                     DIDNumber d = mapper.readValue(jsonObj.toJSONString(), DIDNumber.class);
@@ -165,9 +165,9 @@ public class SipIOResourcesAPI {
                     }
 
                     // Look for GW using this reference
-                    List l = find(Gateway.class, "@.spec.regService.credentials.username=='"
-                            + gateway.getSpec().getRegService().getCredentials().getUsername()
-                            + "' && @.spec.regService.host=='" + gateway.getSpec().getRegService().getHost() + "'");
+                    List l = find(Gateway.class, "@.spec.credentials.username=='"
+                            + gateway.getSpec().getCredentials().getUsername()
+                            + "' && @.spec.host=='" + gateway.getSpec().getHost() + "'");
 
                     if(l.size() == 0) {
                         throw new ResourceNotFoundException();

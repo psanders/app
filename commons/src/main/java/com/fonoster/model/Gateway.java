@@ -45,7 +45,7 @@ public class Gateway {
   // Must have no-argument constructor
   public Gateway() {}
 
-  public Gateway(ServiceProvider provider, String name, Spec.RegService regService) {
+  public Gateway(ServiceProvider provider, String name, Spec spec) {
     this.id = new ObjectId();
     this.modified = new DateTime();
     this.created = new DateTime();
@@ -55,8 +55,7 @@ public class Gateway {
     this.metadata = new HashMap();
     metadata.put("name", name);
     metadata.put("ref", this.id.toString());
-    this.spec = new Spec();
-    this.spec.setRegService(regService);
+    this.spec = spec;
   }
 
   @JsonIgnore
@@ -141,90 +140,78 @@ public class Gateway {
   }
 
   public static class Spec {
-    @NotNull private RegService regService;
+    @NotNull private String host;
+    @NotNull private String transport; // Default is UDP
+    @NotNull private Credentials credentials;
+    private List<String> registries;
 
-    public RegService getRegService() {
-      return regService;
+    // Must have no-argument constructor
+    public Spec() {}
+
+    public Spec(String host, String transport, Credentials credentials) {
+      this.host = host;
+      this.transport = transport;
+      this.credentials = credentials;
     }
 
-    public void setRegService(RegService regService) {
-      this.regService = regService;
+    public String getHost() {
+      return host;
     }
 
-    public static class RegService {
-      @NotNull private String host;
-      @NotNull private String transport; // Default is UDP
-      @NotNull private Credentials credentials;
-      private List<String> registries;
+    public void setHost(String host) {
+      this.host = host;
+    }
+
+    public String getTransport() {
+      return transport;
+    }
+
+    public void setTransport(String transport) {
+      this.transport = transport;
+    }
+
+    public Credentials getCredentials() {
+      return credentials;
+    }
+
+    public void setCredentials(Credentials credentials) {
+      this.credentials = credentials;
+    }
+
+    public List<String> getRegistries() {
+      return registries;
+    }
+
+    public void setRegistries(List<String> registries) {
+      this.registries = registries;
+    }
+
+    public static class Credentials {
+      @NotNull private String username;
+      @NotNull private String secret;
 
       // Must have no-argument constructor
-      public RegService() {}
+      public Credentials() {}
 
-      public RegService(String host, String transport, Credentials credentials) {
-        this.host = host;
-        this.transport = transport;
-        this.credentials = credentials;
+      public Credentials(String username, String secret) {
+        this.username = username;
+        this.secret = secret;
       }
 
-      public String getHost() {
-        return host;
+      public String getUsername() {
+        return username;
       }
 
-      public void setHost(String host) {
-        this.host = host;
+      public void setUsername(String username) {
+        this.username = username;
       }
 
-      public String getTransport() {
-        return transport;
+      public String getSecret() {
+        return secret;
       }
 
-      public void setTransport(String transport) {
-        this.transport = transport;
-      }
-
-      public Credentials getCredentials() {
-        return credentials;
-      }
-
-      public void setCredentials(Credentials credentials) {
-        this.credentials = credentials;
-      }
-
-      public List<String> getRegistries() {
-        return registries;
-      }
-
-      public void setRegistries(List<String> registries) {
-        this.registries = registries;
-      }
-
-      public static class Credentials {
-        @NotNull private String username;
-        @NotNull private String secret;
-
-        // Must have no-argument constructor
-        public Credentials() {}
-
-        public Credentials(String username, String secret) {
-          this.username = username;
-          this.secret = secret;
-        }
-
-        public String getUsername() {
-          return username;
-        }
-
-        public void setUsername(String username) {
-          this.username = username;
-        }
-
-        public String getSecret() {
-          return secret;
-        }
-
-        public void setSecret(String secret) {
-          this.secret = secret;
-        }
+      public void setSecret(String secret) {
+        this.secret = secret;
       }
     }
   }

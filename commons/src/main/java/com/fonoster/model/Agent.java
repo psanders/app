@@ -57,7 +57,6 @@ public class Agent {
     this.spec = spec;
   }
 
-  @JsonIgnore
   public ObjectId getId() {
     return id;
   }

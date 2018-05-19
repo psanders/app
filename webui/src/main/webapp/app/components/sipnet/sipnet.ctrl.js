@@ -80,16 +80,24 @@
 
         self.remove = function() {
             self.selected.forEach(function(agent) {
+                console.log(JSON.stringify(agent))
                 Agents.remove({agentId: agent.id}).$promise
                 .then(function(data) {
                     findAndRemove(self.agents.agents, 'id', agent.id);
                 }).catch(function(error) {
-                    console.log(JSON.stringify(error));
+                  toastMe(error.data.message, 7000);
+                  $scope.hasError = true;
                 });
             });
-            self.removed = self.selected;
-            self.selected = [];
-            removeToast("Removed " + self.removed.length + " agent/s", 7000);
+
+            // This prevents the remove message to be call if a prior error exist...
+            $timeout(function () {
+                if (!$scope.hasError) {
+                    self.removed = self.selected;
+                    self.selected = [];
+                    removeToast("Removed " + self.removed.length + " agent/s", 7000);
+                }
+            }, 1200);
         }
 
         function findAndRemove(array, property, value) {

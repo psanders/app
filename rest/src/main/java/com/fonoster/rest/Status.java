@@ -42,7 +42,7 @@ public enum Status {
             case "CONFLICT_2":
                 return "Found one or more dependent objects";
             case "INTERNAL_SERVER_ERROR":
-                return "Unauthorized";
+                return "Internal Server Error";
         }
         return "The execution of the service failed";
     }
