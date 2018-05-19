@@ -5,10 +5,10 @@
     angular.module('fnSIPNet').controller('SIPNetAgentsCtrl', SIPNetAgentsCtrl);
     angular.module('fnSIPNet').controller('SIPNetDomainsCtrl', SIPNetDomainsCtrl);
 
-    SIPNetAgentsCtrl.$inject = ['$location', '$q', '$timeout', '$mdToast', 'Agents', 'Domains'];
+    SIPNetAgentsCtrl.$inject = ['$scope', '$location', '$q', '$timeout', '$mdToast', 'Agents', 'Domains'];
     SIPNetDomainsCtrl.$inject = ['$scope', '$location', '$q', '$timeout', '$mdToast', 'Domains', 'Numbers'];
 
-    function SIPNetAgentsCtrl($location, $q, $timeout, $mdToast, Agents, Domains) {
+    function SIPNetAgentsCtrl($scope, $location, $q, $timeout, $mdToast, Agents, Domains) {
         var self = this;
         self.view = 'LIST'
         self.selected = [];
