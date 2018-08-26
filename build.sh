@@ -21,5 +21,5 @@ confirm && PACK='-p' && echo 'This might take a while. Go grab some coffee  :)'
 
 WORKDIR=$PWD
 cd webui/src/main/webapp/app && npm update && webpack $PACK
-cd $WORKDIR/app
+cd $WORKDIR
 gradle clean goJF jar war shadowJar
